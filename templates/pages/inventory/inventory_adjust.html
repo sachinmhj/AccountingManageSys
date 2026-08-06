@@ -14,24 +14,22 @@
                         onclick="event.stopPropagation();">Date</th>
                 <th>Entry No</th>
                 <th>Reference</th>
-                <th>Source Warehouse</th>
-                <th>Destination Warehouse</th>
+                <th>Amount</th>
             </tr>
         </thead>
         <tbody>
-            {% for transfer in transfers %}
+            {% for adjust in adjusts %}
             <tr>
                 <td>
                     <input 
                         type="checkbox"
                         class="row-checkbox"
                     >
-                    {{ transfer.date }}
+                    {{ adjust.date }}
                 </td>
-                <td>{{ transfer.entry_no }}</td>
-                <td>{{ transfer.reference }}</td>
-                <td>{{ transfer.source_warehouse }}</td>
-                <td>{{ transfer.destination_warehouse }}</td>
+                <td>{{ adjust.entry_no }}</td>
+                <td>{{ adjust.reference }}</td>
+                <td>{{ adjust.amount }}</td>
             </tr>
             {% empty %}
             <tr>

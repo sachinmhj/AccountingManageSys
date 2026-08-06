@@ -148,7 +148,7 @@
 
                 <li>
                     <div class="submenu-item-wrapper">
-                        <a href="#" class="{% if request.resolver_match.url_name == 'inventory_adjustment' %}submenu-active{% endif %}">
+                        <a href="{% url 'inventory_adjustment' %}" class="{% if request.resolver_match.url_name == 'inventory_adjustment' %}submenu-active{% endif %}">
                             Inventory Adjustment
                         </a>
                         <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
@@ -157,7 +157,7 @@
 
                 <li>
                     <div class="submenu-item-wrapper">
-                        <a href="#" class="{% if request.resolver_match.url_name == 'bill_material' %}submenu-active{% endif %}">
+                        <a href="{% url 'bill_material' %}" class="{% if request.resolver_match.url_name == 'bill_material' %}submenu-active{% endif %}">
                             Bills of Materials
                         </a>
                         <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
@@ -166,7 +166,7 @@
 
                 <li>
                     <div class="submenu-item-wrapper">
-                        <a href="#" class="{% if request.resolver_match.url_name == 'production_order' %}submenu-active{% endif %}">
+                        <a href="{% url 'production_order' %}" class="{% if request.resolver_match.url_name == 'production_order' %}submenu-active{% endif %}">
                             Production Orders
                         </a>
                         <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
@@ -175,7 +175,7 @@
 
                 <li>
                     <div class="submenu-item-wrapper">
-                        <a href="#" class="{% if request.resolver_match.url_name == 'production_journal' %}submenu-active{% endif %}">
+                        <a href="{% url 'production_journal' %}" class="{% if request.resolver_match.url_name == 'production_journal' %}submenu-active{% endif %}">
                             Production Journal
                         </a>
                         <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>

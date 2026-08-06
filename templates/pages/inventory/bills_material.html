@@ -11,27 +11,25 @@
                     <input 
                         type="checkbox"
                         class="select-checkbox"
-                        onclick="event.stopPropagation();">Date</th>
-                <th>Entry No</th>
-                <th>Reference</th>
-                <th>Source Warehouse</th>
-                <th>Destination Warehouse</th>
+                        onclick="event.stopPropagation();">Product Name</th>
+                <th>Finished Goods</th>
+                <th>Raw Materials</th>
+                <th>By Products</th>
             </tr>
         </thead>
         <tbody>
-            {% for transfer in transfers %}
+            {% for bill in bills %}
             <tr>
                 <td>
                     <input 
                         type="checkbox"
                         class="row-checkbox"
                     >
-                    {{ transfer.date }}
+                    {{ bill.product_name }}
                 </td>
-                <td>{{ transfer.entry_no }}</td>
-                <td>{{ transfer.reference }}</td>
-                <td>{{ transfer.source_warehouse }}</td>
-                <td>{{ transfer.destination_warehouse }}</td>
+                <td>{{ bill.finished_goods }}</td>
+                <td>{{ bill.raw_materials }}</td>
+                <td>{{ bill.by_products }}</td>
             </tr>
             {% empty %}
             <tr>
