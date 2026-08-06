@@ -83,6 +83,55 @@ class InventoryProductView(TemplateView):
         ]
         context["products"] = []
         return context
+    
+
+class VariantProductView(TemplateView):
+    template_name = "pages/inventory/variant_product.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Variant Products"
+        context["tabs"] = [
+            "Product",
+            "Service"
+        ]
+        context["products"] = []
+        return context
+
+class VariantAttributeView(TemplateView):
+    template_name = "pages/inventory/variant_attribute.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Variant Attributes"
+        context["attributes"] = []
+        return context
+
+class ProductCategoryView(TemplateView):
+    template_name = "pages/inventory/product_category.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Product Categories"
+        context["categories"] = []
+        return context
+
+class WarehouseTransferView(TemplateView):
+
+    template_name = "pages/inventory/warehouse_transfer.html"
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context["title"] = "Warehouse Transfer"
+
+        context["tabs"] = [
+            "Approved",
+            "Draft"
+        ]
+
+        context["transfers"] = []
+
+        return
 
 
 

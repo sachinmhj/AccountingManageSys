@@ -1,0 +1,63 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/invoice.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="invoice-page">
+    {% include "components/erp_list_header.html" %}
+<div class="invoice-table-container">
+<table class="invoice-table">
+    <thead>
+        <tr>
+            <th>
+                <input 
+                    type="checkbox"
+                    class="select-checkbox"
+                    onclick="event.stopPropagation();">
+                Name
+            </th>
+            <th>Parent</th>
+        </tr>
+    </thead>
+
+<tbody>
+{% for product in products %}
+<tr>
+    <td>
+        <div class="product-name">
+            <input type="checkbox" class="row-checkbox">
+            {{ product.name }}
+        </div>
+
+        <div class="general-row">
+            <label>
+                <input type="checkbox" class="row-checkbox">
+                General
+            </label>
+
+            <div class="action-menu">
+                <button class="dots-btn" onclick="toggleMenu(event,this)">
+                    ⋮
+                </button>
+
+                <div class="dropdown-menu">
+                    <a href="#">Edit</a>
+                    <a href="#">Delete</a>
+                </div>
+            </div>
+        </div>
+    </td>
+
+    <td>
+        {{ product.parent }}
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+{% endblock %}

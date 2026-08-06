@@ -556,3 +556,47 @@
 .hidden{
     display:none !important;
 }
+/* product category */
+.product-name{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.general-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:8px;
+    padding-left:24px;
+}
+
+.action-menu{
+    position:relative;
+}
+
+.dots-btn{
+    background:none;
+    border:none;
+    font-size:22px;
+    cursor:pointer;
+}
+
+.dropdown-menu{
+    display:none;
+    position:absolute;
+    right:0;
+    top:25px;
+    background:white;
+    border:1px solid #ddd;
+    border-radius:6px;
+    min-width:100px;
+    z-index:100;
+}
+
+.dropdown-menu a{
+    display:block;
+    padding:8px 12px;
+    text-decoration:none;
+    color:#333;
+}

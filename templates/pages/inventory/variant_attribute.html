@@ -1,0 +1,70 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="invoice-page">
+    <div class="invoice-header">
+
+        <div class="invoice-tabs">
+
+        <h2>{{ title }}</h2>
+
+        {% for tab in tabs %}
+        <button class="tab {% if forloop.first %}active{% endif %}"
+                onclick="changeTab(this)">
+            {{ tab }}
+        </button>
+        {% endfor %}
+
+        </div>
+
+        <div class="header-actions">
+
+        <button class="activity-btn"
+                type="button"
+                onclick="openActivity()">
+
+            <i class='bx bx-history'></i>
+
+        </button>
+
+        <button class="new-btn" type="button">
+
+            <i class='bx bx-plus'></i>
+            <span>New</span>
+
+        </button>
+
+        </div>
+
+    </div>
+    <!-- {% include "components/erp_list_header.html" %}
+      -->
+<div class="invoice-table-container">
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th>
+                <th>Name</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for attribute in attributes %}
+            <tr>
+                <td>{{ attribute.name }}</td>
+                <td>{{ attribute.options }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="empty">
+                    No attributes found
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div></div>
+</div>
+</div>
+{% endblock %}

@@ -9,6 +9,10 @@ from .views import (
     ExpensesView,
     SupplierPaymentView,
     InventoryProductView,
+    VariantProductView,
+    VariantAttributeView,
+    ProductCategoryView,
+    WarehouseTransferView,
 )
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
@@ -20,5 +24,9 @@ urlpatterns = [
     path("purchase/",PurchaseView.as_view(),name="purchase"),
     path("purchase/expenses/", ExpensesView.as_view(), name="expenses"),
     path("purchase/supplier-payment/",SupplierPaymentView.as_view(),name="supplier_payment"),
+    path("inventory/variant-product/",VariantProductView.as_view(),name="variant_product"),
+    path("inventory/variant-attribute/",VariantAttributeView.as_view(),name="variant_attribute"),
+    path("inventory/product-category/",ProductCategoryView.as_view(),name="product_category"),
+    path("inventory/warehouse-transfer/",WarehouseTransferView.as_view(),name="warehouse_transfer"),
 
 ]
