@@ -1,0 +1,249 @@
+<aside class="sidebar">
+
+    <!-- <div class="brand">
+        <div class="brand-icon"></div>
+        <span>ERP System</span>
+    </div> -->
+
+    <ul class="menu">
+
+        <!-- ================= Dashboard ================= -->
+
+        <li class="menu-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+
+            <a href="{% url 'home' %}" class="menu-link">
+
+                <div class="menu-left">
+                    <i class='bx bx-home-alt'></i>
+                    <span>Dashboard</span>
+                </div>
+
+            </a>
+
+        </li>
+
+
+        <!-- ================= Sales ================= -->
+
+        <li class="menu-item has-submenu {% if request.resolver_match.url_name == 'invoice' or request.resolver_match.url_name == 'customer_payment' %}open{% endif %}">
+
+            <div class="menu-link submenu-toggle">
+
+                <div class="menu-left">
+                    <i class='bx bx-line-chart'></i>
+                    <span>Sales</span>
+                </div>
+
+                <i class='bx bx-chevron-right submenu-arrow'></i>
+
+            </div>
+
+            <ul class="submenu">
+
+                <li>
+                    <div class="submenu-item-wrapper">
+
+                        <a href="{% url 'invoice' %}"
+                           class="{% if request.resolver_match.url_name == 'invoice' %}submenu-active{% endif %}">
+                            Invoices
+                        </a>
+
+                        <a href="#" class="add-icon">
+                            <i class='bx bx-plus'></i>
+                        </a>
+
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+
+                        <a href="{% url 'customer_payment' %}"
+                           class="{% if request.resolver_match.url_name == 'customer_payment' %}submenu-active{% endif %}">
+                            Customer Payments
+                        </a>
+
+                        <a href="#" class="add-icon">
+                            <i class='bx bx-plus'></i>
+                        </a>
+
+                    </div>
+                </li>
+
+            </ul>
+
+        </li>
+
+
+        <!-- ================= Inventory ================= -->
+
+        <li class="menu-item has-submenu {% if request.resolver_match.url_name == 'inventory_product' or request.resolver_match.url_name == 'variant_product' or request.resolver_match.url_name == 'variant_attribute' or request.resolver_match.url_name == 'product_category' or request.resolver_match.url_name == 'unit_measurement' or request.resolver_match.url_name == 'warehouse_transfer' or request.resolver_match.url_name == 'inventory_adjustment' or request.resolver_match.url_name == 'bill_material' or request.resolver_match.url_name == 'production_order' or request.resolver_match.url_name == 'production_journal' %}open{% endif %}">
+
+            <div class="menu-link submenu-toggle">
+
+                <div class="menu-left">
+                    <i class='bx bx-package'></i>
+                    <span>Inventory</span>
+                </div>
+
+                <i class='bx bx-chevron-right submenu-arrow'></i>
+
+            </div>
+
+            <ul class="submenu">
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="{% url 'inventory_product' %}" class="{% if request.resolver_match.url_name == 'inventory_product' %}submenu-active{% endif %}">
+                            Products
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="#" class="{% if request.resolver_match.url_name == 'variant_product' %}submenu-active{% endif %}">
+                            Variant Products
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="#" class="{% if request.resolver_match.url_name == 'variant_attribute' %}submenu-active{% endif %}">
+                            Variant Attributes
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="#" class="{% if request.resolver_match.url_name == 'product_category' %}submenu-active{% endif %}">
+                            Product Category
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="#" class="{% if request.resolver_match.url_name == 'unit_measurement' %}submenu-active{% endif %}">
+                            Units of Measurement
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="#" class="{% if request.resolver_match.url_name == 'warehouse_transfer' %}submenu-active{% endif %}">
+                            Warehouse Transfer
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="#" class="{% if request.resolver_match.url_name == 'inventory_adjustment' %}submenu-active{% endif %}">
+                            Inventory Adjustment
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="#" class="{% if request.resolver_match.url_name == 'bill_material' %}submenu-active{% endif %}">
+                            Bills of Materials
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="#" class="{% if request.resolver_match.url_name == 'production_order' %}submenu-active{% endif %}">
+                            Production Orders
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="#" class="{% if request.resolver_match.url_name == 'production_journal' %}submenu-active{% endif %}">
+                            Production Journal
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+            </ul>
+
+        </li>
+
+
+        <!-- ================= Purchase ================= -->
+
+        <li class="menu-item has-submenu {% if request.resolver_match.url_name == 'purchase' or request.resolver_match.url_name == 'expenses' or request.resolver_match.url_name == 'supplier_payment' %}open{% endif %}">
+
+            <div class="menu-link submenu-toggle">
+
+                <div class="menu-left">
+                    <i class='bx bx-cart'></i>
+                    <span>Purchase</span>
+                </div>
+
+                <i class='bx bx-chevron-right submenu-arrow'></i>
+
+            </div>
+
+            <ul class="submenu">
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="{% url 'purchase' %}" class="{% if request.resolver_match.url_name == 'purchase' %}submenu-active{% endif %}">
+                            Purchase Bills
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="{% url 'expenses' %}" class="{% if request.resolver_match.url_name == 'expenses' %}submenu-active{% endif %}">
+                            Expenses
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="#">
+                            Assets
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="{% url 'supplier_payment' %}" class="{% if request.resolver_match.url_name == 'supplier_payment' %}submenu-active{% endif %}">
+                            Supplier Payments
+                        </a>
+                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                    </div>
+                </li>
+
+            </ul>
+
+        </li>
+
+    </ul>
+
+</aside>

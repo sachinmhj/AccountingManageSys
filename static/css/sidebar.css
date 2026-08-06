@@ -1,0 +1,263 @@
+/* ======================================================
+   SIDEBAR
+====================================================== */
+
+/* .sidebar{
+    grid-column:1;
+    grid-row:2;
+    background:#ffffff;
+    border-right:1px solid #e5e7eb;
+    overflow-y:auto;
+} */
+
+/* ======================================================
+   BRAND
+====================================================== */
+
+.brand{
+    height:54px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:0 16px;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.brand-icon{
+    width:14px;
+    height:14px;
+    background:#198754;
+    border-radius:2px;
+    flex-shrink:0;
+}
+
+.brand span{
+    font-size:15px;
+    font-weight:600;
+    color:#333;
+    white-space:nowrap;
+}
+
+/* ======================================================
+   MENU
+====================================================== */
+
+.menu{
+    list-style:none;
+    margin:0;
+    padding:6px 0;
+}
+
+.menu-item{
+    margin:0;
+    padding:0;
+}
+
+/* ======================================================
+   MAIN MENU
+====================================================== */
+
+.menu-link{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    height:38px;
+    padding:0 16px;
+    color:#444;
+    text-decoration:none;
+    cursor:pointer;
+    transition:background .15s;
+}
+
+.menu-link:hover{
+    background:#f5f6f8;
+}
+
+.menu-link:hover .menu-left i,
+.menu-link:hover .menu-left span,
+.menu-link:hover .submenu-arrow{
+    color:#198754 !important;
+}
+
+.menu-left{
+    display:flex;
+    align-items:center;
+    flex:1;
+    min-width:0;
+    gap:12px;
+}
+
+.menu-left i{
+    width:18px;
+    font-size:18px;
+    color:#666;
+    text-align:center;
+    flex-shrink:0;
+}
+
+.menu-left span{
+    font-size:14px;
+    font-weight:500;
+    color:#444;
+    white-space:nowrap;
+}
+
+/* ======================================================
+   ACTIVE
+====================================================== */
+
+.menu-item.active>.menu-link{
+    background:#edf7f1;
+    border-left:3px solid #198754;
+    padding-left:13px;
+}
+
+.menu-item.active>.menu-link i,
+.menu-item.active>.menu-link span{
+    color:#198754;
+    font-weight:600;
+}
+
+/* ======================================================
+   SUBMENU ARROW
+====================================================== */
+
+.submenu-arrow{
+    font-size:18px;
+    color:#888;
+    transition:transform .2s ease;
+    flex-shrink:0;
+}
+
+.menu-item.open>.menu-link .submenu-arrow{
+    transform:rotate(90deg);
+}
+
+/* ======================================================
+   SUBMENU
+====================================================== */
+
+.submenu{
+    display:none;
+    list-style:none;
+    margin:0;
+    padding:0;
+    padding-left:34px;
+}
+
+.menu-item.open>.submenu{
+    display:block;
+}
+
+.submenu li{
+    margin:0;
+    padding:0;
+}
+
+/* ======================================================
+   SUBMENU ROW
+====================================================== */
+
+.submenu-item-wrapper{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    height:34px;
+    padding-right:10px;
+}
+.submenu-item-wrapper:hover > a:first-child{
+    color:#198754 !important;
+}
+
+.submenu-item-wrapper:hover .add-icon i{
+    color:#198754 !important;
+}
+
+
+
+/* ======================================================
+   SUBMENU LINK
+====================================================== */
+
+.submenu-item-wrapper > a:first-child{
+    flex:1;
+    display:flex;
+    align-items:center;
+
+    height:34px;
+
+    padding:0 8px;
+
+    text-decoration:none;
+    color:#555;
+
+    font-size:14px;
+    font-weight:400;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+
+/* ======================================================
+   ADD ICON
+====================================================== */
+
+.add-icon{
+    width:18px;
+    height:34px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    margin-left:8px;
+
+    text-decoration:none !important;
+
+    background:transparent !important;
+    border:none;
+
+    flex-shrink:0;
+
+    position:relative;
+    top:-1px;
+}
+
+.add-icon i{
+    color:#777 !important;
+    font-size:18px;
+    line-height:1;
+}
+
+.add-icon:hover,
+.add-icon:focus,
+.add-icon:active{
+    background:transparent !important;
+    color:#198754 !important;
+}
+
+.add-icon:hover i{
+    color:#198754 !important;
+}
+/* ======================================================
+   SCROLLBAR
+====================================================== */
+
+.sidebar::-webkit-scrollbar{
+    width:5px;
+}
+
+.sidebar::-webkit-scrollbar-track{
+    background:#fafafa;
+}
+
+.sidebar::-webkit-scrollbar-thumb{
+    background:#d2d2d2;
+    border-radius:8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover{
+    background:#bdbdbd;
+}

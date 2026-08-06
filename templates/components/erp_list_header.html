@@ -1,0 +1,122 @@
+<div class="invoice-header">
+
+    <div class="invoice-tabs">
+
+        <h2>{{ title }}</h2>
+
+        {% for tab in tabs %}
+        <button class="tab {% if forloop.first %}active{% endif %}"
+                onclick="changeTab(this)">
+            {{ tab }}
+        </button>
+        {% endfor %}
+
+    </div>
+
+    <div class="header-actions">
+
+        <button class="activity-btn"
+                type="button"
+                onclick="openActivity()">
+
+            <i class='bx bx-history'></i>
+
+        </button>
+
+        <button class="new-btn" type="button">
+
+            <i class='bx bx-plus'></i>
+            <span>New</span>
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<div class="invoice-tools">
+
+    <div class="search-wrapper">
+
+        <span class="search-icon">
+
+            <i class='bx bx-search'></i>
+
+        </span>
+
+        <input
+            type="text"
+            class="search-box"
+            placeholder="Search">
+
+    </div>
+
+
+    <div class="list-actions">
+
+        <div class="pagination">
+
+            <button type="button">
+
+                <i class='bx bx-chevron-left'></i>
+
+            </button>
+
+            <span>0 - 0 of 0</span>
+
+            <button type="button">
+
+                <i class='bx bx-chevron-right'></i>
+
+            </button>
+
+        </div>
+
+
+        <div class="options-dropdown">
+
+            <button
+                class="options-btn"
+                type="button"
+                onclick="toggleOptions(event)">
+
+                Options
+
+                <i class='bx bx-chevron-down'></i>
+
+            </button>
+
+
+            <div class="options-menu" id="optionsMenu">
+
+                <div>Export</div>
+
+                <div>Import</div>
+
+                <div>Voided Records</div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function changeTab(clickedTab){
+
+    const tabs = clickedTab.parentElement.querySelectorAll(".tab");
+
+    tabs.forEach(function(tab){
+        tab.classList.remove("active");
+    });
+
+    clickedTab.classList.add("active");
+
+}
+
+</script>

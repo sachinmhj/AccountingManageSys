@@ -1,0 +1,84 @@
+/* ===== Menu Group ===== */
+
+.menu-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:9px 12px;
+    margin:2px 6px;
+    border-radius:4px;
+    cursor:pointer;
+    color:#444;
+    transition:background .15s;
+}
+
+.menu-header:hover{
+    background:#f3f4f6;
+}
+
+/* ===== Left Side ===== */
+
+.menu-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.menu-left i{
+    width:18px;
+    font-size:16px;
+    text-align:center;
+}
+
+/* ===== Arrow ===== */
+
+.arrow{
+    font-size:13px;
+    color:#777;
+    transition:transform .2s;
+}
+
+.menu-group.open .arrow{
+    transform:rotate(180deg);
+}
+
+/* ===== Submenu ===== */
+
+.submenu{
+    display:none;
+    list-style:none;
+    padding-left:34px;
+    margin-top:2px;
+}
+
+.menu-group.open .submenu{
+    display:block;
+}
+
+/* ===== Submenu Items ===== */
+
+.submenu li{
+    margin:2px 0;
+}
+
+.submenu li a{
+    display:block;
+    padding:8px 10px;
+    text-decoration:none;
+    border-radius:4px;
+    color:#555;
+    font-size:13px;
+    transition:background .15s;
+}
+
+.submenu li:hover a{
+    background:#f5f5f5;
+}
+
+/* ===== Active ===== */
+
+.submenu li.active a{
+    background:#e8f5ee;
+    color:#198754;
+    font-weight:600;
+}

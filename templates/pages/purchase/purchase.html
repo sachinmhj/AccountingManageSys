@@ -1,0 +1,109 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="invoice-page">
+
+
+    {% include "components/erp_list_header.html" %}
+
+
+    <div class="invoice-table-container">
+
+        <table class="invoice-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+
+                        <input 
+                            type="checkbox"
+                            class="select-checkbox"
+                        >
+
+                        Suppliers
+
+                    </th>
+
+                    <th>
+                        Bill No
+                    </th>
+
+                    <th>
+                        Reference No
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Total
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for purchase in purchases %}
+
+                <tr>
+
+                    <td>
+
+                        <input 
+                            type="checkbox"
+                            class="row-checkbox"
+                        >
+
+                        {{ purchase.suppliers }}
+
+                    </td>
+
+                    <td>
+                        {{ purchase.bill_no }}
+                    </td>
+
+                    <td>
+                        {{ purchase.reference_no }}
+                    </td>
+
+                    <td>
+                        {{ purchase.date }}
+                    </td>
+
+                    <td>
+                        {{ purchase.total }}
+                    </td>
+
+                </tr>
+
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="5" class="empty">
+                        No purchase bills found
+                    </td>
+
+                </tr>
+
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

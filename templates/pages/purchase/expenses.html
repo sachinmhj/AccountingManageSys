@@ -1,0 +1,60 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="invoice-page">
+
+    {% include "components/erp_list_header.html" with title="Expenses" tabs=tabs %}
+
+    <div class="invoice-table-container">
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox"class="select-checkbox">Expense Name </th>
+                    <th>
+                        Reference No
+                    </th>
+                    <th>
+                        Date
+                    </th>
+                    <th>
+                        Category
+                    </th>
+                    <th>
+                        Amount
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td>
+                        {{ expense.name }}
+                    </td>
+                    <td>
+                        {{ expense.reference }}
+                    </td>
+                    <td>
+                        {{ expense.date }}
+                    </td>
+                    <td>
+                        {{ expense.category }}
+                    </td>
+                    <td>
+                        {{ expense.amount }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty">
+                        No expenses found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
