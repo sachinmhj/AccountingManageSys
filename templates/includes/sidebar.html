@@ -103,7 +103,7 @@
 
                 <li>
                     <div class="submenu-item-wrapper">
-                        <a href="#" class="{% if request.resolver_match.url_name == 'variant_product' %}submenu-active{% endif %}">
+                        <a href="{% url 'variant_product' %}" class="{% if request.resolver_match.url_name == 'variant_product' %}submenu-active{% endif %}">
                             Variant Products
                         </a>
                         <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
@@ -112,7 +112,7 @@
 
                 <li>
                     <div class="submenu-item-wrapper">
-                        <a href="#" class="{% if request.resolver_match.url_name == 'variant_attribute' %}submenu-active{% endif %}">
+                        <a href="{% url 'variant_attribute' %}" class="{% if request.resolver_match.url_name == 'variant_attribute' %}submenu-active{% endif %}">
                             Variant Attributes
                         </a>
                         <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
@@ -121,7 +121,7 @@
 
                 <li>
                     <div class="submenu-item-wrapper">
-                        <a href="#" class="{% if request.resolver_match.url_name == 'product_category' %}submenu-active{% endif %}">
+                        <a href="{% url 'product_category' %}" class="{% if request.resolver_match.url_name == 'product_category' %}submenu-active{% endif %}">
                             Product Category
                         </a>
                         <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
@@ -139,7 +139,7 @@
 
                 <li>
                     <div class="submenu-item-wrapper">
-                        <a href="#" class="{% if request.resolver_match.url_name == 'warehouse_transfer' %}submenu-active{% endif %}">
+                        <a href="{% url 'warehouse_transfer' %}" class="{% if request.resolver_match.url_name == 'warehouse_transfer' %}submenu-active{% endif %}">
                             Warehouse Transfer
                         </a>
                         <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>

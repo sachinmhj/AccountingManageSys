@@ -11,30 +11,32 @@
                     <input 
                         type="checkbox"
                         class="select-checkbox"
-                        onclick="event.stopPropagation();">Code/SKU</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Tax</th>
+                        onclick="event.stopPropagation();">Date</th>
+                <th>Entry No</th>
+                <th>Reference</th>
+                <th>Source Warehouse</th>
+                <th>Destination Warehouse</th>
             </tr>
         </thead>
         <tbody>
-            {% for product in products %}
+            {% for transfer in transfers %}
             <tr>
                 <td>
                     <input 
                         type="checkbox"
                         class="row-checkbox"
                     >
-                    {{ product.code }}
+                    {{ transfer.date }}
                 </td>
-                <td>{{ product.name }}</td>
-                <td>{{ product.category }}</td>
-                <td>{{ product.tax }}</td>
+                <td>{{ transfer.entry_no }}</td>
+                <td>{{ transfer.reference }}</td>
+                <td>{{ transfer.source_warehouse }}</td>
+                <td>{{ transfer.destination_warehouse }}</td>
             </tr>
             {% empty %}
             <tr>
                 <td colspan="6" class="empty">
-                    No products found
+                    No Data found
                 </td>
             </tr>
             {% endfor %}
