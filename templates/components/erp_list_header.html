@@ -25,13 +25,16 @@
 
         </button>
 
+        {% if new_url %}
         <button class="new-btn"
                 type="button"
                 onclick="window.location.href='{% url new_url %}'">
 
             <i class='bx bx-plus'></i>
             <span>New</span>
+
         </button>
+        {% endif %}
 
     </div>
 
