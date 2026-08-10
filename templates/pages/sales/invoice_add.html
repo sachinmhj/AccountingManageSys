@@ -1,0 +1,632 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/invoice_add.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="invoice-add-page">
+
+    <div class="invoice-add-header">
+        <div class="invoice-add-title">
+            <h2>Add New Invoice</h2>
+            <a href="#">HeadOffice (HO)</a>
+        </div>
+
+        <div class="invoice-add-actions">
+            <button type="submit" form="invoiceAddForm" class="invoice-save-btn">Save</button>
+            <button type="button" class="invoice-close-btn" onclick="goBackToInvoices()">×</button>
+        </div>
+    </div>
+
+    <div class="invoice-add-body">
+        <form id="invoiceAddForm" method="POST">
+            {% csrf_token %}
+
+            <div class="invoice-form-grid">
+                <!-- Customer Picker -->
+                <div class="invoice-form-group col-span-8 customer-picker-container" onclick="event.stopPropagation();">
+                    <label>Customer Name <span>*</span></label>
+                    <input type="hidden" name="customer" id="selectedCustomerId" required>
+                    
+                    <div class="custom-select-trigger" onclick="toggleCustomerDropdown(event)">
+                        <input type="text" 
+                               id="customerSearchInput" 
+                               class="customer-input-field"
+                               placeholder="Customer Name" 
+                               oninput="filterCustomers()">
+                        <span class="search-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </span>
+                    </div>
+
+                    <div class="custom-dropdown-popup" id="customerDropdownPopup">
+                        <div class="dropdown-options-list" id="customerOptionsList">
+                            <div class="dropdown-option-item" onclick="selectCustomer('Cash Customer (Customer)', 'CUS0001', event)">
+                                <span class="customer-name">Cash Customer (Customer)</span>
+                                <span class="customer-code">CUS0001</span>
+                            </div>
+                        </div>
+                        <div class="dropdown-add-new-row">
+                            <button type="button" class="btn-add-new" onclick="addNewCustomer(event)">+ Add New</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>Reference No</label>
+                    <input type="text" name="reference" placeholder="Reference Number">
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>Invoice Code</label>
+                    <input type="text" value="DRAFT" readonly>
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>Invoice Date <span>*</span></label>
+                    <input type="date" name="invoice_date" required>
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>Due Date <span>*</span></label>
+                    <input type="date" name="due_date" required>
+                </div>
+
+                <div class="invoice-form-group col-span-6">
+                    <label>Currency</label>
+                    <select name="currency">
+                        <option value="NPR">Nepalese Rupee</option>
+                        <option value="JPY">Japanese Yen</option>
+                        <option value="USD">US Dollar</option>
+                        <option value="EUR">Euro</option>
+                        <option value="CNY">Chinese Yuan</option>
+                        <option value="CHF">Swiss Franc</option>
+                        <option value="INR">Indian Rupee</option>
+                    </select>
+                </div>
+
+                <div class="invoice-form-group col-span-6">
+                    <label>Exchange Rate To NPR <span>*</span></label>
+                    <input type="number" name="exchange_rate" value="1" step="0.01" required>
+                </div>
+            </div>
+            <div class="invoice-export-section">
+                <label>
+                    <input type="checkbox" id="exportSalesToggle" name="is_export" onchange="toggleExportFields()">
+                    This is export sales
+                </label>
+            </div>
+
+            <div id="exportFieldsGroup" class="invoice-form-grid export-fields-grid" style="display: none;">
+                <div class="invoice-form-group col-span-4">
+                    <label>Country</label>
+                    <select name="export_country" id="exportCountrySelect">
+                        <option value="" disabled selected>Country</option>
+                    </select>
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>Date</label>
+                    <input type="date" name="export_date" placeholder="DD-MM-YYYY (AD)">
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>Document No</label>
+                    <input type="text" name="export_document_no" placeholder="Document No">
+                </div>
+            </div>
+            <div class="invoice-items-section">
+                <div class="invoice-items-header">
+                    <div>Product / service</div>
+                    <div>Qty</div>
+                    <div>Rate</div>
+                    <div>Discount</div>
+                    <div>Tax</div>
+                    <div>Amount</div>
+                </div>
+
+                <div class="invoice-item-row">
+                    <!-- Product Custom Picker -->
+                    <div class="product-picker-container" onclick="event.stopPropagation();">
+                        <input type="hidden" name="product" id="selectedProductId">
+                        <div class="custom-select-trigger" onclick="toggleProductDropdown(event)">
+                            <input type="text" 
+                                   id="productSearchInput" 
+                                   class="product-input-field" 
+                                   placeholder="Add Code or Product" 
+                                   readonly>
+                            <span class="chevron-icon">▼</span>
+                        </div>
+
+                        <div class="custom-dropdown-popup product-popup" id="productDropdownPopup">
+                            <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                                <button type="button" class="btn-add-new" onclick="openProductModal(event)">+ Add New</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TDS Switch Section -->
+            <div class="invoice-tds-section">
+                <label class="invoice-switch">
+                    <input type="checkbox" id="tdsApplicableToggle" name="tds_applicable" onchange="toggleTdsFields()">
+                    <span class="invoice-slider"></span>
+                </label>
+                <strong>TDS is applicable</strong>
+            </div>
+
+            <div id="tdsFieldsGroup" class="invoice-form-grid tds-fields-grid" style="display: none;">
+                <div class="invoice-form-group col-span-4">
+                    <label>TDS Account <span>*</span></label>
+                    <select name="tds_account">
+                        <option value="" disabled selected>Select Account</option>
+                    </select>
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>TDS Type <span>*</span></label>
+                    <select name="tds_type">
+                        <option value="" disabled selected></option>
+                    </select>
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>TDS Amount <span>*</span></label>
+                    <input type="number" name="tds_amount" placeholder="TDS Amount" step="0.01">
+                </div>
+            </div>
+
+            <button type="button" class="invoice-add-option">+ Add Terms and Conditions</button>
+            <button type="button" class="invoice-add-option">+ Add Reporting Tags</button>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="productModalOverlay">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>New Product/Service</h3>
+            <button type="button" class="modal-close-btn" onclick="closeProductModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <form id="newProductForm">
+                <div class="modal-form-group">
+                    <label>Type of Product <span>*</span></label>
+                    <div class="product-type-toggle">
+                        <button type="button" class="type-btn active" id="typeGoodsBtn" onclick="setProductType('Goods')">Goods</button>
+                        <button type="button" class="type-btn" id="typeServicesBtn" onclick="setProductType('Services')">Services</button>
+                    </div>
+                    <input type="hidden" name="product_type" id="productTypeValue" value="Goods">
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Name <span>*</span></label>
+                    <input type="text" name="product_name" placeholder="Name" required>
+                </div>
+
+                <div class="modal-grid-2">
+                    <div class="modal-form-group">
+                        <label>Code</label>
+                        <input type="text" name="product_code" value="P0001" readonly>
+                    </div>
+
+                    <div class="modal-form-group category-picker-container" onclick="event.stopPropagation();">
+                        <label>Category <span>*</span></label>
+                        <input type="hidden" name="product_category" id="selectedCategoryId" required>
+                        
+                        <div class="custom-select-trigger" onclick="toggleCategoryDropdown(event)">
+                            <input type="text" 
+                                   id="categorySearchInput" 
+                                   class="modal-input-field" 
+                                   placeholder="Category Name" 
+                                   readonly>
+                            <span class="chevron-icon">▼</span>
+                        </div>
+
+                        <div class="custom-dropdown-popup category-popup" id="categoryDropdownPopup">
+                            <div class="dropdown-options-list" id="categoryOptionsList">
+                                <div class="dropdown-option-item" onclick="selectCategory('General', event)">General</div>
+                            </div>
+                            <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                                <button type="button" class="btn-add-new" onclick="openCategoryModal(event)">+ Add New</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-grid-2">
+                    <div class="modal-form-group">
+                        <label>Tax</label>
+                        <select name="product_tax">
+                            <option value="No Vat">No Vat</option>
+                            <option value="13% VAT">13% VAT</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-form-group unit-picker-container" onclick="event.stopPropagation();">
+                        <label>Primary Unit <span>*</span></label>
+                        <input type="hidden" name="primary_unit" id="selectedUnitId" required>
+                        
+                        <div class="custom-select-trigger" onclick="toggleUnitDropdown(event)">
+                            <input type="text" 
+                                   id="unitSearchInput" 
+                                   class="modal-input-field" 
+                                   placeholder="Primary Unit" 
+                                   readonly>
+                            <span class="chevron-icon">▼</span>
+                        </div>
+
+                        <div class="custom-dropdown-popup unit-popup" id="unitDropdownPopup">
+                            <div class="dropdown-options-list" id="unitOptionsList">
+                                <div class="dropdown-option-item" onclick="selectUnit('Bag', event)">Bag</div>
+                                <div class="dropdown-option-item" onclick="selectUnit('Can', event)">Can</div>
+                                <div class="dropdown-option-item" onclick="selectUnit('Box', event)">Box</div>
+                                <div class="dropdown-option-item" onclick="selectUnit('Carton', event)">Carton</div>
+                                <div class="dropdown-option-item" onclick="selectUnit('Cubic Feet', event)">Cubic Feet</div>
+                                <div class="dropdown-option-item" onclick="selectUnit('Kg', event)">Kg</div>
+                                <div class="dropdown-option-item" onclick="selectUnit('Piece', event)">Piece</div>
+                            </div>
+                            <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                                <button type="button" class="btn-add-new" onclick="openUnitModal(event)">+ Add New</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-grid-2">
+                    <div class="modal-form-group">
+                        <label>HS Code</label>
+                        <input type="text" name="hs_code" placeholder="HS Code">
+                    </div>
+
+                    <div class="modal-form-group">
+                        <label>Location</label>
+                        <select name="location">
+                            <option value="All">Select Location &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-toggle-group">
+                    <label class="invoice-switch">
+                        <input type="checkbox" name="available_for_sale" checked>
+                        <span class="invoice-slider"></span>
+                    </label>
+                    <strong>Available For Sale</strong>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-save-btn" onclick="saveNewProduct()">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay nested-modal-overlay" id="categoryModalOverlay">
+    <div class="modal-card category-modal-card">
+        <div class="modal-header">
+            <h3>New Category</h3>
+            <button type="button" class="modal-close-btn" onclick="closeCategoryModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <form id="newCategoryForm">
+                <div class="modal-form-group">
+                    <label>Name <span>*</span></label>
+                    <input type="text" id="newCategoryName" name="category_name" placeholder="Name" required>
+                </div>
+
+                <div class="modal-form-group">
+                    <label for="underCategorySelect">Under Category</label>
+                    <select id="underCategorySelect" name="parent_category" class="category-select" required>
+                        <option value="" disabled selected hidden>Select a category...</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Description</label>
+                    <input type="text" name="category_description" placeholder="Description">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-save-btn" onclick="saveNewCategory()">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay nested-modal-overlay" id="unitModalOverlay">
+    <div class="modal-card unit-modal-card">
+        <div class="modal-header">
+            <h3>New Primary Unit</h3>
+            <button type="button" class="modal-close-btn" onclick="closeUnitModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <form id="newUnitForm">
+                <div class="modal-form-group">
+                    <label>Unit Name <span>*</span></label>
+                    <input type="text" id="newUnitName" name="unit_name" placeholder="e.g. Meter, Liter" required>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Short Name</label>
+                    <input type="text" id="newUnitSymbol" name="unit_symbol" placeholder="e.g. m, L">
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Description</label>
+                    <input type="text" name="category_description"  placeholder="Description ">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-save-btn" onclick="saveNewUnit()">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+const allCountries = [
+    "Afghanistan", "Åland Islands", "Albania", "Algeria", "American Samoa", "Andorra", "Angola", "Anguilla",
+    "Antarctica", "Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan",
+    "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan",
+    "Bolivia", "Bonaire, Sint Eustatius and Saba", "Bosnia and Herzegovina", "Botswana", "Bouvet Island", "Brazil",
+    "British Indian Ocean Territory", "Brunei Darussalam", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde",
+    "Cambodia", "Cameroon", "Canada", "Cayman Islands", "Central African Republic", "Chad", "Chile", "China",
+    "Christmas Island", "Cocos (Keeling) Islands", "Colombia", "Comoros", "Congo", "Congo (Democratic Republic)",
+    "Cook Islands", "Costa Rica", "Côte d'Ivoire", "Croatia", "Cuba", "Curaçao", "Cyprus", "Czechia", "Denmark",
+    "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea",
+    "Estonia", "Eswatini", "Ethiopia", "Falkland Islands", "Faroe Islands", "Fiji", "Finland", "France", "French Guiana",
+    "French Polynesia", "French Southern Territories", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar",
+    "Greece", "Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guernsey", "Guinea", "Guinea-Bissau",
+    "Guyana", "Haiti", "Heard Island and McDonald Islands", "Holy See", "Honduras", "Hong Kong", "Hungary", "Iceland",
+    "India", "Indonesia", "Iran", "Iraq", "Ireland", "Isle of Man", "Israel", "Italy", "Jamaica", "Japan", "Jersey",
+    "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea (North)", "Korea (South)", "Kuwait", "Kyrgyzstan", "Lao PDR",
+    "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macao",
+    "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Martinique", "Mauritania",
+    "Mauritius", "Mayotte", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Montserrat",
+    "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Caledonia", "New Zealand",
+    "Nicaragua", "Niger", "Nigeria", "Niue", "Norfolk Island", "North Macedonia", "Northern Mariana Islands",
+    "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru",
+    "Philippines", "Pitcairn", "Poland", "Portugal", "Puerto Rico", "Qatar", "Réunion", "Romania", "Russian Federation",
+    "Rwanda", "Saint Barthélemy", "Saint Helena", "Saint Kitts and Nevis", "Saint Lucia", "Saint Martin",
+    "Saint Pierre and Miquelon", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe",
+    "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Sint Maarten", "Slovakia",
+    "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Georgia", "South Sudan", "Spain", "Sri Lanka",
+    "Sudan", "Suriname", "Svalbard and Jan Mayen", "Sweden", "Switzerland", "Syrian Arab Republic", "Taiwan",
+    "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tokelau", "Tonga", "Trinidad and Tobago", "Tunisia",
+    "Turkey", "Turkmenistan", "Turks and Caicos Islands", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates",
+    "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Viet Nam",
+    "Virgin Islands (British)", "Virgin Islands (U.S.)", "Wallis and Futuna", "Western Sahara", "Yemen", "Zambia", "Zimbabwe"
+];
+
+function populateCountries() {
+    const selectEl = document.getElementById("exportCountrySelect");
+    if (!selectEl) return;
+    allCountries.forEach(country => {
+        const option = document.createElement("option");
+        option.value = country;
+        option.textContent = country;
+        selectEl.appendChild(option);
+    });
+}
+
+function goBackToInvoices() {
+    window.location.href = "{% url 'invoice' %}";
+}
+
+function toggleExportFields() {
+    const checkBox = document.getElementById("exportSalesToggle");
+    const exportFields = document.getElementById("exportFieldsGroup");
+    exportFields.style.display = checkBox.checked ? "grid" : "none";
+}
+
+function toggleTdsFields() {
+    const checkBox = document.getElementById("tdsApplicableToggle");
+    const tdsFields = document.getElementById("tdsFieldsGroup");
+    tdsFields.style.display = checkBox.checked ? "grid" : "none";
+}
+
+function toggleCustomerDropdown(e) {
+    if (e) e.stopPropagation();
+    const popup = document.getElementById("customerDropdownPopup");
+    const isActive = popup.classList.contains("active");
+    closeAllPopups();
+    if (!isActive) popup.classList.add("active");
+}
+
+function selectCustomer(name, code, e) {
+    if (e) e.stopPropagation();
+    document.getElementById("customerSearchInput").value = `${name} (${code})`;
+    document.getElementById("selectedCustomerId").value = code;
+    document.getElementById("customerDropdownPopup").classList.remove("active");
+}
+
+function filterCustomers() {
+    const filter = document.getElementById("customerSearchInput").value.toLowerCase();
+    const items = document.querySelectorAll("#customerDropdownPopup .dropdown-option-item");
+    items.forEach(item => {
+        item.style.display = item.textContent.toLowerCase().includes(filter) ? "flex" : "none";
+    });
+}
+
+function addNewCustomer(e) {
+    if (e) e.stopPropagation();
+    alert("Add New Customer clicked");
+}
+
+function toggleProductDropdown(e) {
+    if (e) e.stopPropagation();
+    const popup = document.getElementById("productDropdownPopup");
+    const isActive = popup.classList.contains("active");
+    closeAllPopups();
+    if (!isActive) popup.classList.add("active");
+}
+
+function openProductModal(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    closeAllPopups();
+
+    const modal = document.getElementById("productModalOverlay");
+    if (modal) modal.classList.add("active");
+}
+
+function closeProductModal() {
+    const modal = document.getElementById("productModalOverlay");
+    if (modal) modal.classList.remove("active");
+}
+
+function setProductType(type) {
+    document.getElementById("productTypeValue").value = type;
+    const goodsBtn = document.getElementById("typeGoodsBtn");
+    const servicesBtn = document.getElementById("typeServicesBtn");
+
+    if (type === 'Goods') {
+        goodsBtn.classList.add("active");
+        servicesBtn.classList.remove("active");
+    } else {
+        servicesBtn.classList.add("active");
+        goodsBtn.classList.remove("active");
+    }
+}
+
+function saveNewProduct() {
+    alert("New Product Saved!");
+    closeProductModal();
+}
+
+function toggleCategoryDropdown(e) {
+    if (e) e.stopPropagation();
+    const popup = document.getElementById("categoryDropdownPopup");
+    const isActive = popup.classList.contains("active");
+    closeAllPopups();
+    if (!isActive) popup.classList.add("active");
+}
+
+function selectCategory(name, e) {
+    if (e) e.stopPropagation();
+    document.getElementById("categorySearchInput").value = name;
+    document.getElementById("selectedCategoryId").value = name;
+    document.getElementById("categoryDropdownPopup").classList.remove("active");
+}
+
+function openCategoryModal(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    closeAllPopups();
+
+    const modal = document.getElementById("categoryModalOverlay");
+    if (modal) modal.classList.add("active");
+}
+
+function closeCategoryModal() {
+    const modal = document.getElementById("categoryModalOverlay");
+    if (modal) modal.classList.remove("active");
+}
+
+function saveNewCategory() {
+    const nameInput = document.getElementById("newCategoryName");
+    if (!nameInput.value.trim()) {
+        alert("Please enter a category name");
+        return;
+    }
+
+    const categoryName = nameInput.value.trim();
+    selectCategory(categoryName);
+    const list = document.getElementById("categoryOptionsList");
+    const item = document.createElement("div");
+    item.className = "dropdown-option-item";
+    item.textContent = categoryName;
+    item.onclick = function(e) { selectCategory(categoryName, e); };
+    list.appendChild(item);
+    const parentSelect = document.getElementById("underCategorySelect");
+    const opt = document.createElement("option");
+    opt.value = categoryName;
+    opt.textContent = categoryName;
+    parentSelect.appendChild(opt);
+    nameInput.value = "";
+    closeCategoryModal();
+}
+
+function toggleUnitDropdown(e) {
+    if (e) e.stopPropagation();
+    const popup = document.getElementById("unitDropdownPopup");
+    const isActive = popup.classList.contains("active");
+    closeAllPopups();
+    if (!isActive) popup.classList.add("active");
+}
+
+function selectUnit(name, e) {
+    if (e) e.stopPropagation();
+    document.getElementById("unitSearchInput").value = name;
+    document.getElementById("selectedUnitId").value = name;
+    document.getElementById("unitDropdownPopup").classList.remove("active");
+}
+
+function openUnitModal(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    closeAllPopups();
+
+    const modal = document.getElementById("unitModalOverlay");
+    if (modal) modal.classList.add("active");
+}
+
+function closeUnitModal() {
+    const modal = document.getElementById("unitModalOverlay");
+    if (modal) modal.classList.remove("active");
+}
+
+function saveNewUnit() {
+    const nameInput = document.getElementById("newUnitName");
+    if (!nameInput.value.trim()) {
+        alert("Please enter a unit name");
+        return;
+    }
+
+    const unitName = nameInput.value.trim();
+    selectUnit(unitName);
+    const list = document.getElementById("unitOptionsList");
+    const item = document.createElement("div");
+    item.className = "dropdown-option-item";
+    item.textContent = unitName;
+    item.onclick = function(e) { selectUnit(unitName, e); };
+    list.appendChild(item);
+
+    nameInput.value = "";
+    document.getElementById("newUnitSymbol").value = "";
+    closeUnitModal();
+}
+
+function closeAllPopups() {
+    const popups = document.querySelectorAll('.custom-dropdown-popup');
+    popups.forEach(p => p.classList.remove('active'));
+}
+document.addEventListener("click", function(e) {
+    closeAllPopups();
+});
+
+document.addEventListener("DOMContentLoaded", populateCountries);
+</script>
+
+{% endblock %}

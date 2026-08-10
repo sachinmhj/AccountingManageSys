@@ -1,0 +1,613 @@
+
+.invoice-add-page {
+    width: 100%;
+    min-height: 100vh;
+    background: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #334155;
+    box-sizing: border-box;
+    animation: invoiceSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes invoiceSlideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+
+.invoice-add-header {
+    height: 60px;
+    padding: 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.invoice-add-title {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.invoice-add-title h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.invoice-add-title a {
+    color: #4f46e5;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.invoice-add-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.invoice-save-btn {
+    border: none;
+    background: #10b981;
+    color: #ffffff;
+    padding: 8px 26px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.invoice-save-btn:hover {
+    background: #059669;
+}
+
+.invoice-close-btn {
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.invoice-add-body {
+    padding: 24px 28px 60px;
+    max-width: 1100px;
+}
+
+.invoice-form-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 16px 20px;
+    margin-bottom: 16px;
+}
+
+.col-span-8 { grid-column: span 8; }
+.col-span-6 { grid-column: span 6; }
+.col-span-4 { grid-column: span 4; }
+
+.invoice-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.invoice-form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.invoice-form-group label span {
+    color: #ef4444;
+}
+
+.invoice-form-group input,
+.invoice-form-group select {
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #1e293b;
+    background-color: #ffffff;
+    outline: none;
+}
+
+.invoice-form-group input[readonly] {
+    background-color: #f1f5f9;
+    color: #64748b;
+}
+
+.customer-picker-container,
+.product-picker-container {
+    position: relative;
+}
+
+.custom-select-trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.customer-input-field,
+.product-input-field {
+    width: 100%;
+    height: 38px;
+    padding: 0 36px 0 12px !important;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #1e293b;
+    outline: none;
+    background-color: #ffffff;
+}
+
+.customer-input-field::placeholder,
+.product-input-field::placeholder {
+    color: #94a3b8;
+}
+
+.search-icon, .chevron-icon {
+    position: absolute;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+
+.custom-dropdown-popup {
+    display: none;
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    z-index: 100;
+    overflow: hidden;
+}
+
+.custom-dropdown-popup.active {
+    display: block;
+}
+
+.dropdown-options-list {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.dropdown-option-item {
+    padding: 12px 16px;
+    background-color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    cursor: pointer;
+    color: #334155;
+    font-weight: 500;
+}
+
+.dropdown-option-item:hover {
+    background-color: #cbd5e1;
+}
+
+.dropdown-option-item .customer-code {
+    font-size: 13px;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.dropdown-add-new-row {
+    padding: 12px;
+    text-align: center;
+    background-color: #ffffff;
+    border-top: 1px solid #f1f5f9;
+}
+
+.btn-add-new {
+    background: none;
+    border: none;
+    color: #10b981;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 12px;
+    border-radius: 4px;
+}
+
+.btn-add-new:hover {
+    background-color: #10b981;
+    color: #ffffff;
+}
+
+/* Export Sales */
+.invoice-export-section {
+    margin: 12px 0 16px 0;
+}
+
+.invoice-export-section label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.invoice-export-section input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #10b981;
+}
+
+.export-fields-grid {
+    margin-bottom: 20px;
+}
+
+
+.invoice-items-section {
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    overflow: visible;
+    margin-bottom: 24px;
+}
+
+.invoice-items-header {
+    display: grid;
+    grid-template-columns: 2fr repeat(5, 1fr);
+    background-color: #3b4252;
+    color: #ffffff;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.invoice-items-header div:not(:first-child) {
+    text-align: right;
+}
+
+.invoice-item-row {
+    padding: 10px 14px;
+    background-color: #ffffff;
+}
+
+.invoice-tds-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0 16px;
+}
+
+.invoice-switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 22px;
+}
+
+.invoice-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.invoice-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #cbd5e1;
+    border-radius: 22px;
+    transition: 0.2s;
+}
+
+.invoice-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+
+input:checked + .invoice-slider {
+    background-color: #10b981;
+}
+
+input:checked + .invoice-slider:before {
+    transform: translateX(20px);
+}
+
+.tds-fields-grid {
+    margin-bottom: 20px;
+}
+
+
+.invoice-add-option {
+    display: block;
+    background: none;
+    border: none;
+    color: #2563eb;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 0;
+}
+
+.invoice-add-option:hover {
+    text-decoration: underline;
+}
+
+/* 
+   New Product/Service Popup*/
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-card {
+    background: #ffffff;
+    width: 520px;
+    max-width: 90%;
+    border-radius: 6px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+    animation: modalPop 0.2s ease-out;
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.modal-close-btn {
+    border: none;
+    background: none;
+    font-size: 20px;
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.modal-form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.modal-form-group label span {
+    color: #ef4444;
+}
+
+.modal-form-group input,
+.modal-form-group select {
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #1e293b;
+    outline: none;
+    background-color: #ffffff;
+}
+
+.modal-form-group input[readonly] {
+    background-color: #f1f5f9;
+    color: #64748b;
+}
+
+.product-type-toggle {
+    display: flex;
+    gap: 8px;
+}
+
+.type-btn {
+    flex: 1;
+    height: 38px;
+    border: 1px solid #cbd5e1;
+    background-color: #f8fafc;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.type-btn.active {
+    border-color: #2563eb;
+    background-color: #ffffff;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.modal-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.modal-toggle-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0 24px;
+}
+
+.modal-actions {
+    margin-top: 10px;
+}
+
+.modal-save-btn {
+    width: 100px;
+    height: 36px;
+    background-color: #10b981;
+    border: none;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.modal-save-btn:hover {
+    background-color: #059669;
+}
+/* Custom Pickers Container Positioning */
+.category-picker-container,
+.unit-picker-container {
+    position: relative;
+}
+
+.modal-input-field {
+    width: 100%;
+    height: 38px;
+    padding: 0 32px 0 12px !important;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #1e293b;
+    outline: none;
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+/* Custom Dropdown Popup Styling */
+.custom-dropdown-popup {
+    display: none;
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    overflow: hidden;
+}
+
+.custom-dropdown-popup.active {
+    display: block !important;
+}
+
+/* Scrollable Options List */
+.dropdown-options-list {
+    max-height: 160px;
+    overflow-y: auto;
+}
+
+.dropdown-option-item {
+    padding: 9px 12px;
+    font-size: 13px;
+    color: #334155;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.dropdown-option-item:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+/* Add New Row */
+.dropdown-add-new-row {
+    border-top: 1px solid #e2e8f0;
+    padding: 6px 8px;
+    background-color: #f8fafc;
+}
+
+.btn-add-new {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: #2563eb;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 6px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn-add-new:hover {
+    background-color: #eff6ff;
+}
+
+/* Stacked Modal Overlays for Nested Popups */
+.nested-modal-overlay {
+    z-index: 999999 !important;
+}
+
+.category-modal-card,
+.unit-modal-card {
+    width: 440px;
+    max-width: 90%;
+}
+.category-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  outline: none;
+}
+
+.category-select:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+}

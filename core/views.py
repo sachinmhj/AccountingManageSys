@@ -6,65 +6,32 @@ class HomeView(TemplateView):
     template_name = "pages/home.html"
 
 
-
 class SalesView(TemplateView):
     template_name = "pages/sales.html"
 
 
 
-
 class InvoiceView(TemplateView):
-
     template_name = "pages/sales/invoice.html"
 
-
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
-
-
         context["title"] = "Invoice"
-
-        context["tabs"] = [
-            "Approved",
-            "Draft"
-        ]
-
+        context["tabs"] = ["Approved", "Draft"]
         context["invoices"] = []
-
-
+        context["new_url"] = "invoice_add"
         return context
-
-
-
-
 
 class CustomerPaymentView(TemplateView):
-
     template_name = "pages/sales/customer_payment.html"
 
-
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
-
-
         context["title"] = "Customer Payments"
-
-
-        context["tabs"] = [
-            "Approved",
-            "Draft"
-        ]
-
-
+        context["tabs"] = ["Approved", "Draft"]
         context["payments"] = []
-
-
+        context["new_url"] = "customer_payment_add"
         return context
-
-
-
 
 
 
@@ -83,6 +50,20 @@ class InventoryProductView(TemplateView):
         ]
         context["products"] = []
         return context
+class InvoiceAddView(TemplateView):
+    template_name = "pages/sales/invoice_add.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Add New Invoice"
+        return context
+class CustomerPaymentAddView(TemplateView):
+    template_name = "pages/sales/customer_payment_add.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "New Customer Payment"
+        return context
+    
     
 
 class VariantProductView(TemplateView):
@@ -119,82 +100,52 @@ class WarehouseTransferView(TemplateView):
     template_name = "pages/inventory/warehouse_transfer.html"
 
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
-
         context["title"] = "Warehouse Transfer"
-
         context["tabs"] = [
             "Approved",
             "Draft"
         ]
-
         context["transfers"] = []
-
         return context
 
 class InventoryAdjustmentView(TemplateView):
-
     template_name = "pages/inventory/inventory_adjust.html"
-
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
-
         context["title"] = "Inventory Adjustment"
-
         context["tabs"] = [
             "Approved",
             "Draft"
         ]
-
         context["adjusts"] = []
-
         return context
 
 class BillMaterialView(TemplateView):
-
     template_name = "pages/inventory/bills_material.html"
-
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
-
         context["title"] = "Bill of Materials"
-
         context["bills"] = []
-
         return context
 
 class ProductionOrderView(TemplateView):
-
     template_name = "pages/inventory/production_order.html"
-
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
-
         context["title"] = "Production Order"
-
         context["tabs"] = [
             "Approved",
             "Draft"
         ]
-
         context["orders"] = []
-
         return context
 
 class ProductionJournalView(TemplateView):
-
     template_name = "pages/inventory/production_journal.html"
-
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
-
         context["title"] = "Production Journal"
-
         context["tabs"] = [
             "Approved",
             "Draft"

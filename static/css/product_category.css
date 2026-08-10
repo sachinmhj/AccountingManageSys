@@ -1,0 +1,149 @@
+/* =====================================================
+   Product Category
+===================================================== */
+
+
+/* Make the table use the full available width */
+
+.invoice-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+
+/* Name column */
+
+.invoice-table th:first-child,
+.invoice-table td:first-child {
+    width: 50%;
+}
+
+
+/* Parent column */
+
+.invoice-table th:last-child,
+.invoice-table td:last-child {
+    width: 50%;
+}
+
+
+/* =====================================================
+   General Row
+===================================================== */
+
+.general-row td {
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+}
+
+
+/* General sits directly under Name */
+
+.general-content {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    padding-left: 28px;
+}
+
+
+.general-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-size: 13px;
+    color: #444;
+}
+
+
+/* =====================================================
+   Three Dots
+===================================================== */
+
+.general-action {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    width: 100%;
+}
+
+
+.action-menu {
+    position: relative;
+}
+
+
+.dots-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 28px;
+
+    padding: 0;
+
+    border: none;
+    background: transparent;
+
+    font-size: 20px;
+    line-height: 1;
+
+    color: #555;
+
+    cursor: pointer;
+}
+
+
+.dots-btn:hover {
+    color: #198754;
+}
+
+
+/* =====================================================
+   Dropdown
+===================================================== */
+
+.dropdown-menu {
+    display: none;
+
+    position: absolute;
+    right: 0;
+    top: 30px;
+
+    min-width: 110px;
+
+    background: #fff;
+
+    border: 1px solid #ddd;
+    border-radius: 6px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+
+    z-index: 1000;
+}
+
+
+.dropdown-menu.show {
+    display: block;
+}
+
+
+.dropdown-menu a {
+    display: block;
+
+    padding: 8px 12px;
+
+    color: #333;
+    text-decoration: none;
+
+    font-size: 13px;
+}
+
+
+.dropdown-menu a:hover {
+    background: #f5f5f5;
+}

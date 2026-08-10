@@ -1,0 +1,587 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/customer_payment_add.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="payment-add-page">
+
+    <div id="paymentReceivedView">
+        <div class="payment-header">
+            <div class="payment-title-group">
+                <h2>New Customer Payment</h2>
+                <a href="#" class="branch-link">HeadOffice (HO)</a>
+            </div>
+
+            <div class="payment-actions">
+                <button type="button" class="btn-quick-receipt" onclick="switchToQuickReceipt()">
+                    Quick Receipt
+                </button>
+                <button type="submit" form="customerPaymentForm" class="btn-save">
+                    Save
+                </button>
+                <button type="button" class="btn-close" onclick="goBackToPayments()">×</button>
+            </div>
+        </div>
+
+        <div class="payment-body">
+            <form id="customerPaymentForm" method="POST">
+                {% csrf_token %}
+
+                <div class="payment-grid main-grid">
+                    <div class="form-group col-span-8">
+                        <label>Received From <span class="required">*</span></label>
+                        <div class="custom-dropdown-wrapper">
+                            <input type="hidden" name="customer" id="selectedReceivedFromValue" required>
+                            <div class="custom-dropdown-trigger" onclick="toggleReceivedFromDropdown(event)">
+                                <span id="selectedReceivedFromText" class="placeholder-text">Received From</span>
+                            </div>
+                            <div class="custom-dropdown-menu" id="receivedFromDropdownMenu">
+                                <div class="dropdown-search-box">
+                                    <input type="text" placeholder="Received From" id="receivedFromSearchInput" onkeyup="filterReceivedFromOptions()">
+                                </div>
+
+                                <div class="dropdown-options-list" id="receivedFromOptionsList">
+                                    <div class="dropdown-option" onclick="selectReceivedFrom('Cash Customer (Customer) (CUS0001)')">
+                                        Cash Customer (Customer) (CUS0001)
+                                    </div>
+                                    <div class="dropdown-option" onclick="selectReceivedFrom('Cash in Hand (BC0001)')">
+                                        Cash in Hand (BC0001)
+                                    </div>
+                                </div>
+
+                                <div class="dropdown-footer">
+                                    <button type="button" class="btn-add-new-account" onclick="openContactModal()">+ Add New</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Received Account <span class="required">*</span></label>
+                        <select name="received_account" required>
+                            <option value="" disabled selected hidden>Select Account</option>
+                            <option value="cash">Cash in Hand</option>
+                            <option value="bank">Bank Account</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Payment Code</label>
+                        <input type="text" value="DRAFT" readonly class="input-readonly">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Received Date <span class="required">*</span></label>
+                        <input type="date" name="received_date" value="2026-08-10" required>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Amount <span class="required">*</span></label>
+                        <input type="number" name="amount" placeholder="Amount" step="0.01" required>
+                    </div>
+
+                    <div class="form-group col-span-6">
+                        <label>Currency</label>
+                        <select name="currency">
+                            <option value="NPR" selected>Nepalese Rupee</option>
+                            <option value="USD">US Dollar</option>
+                            <option value="EUR">Euro</option>
+                            <option value="INR">Indian Rupee</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-span-6">
+                        <label>Exchange Rate To NPR <span class="required">*</span></label>
+                        <input type="number" name="exchange_rate" value="1" step="0.01" required>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <div class="payment-mode-section">
+                    <h3 class="section-title">Payment Mode</h3>
+                    <div class="payment-grid">
+                        <div class="form-group col-span-6">
+                            <label>Payment Mode</label>
+                            <select name="payment_mode">
+                                <option value="" disabled selected hidden>Payment Mode</option>
+                                <option value="cash">Cash</option>
+                                <option value="cheque">Cheque</option>
+                                <option value="bank_transfer">Online Transfer</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-span-6">
+                            <label>Payment Reference#</label>
+                            <input type="text" name="payment_reference" placeholder="Payment Reference#">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <div class="toggles-section">
+                    <div class="toggle-group">
+                        <label class="switch">
+                            <input type="checkbox" id="bankChargeToggle" name="has_bank_charge" onchange="toggleBankChargeFields()">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">Bank charge</span>
+                    </div>
+
+                    <div id="bankChargeFields" class="payment-grid sub-grid" style="display:none;">
+                        <div class="form-group col-span-6">
+                            <label>Bank Charge Account</label>
+                            <select name="bank_charge_account">
+                                <option value="" disabled selected hidden>Select Account</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-span-6">
+                            <label>Bank Charge Amount</label>
+                            <input type="number" name="bank_charge_amount" placeholder="0.00" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="toggle-group">
+                        <label class="switch">
+                            <input type="checkbox" id="tdsToggle" name="has_tds" onchange="toggleTdsFields()">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">TDS</span>
+                    </div>
+
+                    <div id="tdsFields" class="payment-grid sub-grid" style="display:none;">
+                        <div class="form-group col-span-6">
+                            <label>TDS Account <span>*</span></label>
+                            <select name="tds_account">
+                                <option value="" disabled selected hidden>Select Account</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-span-6">
+                            <label>TDS Type <span>*</span></label>
+                            <select name="tds_type">
+                                <option value="" disabled selected hidden>TDS type</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-span-6">
+                            <label>TDS Amount <span>*</span></label>
+                            <input type="number" name="tds_amount" placeholder="0.00" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <div class="notes-section">
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea name="notes" placeholder="Notes" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <button type="button" class="invoice-add-option">+ Add Reporting Tags</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="quickReceiptView" style="display: none;">
+        <div class="payment-header">
+            <div class="payment-title-group">
+                <h2>New Quick Receipt</h2>
+            </div>
+
+            <div class="payment-actions">
+                <button type="submit" form="quickReceiptForm" class="btn-save">
+                    Save
+                </button>
+                <button type="button" class="btn-close" onclick="switchToPaymentReceived()">×</button>
+            </div>
+        </div>
+
+        <div class="payment-body">
+            <form id="quickReceiptForm" method="POST">
+                {% csrf_token %}
+                <div class="payment-grid main-grid">
+                    <div class="form-group col-span-8">
+                        <label>Deposited To <span class="required">*</span></label>
+                        <select name="deposited_to" required>
+                            <option value="" disabled selected hidden>Select Account</option>
+                            <option value="cash">Cash in Hand</option>
+                            <option value="bank">Bank Account</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Date <span class="required">*</span></label>
+                        <input type="date" name="receipt_date" value="2026-08-10" required>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>#Payment</label>
+                        <input type="text" value="DRAFT" readonly class="input-readonly">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Reference</label>
+                        <input type="text" name="reference" placeholder="Reference">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Currency</label>
+                        <select name="currency">
+                            <option value="NPR" selected>Nepalese Rupee</option>
+                            <option value="USD">US Dollar</option>
+                            <option value="EUR">Euro</option>
+                            <option value="INR">Indian Rupee</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Exchange Rate To NPR <span class="required">*</span></label>
+                        <input type="number" name="exchange_rate" value="1" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="quick-receipt-table-container">
+                    <div class="quick-receipt-table-header">
+                        <div class="header-col">Accounts</div>
+                        <div class="header-col text-right">Amount</div>
+                    </div>
+
+                    <div class="quick-receipt-table-row">
+                        <div class="row-col custom-dropdown-wrapper">
+                            <input type="hidden" name="account_item" id="selectedAccountValue">
+                            <div class="custom-dropdown-trigger" onclick="toggleAccountDropdown(event)">
+                                <span id="selectedAccountText" class="placeholder-text">Select Account</span>
+                            </div>
+                            <div class="custom-dropdown-menu" id="accountDropdownMenu">
+                                <div class="dropdown-search-box">
+                                    <input type="text" placeholder="Select Account" id="accountSearchInput" onkeyup="filterAccounts()">
+                                </div>
+
+                                <div class="dropdown-options-list" id="accountOptionsList">
+                                    <div class="dropdown-option" onclick="selectAccount('Cash Customer (CUS0001)')">Cash Customer (CUS0001)</div>
+                                    <div class="dropdown-option" onclick="selectAccount('Cash In Hand (BC0001)')">Cash In Hand (BC0001)</div>
+                                    <div class="dropdown-option" onclick="selectAccount('Purchase Goods (DE0001)')">Purchase Goods (DE0001)</div>
+                                    <div class="dropdown-option" onclick="selectAccount('Purchase Service (DE0002)')">Purchase Service (DE0002)</div>
+                                    <div class="dropdown-option" onclick="selectAccount('Retained Earning (RS0001)')">Retained Earning (RS0001)</div>
+                                    <div class="dropdown-option" onclick="selectAccount('Sales Goods (DI0001)')">Sales Goods (DI0001)</div>
+                                </div>
+
+                                <div class="dropdown-footer">
+                                    <button type="button" class="btn-add-new-account" onclick="openAccountModal()">Add New</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row-col row-col-amount" id="amountContainer" style="display: none;">
+                            <input type="number" name="account_amount" id="accountAmountInput" placeholder="0.00" step="0.01" class="amount-input-large text-right" oninput="updateTotalAmount(this)">
+                        </div>
+                    </div>
+
+                    <div class="quick-receipt-table-footer">
+                        <div>Total</div>
+                        <div id="receiptTotalAmount">0.00</div>
+                    </div>
+                </div>
+
+                <div class="notes-section">
+                    <div class="form-group">
+                        <label>Note</label>
+                        <textarea name="note" rows="4"></textarea>
+                    </div>
+                </div>
+
+                <button type="button" class="invoice-add-option">+ Add Reporting Tags</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal-overlay" id="contactModalOverlay" style="display: none;">
+            <div class="modal-card contact-modal-card">
+                <div class="modal-header">
+                    <h3>New Received From</h3>
+                    <button type="button" class="modal-close-btn" onclick="closeContactModal()">×</button>
+                </div>
+
+                <div class="modal-body">
+                            <form id="newContactForm">
+                <div class="modal-form-group col-span-12">
+                    <label>Type of Contact <span class="required">*</span></label>
+                    <div class="contact-type-selector">
+                        <label class="contact-type-btn active" onclick="selectContactType(this, 'customer')">
+                            <input type="radio" name="contact_type" value="customer" checked>
+                            <span class="icon-box">C</span> Customer
+                        </label>
+                        <label class="contact-type-btn disabled">
+                            <input type="radio" name="contact_type" value="supplier" disabled>
+                            <span class="icon-box">S</span> Supplier
+                        </label>
+                        <label class="contact-type-btn disabled">
+                            <input type="radio" name="contact_type" value="lead" disabled>
+                            <span class="icon-box">📋</span> Lead
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-form-group col-span-12">
+                    <label>Name <span class="required">*</span></label>
+                    <input type="text" name="contact_name" id="contactNameInput" placeholder="Name" required>
+                </div>
+
+                <div class="modal-form-group col-span-12">
+                    <label>Address</label>
+                    <input type="text" name="contact_address" placeholder="Address">
+                </div>
+
+                <div class="modal-grid-2">
+                    <div class="modal-form-group">
+                        <label>Code</label>
+                        <input type="text" name="contact_code" value="C0002" class="input-readonly" readonly>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>PAN</label>
+                        <input type="text" name="contact_pan" placeholder="PAN">
+                    </div>
+                </div>
+
+                <div class="modal-grid-2">
+                    <div class="modal-form-group">
+                        <label>Phone Number</label>
+                        <input type="text" name="contact_phone" placeholder="Phone Number">
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Group</label>
+                        <select name="contact_group">
+                            <option value="General" selected>General</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-save-btn" onclick="saveNewContact()">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="accountModalOverlay" style="display: none;">
+    <div class="modal-card account-modal-card">
+        <div class="modal-header">
+            <h3>New Account</h3>
+            <button type="button" class="modal-close-btn" onclick="closeAccountModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <form id="newAccountForm">
+                <div class="modal-form-group">
+                    <label>Account Name <span class="required">*</span></label>
+                    <input type="text" name="account_name" placeholder="Account Name" required>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Under <span class="required">*</span></label>
+                    <select name="parent_group" required>
+                        <option value="" disabled selected hidden>Parent Group</option>
+                        <option value="current_asset">Current Assets</option>
+                        <option value="direct_income">Direct Income</option>
+                        <option value="indirect_expense">Indirect Expense</option>
+                        <option value="deposit_assets">Deposits Assets</option>
+                    </select>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Description</label>
+                    <input type="text" name="description" placeholder="Description">
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Code</label>
+                    <input type="text" name="account_code" placeholder="Code">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-save-btn" onclick="saveNewAccount()">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function goBackToPayments() {
+    window.location.href = "{% url 'customer_payment' %}";
+}
+
+function switchToQuickReceipt() {
+    document.getElementById("paymentReceivedView").style.display = "none";
+    document.getElementById("quickReceiptView").style.display = "block";
+}
+
+function switchToPaymentReceived() {
+    document.getElementById("quickReceiptView").style.display = "none";
+    document.getElementById("paymentReceivedView").style.display = "block";
+}
+
+function toggleBankChargeFields() {
+    const toggle = document.getElementById("bankChargeToggle");
+    const fields = document.getElementById("bankChargeFields");
+    fields.style.display = toggle.checked ? "grid" : "none";
+}
+
+function toggleTdsFields() {
+    const toggle = document.getElementById("tdsToggle");
+    const fields = document.getElementById("tdsFields");
+    fields.style.display = toggle.checked ? "grid" : "none";
+}
+
+function updateTotalAmount(input) {
+    const totalEl = document.getElementById("receiptTotalAmount");
+    totalEl.textContent = input.value ? parseFloat(input.value).toFixed(2) : "0.00";
+}
+
+function toggleReceivedFromDropdown(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById("receivedFromDropdownMenu");
+    const isVisible = dropdown.style.display === "block";
+    dropdown.style.display = isVisible ? "none" : "block";
+
+    if (!isVisible) {
+        setTimeout(() => {
+            document.getElementById("receivedFromSearchInput").focus();
+        }, 50);
+    }
+}
+
+function selectReceivedFrom(val) {
+    document.getElementById("selectedReceivedFromValue").value = val;
+    const textEl = document.getElementById("selectedReceivedFromText");
+    textEl.textContent = val;
+    textEl.classList.remove("placeholder-text");
+    document.getElementById("receivedFromDropdownMenu").style.display = "none";
+}
+
+function filterReceivedFromOptions() {
+    const input = document.getElementById("receivedFromSearchInput").value.toLowerCase();
+    const options = document.querySelectorAll("#receivedFromOptionsList .dropdown-option");
+
+    options.forEach(option => {
+        const text = option.textContent.toLowerCase();
+        option.style.display = text.includes(input) ? "block" : "none";
+    });
+}
+
+function toggleAccountDropdown(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById("accountDropdownMenu");
+    const isVisible = dropdown.style.display === "block";
+    dropdown.style.display = isVisible ? "none" : "block";
+
+    if (!isVisible) {
+        setTimeout(() => {
+            document.getElementById("accountSearchInput").focus();
+        }, 50);
+    }
+}
+
+function selectAccount(val) {
+    document.getElementById("selectedAccountValue").value = val;
+    const textEl = document.getElementById("selectedAccountText");
+    textEl.textContent = val;
+    textEl.classList.remove("placeholder-text");
+    document.getElementById("accountDropdownMenu").style.display = "none";
+
+    const amountContainer = document.getElementById("amountContainer");
+    const amountInput = document.getElementById("accountAmountInput");
+    amountContainer.style.display = "block";
+    amountInput.focus();
+}
+
+function filterAccounts() {
+    const input = document.getElementById("accountSearchInput").value.toLowerCase();
+    const options = document.querySelectorAll("#accountOptionsList .dropdown-option");
+
+    options.forEach(option => {
+        const text = option.textContent.toLowerCase();
+        option.style.display = text.includes(input) ? "block" : "none";
+    });
+}
+
+document.addEventListener("click", function (event) {
+    const rfMenu = document.getElementById("receivedFromDropdownMenu");
+    const rfTrigger = document.querySelector("#paymentReceivedView .custom-dropdown-trigger");
+    if (rfMenu && !rfMenu.contains(event.target) && !rfTrigger.contains(event.target)) {
+        rfMenu.style.display = "none";
+    }
+
+    const accMenu = document.getElementById("accountDropdownMenu");
+    const accTrigger = document.querySelector("#quickReceiptView .custom-dropdown-trigger");
+    if (accMenu && !accMenu.contains(event.target) && (!accTrigger || !accTrigger.contains(event.target))) {
+        accMenu.style.display = "none";
+    }
+});
+
+function openContactModal() {
+    document.getElementById("receivedFromDropdownMenu").style.display = "none";
+    document.getElementById("contactModalOverlay").style.display = "flex";
+}
+
+function closeContactModal() {
+    document.getElementById("contactModalOverlay").style.display = "none";
+}
+
+function selectContactType(element, typeValue) {
+    const buttons = document.querySelectorAll('.contact-type-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    element.classList.add('active');
+    const radio = element.querySelector('input[type="radio"]');
+    if (radio) {
+        radio.checked = true;
+    }
+}
+
+function saveNewContact() {
+    const nameInput = document.getElementById("contactNameInput");
+    const contactName = nameInput.value.trim();
+
+    if (contactName) {
+        selectReceivedFrom(contactName);
+        closeContactModal();
+        document.getElementById("newContactForm").reset();
+    } else {
+        alert("Please enter Name.");
+    }
+}
+
+function openAccountModal() {
+    document.getElementById("accountDropdownMenu").style.display = "none";
+    document.getElementById("accountModalOverlay").style.display = "flex";
+}
+
+function closeAccountModal() {
+    document.getElementById("accountModalOverlay").style.display = "none";
+}
+
+function saveNewAccount() {
+    const form = document.getElementById("newAccountForm");
+    const accountName = form.account_name.value.trim();
+
+    if (accountName) {
+        selectAccount(accountName);
+        closeAccountModal();
+        form.reset();
+    } else {
+        alert("Please enter Account Name.");
+    }
+}
+</script>
+
+{% endblock %}
