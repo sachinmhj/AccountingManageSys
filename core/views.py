@@ -131,7 +131,78 @@ class WarehouseTransferView(TemplateView):
 
         context["transfers"] = []
 
-        return
+        return context
+
+class InventoryAdjustmentView(TemplateView):
+
+    template_name = "pages/inventory/inventory_adjust.html"
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context["title"] = "Inventory Adjustment"
+
+        context["tabs"] = [
+            "Approved",
+            "Draft"
+        ]
+
+        context["adjusts"] = []
+
+        return context
+
+class BillMaterialView(TemplateView):
+
+    template_name = "pages/inventory/bills_material.html"
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context["title"] = "Bill of Materials"
+
+        context["bills"] = []
+
+        return context
+
+class ProductionOrderView(TemplateView):
+
+    template_name = "pages/inventory/production_order.html"
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context["title"] = "Production Order"
+
+        context["tabs"] = [
+            "Approved",
+            "Draft"
+        ]
+
+        context["orders"] = []
+
+        return context
+
+class ProductionJournalView(TemplateView):
+
+    template_name = "pages/inventory/production_journal.html"
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context["title"] = "Production Journal"
+
+        context["tabs"] = [
+            "Approved",
+            "Draft"
+        ]
+
+        context["journals"] = []
+
+        return context
 
 
 

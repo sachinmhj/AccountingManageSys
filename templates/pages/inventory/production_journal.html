@@ -7,36 +7,34 @@
     <table class="invoice-table">
         <thead>
             <tr>
-                <th>
-                    <input 
-                        type="checkbox"
-                        class="select-checkbox"
-                        onclick="event.stopPropagation();">Date</th>
-                <th>Entry No</th>
+                <th>Date</th>
+                <th>Code</th>
                 <th>Reference</th>
-                <th>Source Warehouse</th>
-                <th>Destination Warehouse</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
-            {% for transfer in transfers %}
+            {% for journal in journals %}
             <tr>
                 <td>
                     <input 
                         type="checkbox"
                         class="row-checkbox"
                     >
-                    {{ transfer.date }}
+                    {{ journal.date }}
                 </td>
-                <td>{{ transfer.entry_no }}</td>
-                <td>{{ transfer.reference }}</td>
-                <td>{{ transfer.source_warehouse }}</td>
-                <td>{{ transfer.destination_warehouse }}</td>
+                <td>{{ journal.code }}</td>
+                <td>{{ journal.reference }}</td>
+                <td>{{ journal.product }}</td>
+                <td>{{ journal.quantity }}</td>
+                <td>{{ journal.status }}</td>
             </tr>
             {% empty %}
             <tr>
                 <td colspan="6" class="empty">
-                    No Data found
+                    No Data Found
                 </td>
             </tr>
             {% endfor %}
