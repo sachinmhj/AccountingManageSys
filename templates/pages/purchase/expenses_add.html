@@ -25,7 +25,7 @@
         </div>
 
         <div class="modal-body">
-            <form id="newCategoryForm">
+            <form id="newCategoryForm" onsubmit="event.preventDefault(); saveNewCategory();">
                 <div class="modal-form-group">
                     <label>Name <span>*</span></label>
                     <input type="text" id="newCategoryName" name="category_name" placeholder="Name" required>
@@ -41,7 +41,7 @@
 
                 <div class="modal-form-group">
                     <label>Description</label>
-                    <input type="text" name="category_description" placeholder="Description">
+                    <input type="text" id="newCategoryDescription" name="category_description" placeholder="Description">
                 </div>
 
                 <div class="modal-actions">
@@ -52,6 +52,41 @@
     </div>
 </div>
 
+<!-- Account Creation Modal Overlay -->
+<div class="custom-modal-overlay" id="accountModalOverlay" style="display: none;">
+    <div class="custom-modal-card">
+        <div class="custom-modal-header">
+            <h3>New Account</h3>
+            <button type="button" class="close-modal-btn" onclick="closeAccountModal()">&times;</button>
+        </div>
+        <div class="custom-modal-body">
+            <div class="modal-form-group">
+                <label>Account Name <span class="required">*</span></label>
+                <input type="text" id="newAccountName" placeholder="Account Name">
+            </div>
+            <div class="modal-form-group">
+                <label>Under <span class="required">*</span></label>
+                <select id="newAccountUnder">
+                    <option value="" disabled selected>Parent Group</option>
+                    <option value="Expense">Expense</option>
+                    <option value="Direct Expense">Direct Expense</option>
+                    <option value="Indirect Expense">Indirect Expense</option>
+                </select>
+            </div>
+            <div class="modal-form-group">
+                <label>Description</label>
+                <input type="text" id="newAccountDescription" placeholder="Description">
+            </div>
+            <div class="modal-form-group">
+                <label>Code</label>
+                <input type="text" id="newAccountCode" placeholder="Code">
+            </div>
+        </div>
+        <div class="custom-modal-footer">
+            <button type="button" class="btn-modal-save" onclick="saveNewAccount()">Save</button>
+        </div>
+    </div>
+</div>
 
 <div class="invoice-add-page">
 
@@ -83,8 +118,8 @@
                         <div class="dropdown-options-list" id="customerOptionsList">
                             <label>No Data</label>
                         </div>
-                        <div class="dropdown-add-new-btn-container" onclick="event.stopPropagation();">
-                            <button type="button" class="btn-add-new-full" onclick="openContactModal('supplier', event)">Add New</button>
+                        <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                            <button type="button" class="btn-add-new" onclick="openContactModal('supplier', event)">+ Add New</button>
                         </div>
                     </div>
                 </div>
@@ -140,29 +175,27 @@
                 <!-- Dynamic Account Rows Container -->
                 <div id="accountRowsContainer"></div>
 
+                <!-- Account Picker Trigger Field -->
                 <div class="invoice-item-row">
                     <div class="product-picker-container" onclick="event.stopPropagation();">
-                        <input type="hidden" name="product" id="selectedProductId">
-                        <div class="custom-select-trigger" onclick="toggleProductDropdown(event)">
+                        <div class="custom-select-trigger" onclick="toggleAccountPickerDropdown(event)">
                             <input type="text" id="productSearchInput" class="product-input-field"
-                                placeholder="Add Code or Product" readonly>
+                                placeholder="Select Account" readonly>
                             <span class="chevron-icon">▼</span>
                         </div>
 
-                    <!-- Options Popup List -->
-                    <div class="custom-dropdown-popup account-popup" id="accountPickerDropdownPopup">
-                        <div class="dropdown-options-list" id="accountOptionsList">
-                            <div class="dropdown-option-item" onclick="addAccountRow('Purchase Goods (DE0001)', event)">Purchase Goods (DE0001)</div>
-                            <div class="dropdown-option-item" onclick="addAccountRow('Purchase Service (DE0002)', event)">Purchase Service (DE0002)</div>
-                            <div class="dropdown-option-item" onclick="addAccountRow('Retained Earning (RS0001)', event)">Retained Earning (RS0001)</div>
-                            <div class="dropdown-option-item" onclick="addAccountRow('Sales Goods (DI0001)', event)">Sales Goods (DI0001)</div>
-                            <div class="dropdown-option-item" onclick="addAccountRow('Sales Service (DI0002)', event)">Sales Service (DI0002)</div>
-                            <div class="dropdown-option-item" onclick="addAccountRow('Share Capital (C0001)', event)">Share Capital (C0001)</div>
-                        </div>
-                        <div class="custom-dropdown-popup product-popup" id="productDropdownPopup">
+                        <!-- Options Popup List -->
+                        <div class="custom-dropdown-popup account-popup" id="accountPickerDropdownPopup">
+                            <div class="dropdown-options-list" id="accountOptionsList">
+                                <div class="dropdown-option-item" onclick="addAccountRow('Purchase Goods (DE0001)', event)">Purchase Goods (DE0001)</div>
+                                <div class="dropdown-option-item" onclick="addAccountRow('Purchase Service (DE0002)', event)">Purchase Service (DE0002)</div>
+                                <div class="dropdown-option-item" onclick="addAccountRow('Retained Earning (RS0001)', event)">Retained Earning (RS0001)</div>
+                                <div class="dropdown-option-item" onclick="addAccountRow('Sales Goods (DI0001)', event)">Sales Goods (DI0001)</div>
+                                <div class="dropdown-option-item" onclick="addAccountRow('Sales Service (DI0002)', event)">Sales Service (DI0002)</div>
+                                <div class="dropdown-option-item" onclick="addAccountRow('Share Capital (C0001)', event)">Share Capital (C0001)</div>
+                            </div>
                             <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
-                                <button type="button" class="btn-add-new" onclick="openProductModal(event)">+ Add
-                                    New</button>
+                                <button type="button" class="btn-add-new" onclick="openAccountModal(event)">+ Add New Account</button>
                             </div>
                         </div>
                     </div>
@@ -248,7 +281,7 @@
     ];
 
     function goBackToInvoices() {
-        window.location.href = "{% url 'invoice' %}";
+        window.location.href = "{% url 'expenses' %}";
     }
 
     function toggleTdsFields() {
@@ -346,6 +379,20 @@
         items.forEach(item => {
             item.style.display = item.textContent.toLowerCase().includes(filter) ? "flex" : "none";
         });
+    }
+
+    function openProductModal(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        closeAllPopups();
+        const modal = document.getElementById("productModalOverlay");
+        if (modal) {
+            modal.style.display = "flex";
+        } else {
+            openCategoryModal(e);
+        }
     }
 
     /* Account Modal Handlers */
