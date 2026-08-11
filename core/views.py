@@ -206,5 +206,12 @@ class SupplierPaymentView(TemplateView):
         context["title"] = "Suppliers Payment"
         context["tabs"] = ["Approved", "Draft"]
         context["payments"] = []
-        # context["new_url"] = "supplier_payment_add"
+        context["new_url"] = "supplier_add"
+        return context
+    
+class SupplierAddView(TemplateView):
+    template_name ="pages/purchase/supplier_add.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "New Supplier Payment"
         return context
