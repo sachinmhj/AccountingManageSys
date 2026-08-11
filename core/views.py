@@ -165,8 +165,17 @@ class PurchaseView(TemplateView):
         context["title"] = "Purchase"
         context["tabs"] = ["Approved", "Draft"]
         context["purchases"] = []
-        # context["new_url"] = "purchase_add"
+        context["new_url"] = "purchase_add"
         return context
+
+class PurchaseAddView(TemplateView):
+    template_name = "pages/purchase/purchase_add.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Add New Purchase Bill"
+        return context
+    
 
 
 class ExpensesView(TemplateView):
@@ -177,8 +186,16 @@ class ExpensesView(TemplateView):
         context["title"] = "Expenses"
         context["tabs"] = ["Approved", "Draft"]
         context["expenses"] = []
-        # context["new_url"] = "expenses_add"
+        context["new_url"] = "expenses_add"
         return context
+
+class ExpensesAddView(TemplateView):
+    template_name ="pages/purchase/expenses_add.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Add New Expenses"
+        return context
+
 
 
 class SupplierPaymentView(TemplateView):

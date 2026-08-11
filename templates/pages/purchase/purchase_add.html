@@ -4,10 +4,9 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/invoice_add.css' %}">
 <link rel="stylesheet" href="{% static 'css/sales_add.css' %}">
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/sales_add.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/purchase_add.css'%}" {% endblock %} {% block extra_js %} <script
+    src="{% static 'js/sales_add.js' %}">
+</script>
 {% endblock %}
 
 {% block content %}
@@ -18,8 +17,7 @@
 
     <div class="invoice-add-header">
         <div class="invoice-add-title">
-            <h2>Add New Invoice</h2>
-            <a href="#">HeadOffice (HO)</a>
+            <h2>Add New Purchase Bill</h2>
         </div>
 
         <div class="invoice-add-actions">
@@ -33,26 +31,20 @@
             {% csrf_token %}
 
             <div class="invoice-form-grid">
-                <!-- Customer Picker -->
                 <div class="invoice-form-group col-span-8 customer-picker-container" onclick="event.stopPropagation();">
-                    <label>Customer Name <span>*</span></label>
+                    <label>Supplier Name <span>*</span></label>
                     <input type="hidden" name="customer" id="selectedCustomerId" required>
-
                     <div class="custom-select-trigger" onclick="toggleCustomerDropdown(event)">
                         <input type="text" id="customerSearchInput" class="customer-input-field"
-                            placeholder="Customer Name" oninput="filterCustomers()">
+                            placeholder="Supplier Name" oninput="filterCustomers()">
                     </div>
 
                     <div class="custom-dropdown-popup" id="customerDropdownPopup">
                         <div class="dropdown-options-list" id="customerOptionsList">
-                            <div class="dropdown-option-item"
-                                onclick="selectCustomer('Cash Customer (Customer)', 'CUS0001', event)">
-                                <span class="customer-name">Cash Customer (Customer)</span>
-                                <span class="customer-code">CUS0001</span>
-                            </div>
+                            <label>No Data</label>
                         </div>
                         <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
-                            <button type="button" class="btn-add-new" onclick="openContactModal(event)">+ Add
+                            <button type="button" class="btn-add-new" onclick="openContactModal('supplier')">+ Add
                                 New</button>
                         </div>
                     </div>
@@ -64,18 +56,29 @@
                 </div>
 
                 <div class="invoice-form-group col-span-4">
-                    <label>Invoice Code</label>
+                    <label>Bill Number</label>
                     <input type="text" value="DRAFT" readonly class="input-readonly">
                 </div>
 
                 <div class="invoice-form-group col-span-4">
-                    <label>Invoice Date <span>*</span></label>
+                    <label>Bill Date <span>*</span></label>
                     <input type="date" name="invoice_date" value="2026-08-11" required>
                 </div>
 
                 <div class="invoice-form-group col-span-4">
                     <label>Due Date <span>*</span></label>
                     <input type="date" name="due_date" value="2026-08-11" required>
+                </div>
+                <div class="invoice-form-group col-span-4">
+                    <label>Supplier Invoice Reference No</label>
+                    <input type="text" value="DRAFT" readonly class="input-readonly">
+                </div>
+                <div class="invoice-form-group col-span-4">
+                    <label>Warehouse <span>*</span></label>
+                    <select name="warehouse">
+                        <option>Main Warehouse</option>
+
+                    </select>
                 </div>
 
                 <div class="invoice-form-group col-span-6">
@@ -100,7 +103,7 @@
             <div class="invoice-export-section">
                 <label>
                     <input type="checkbox" id="exportSalesToggle" name="is_export" onchange="toggleExportFields()">
-                    This is export sales
+                    This is import sales
                 </label>
             </div>
 
@@ -151,6 +154,56 @@
                     </div>
                 </div>
             </div>
+            <!-- Additional Cost Section -->
+            <div class="additional-cost-header-wrapper">
+                <strong>Additional Cost</strong>
+                <label class="add-productwise-label">
+                    <input type="checkbox" name="add_productwise" id="addProductwiseToggle">
+                    <span>Add product-wise</span>
+                </label>
+            </div>
+
+            <div class="invoice-items-section additional-cost-table">
+                <div class="additional-cost-grid-header">
+                    <div>Cost Terms</div>
+                    <div>Product</div>
+                    <div>Method</div>
+                    <div>Amount (NPR)</div>
+                    <div></div>
+                </div>
+
+                <div id="additionalCostRowsContainer">
+                    <!-- Dynamic Rows appended here -->
+                </div>
+
+                <!-- Select Cost Terms Trigger Row -->
+                <div class="additional-cost-add-row">
+                    <div class="cost-term-picker-container" onclick="event.stopPropagation();">
+                        <div class="custom-select-trigger" onclick="toggleCostTermDropdown(event)">
+                            <input type="text" class="product-input-field" placeholder="Select Products" readonly>
+                            <span class="chevron-icon">▼</span>
+                        </div>
+
+                        <!-- Scrollable Popup List -->
+                        <div class="custom-dropdown-popup cost-term-popup" id="costTermDropdownPopup">
+                            <div class="dropdown-options-list scrollable-terms-list">
+                                <div class="dropdown-option-item" onclick="addCostTermRow('Clearing Charge', event)">
+                                    Clearing Charge</div>
+                                <div class="dropdown-option-item" onclick="addCostTermRow('Custom Duty', event)">Custom
+                                    Duty</div>
+                                <div class="dropdown-option-item" onclick="addCostTermRow('Excise Duty', event)">Excise
+                                    Duty</div>
+                                <div class="dropdown-option-item" onclick="addCostTermRow('Freight', event)">Freight
+                                </div>
+                                <div class="dropdown-option-item" onclick="addCostTermRow('Insurance', event)">Insurance
+                                </div>
+                                <div class="dropdown-option-item" onclick="addCostTermRow('Other Cost', event)">Other
+                                    Cost</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- TDS Switch Section -->
             <div class="invoice-tds-section">
@@ -158,7 +211,7 @@
                     <input type="checkbox" id="tdsApplicableToggle" name="tds_applicable" onchange="toggleTdsFields()">
                     <span class="invoice-slider"></span>
                 </label>
-                <strong>TDS is applicable</strong>
+                <strong>TDS is applicable to this product</strong>
             </div>
 
             <div id="tdsFieldsGroup" class="invoice-form-grid tds-fields-grid" style="display: none;">
@@ -181,8 +234,6 @@
                     <input type="number" name="tds_amount" placeholder="TDS Amount" step="0.01">
                 </div>
             </div>
-
-            <button type="button" class="invoice-add-option">+ Add Terms and Conditions</button>
             <button type="button" class="invoice-add-option">+ Add Reporting Tags</button>
         </form>
     </div>
@@ -248,6 +299,7 @@
                         <label>Tax</label>
                         <select name="product_tax">
                             <option value="No Vat">No Vat</option>
+                            <option value="0 VAT">0 VAT</option>
                             <option value="13% VAT">13% VAT</option>
                         </select>
                     </div>
@@ -710,6 +762,53 @@
         if (symbolInput) symbolInput.value = "";
 
         closeUnitModal();
+    }
+    function toggleCostTermDropdown(e) {
+        if (e) e.stopPropagation();
+        const popup = document.getElementById("costTermDropdownPopup");
+        const isActive = popup.classList.contains("active");
+        closeAllPopups();
+        if (!isActive) popup.classList.add("active");
+    }
+
+    function addCostTermRow(termName, e) {
+        if (e) e.stopPropagation();
+
+        const container = document.getElementById("additionalCostRowsContainer");
+
+        const row = document.createElement("div");
+        row.className = "additional-cost-item-row";
+        row.innerHTML = `
+        <div class="cost-term-name">
+            ${termName}
+            <input type="hidden" name="cost_term_name[]" value="${termName}">
+        </div>
+        <div>
+            <select name="cost_term_product[]">
+                <option value="All Product" selected>All Product</option>
+            </select>
+        </div>
+        <div>
+            <select name="cost_term_method[]">
+                <option value="Value" selected>Value</option>
+                <option value="Quantity">Quantity</option>
+            </select>
+        </div>
+        <div>
+            <input type="number" name="cost_term_amount[]" placeholder="Amount" step="0.01">
+        </div>
+        <div>
+            <button type="button" class="remove-cost-row-btn" onclick="removeCostRow(this)" title="Remove">&times;</button>
+        </div>
+    `;
+
+        container.appendChild(row);
+        document.getElementById("costTermDropdownPopup").classList.remove("active");
+    }
+
+    function removeCostRow(btn) {
+        const row = btn.closest(".additional-cost-item-row");
+        if (row) row.remove();
     }
 </script>
 {% endblock %}

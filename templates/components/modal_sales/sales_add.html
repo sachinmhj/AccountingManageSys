@@ -1,0 +1,68 @@
+<div class="modal-overlay" id="contactModalOverlay" style="display: none;">
+    <div class="modal-card contact-modal-card">
+        <div class="modal-header">
+            <h3 id="contactModalTitle">New Received Form</h3>
+            <button type="button" class="modal-close-btn" onclick="closeContactModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <form id="newContactForm">
+                <div class="modal-form-group col-span-12">
+                    <label>Type of Contact <span class="required">*</span></label>
+                    <div class="contact-type-selector">
+                        <label class="contact-type-btn" id="typeCustomerBtn" onclick="selectContactType('customer')">
+                            <input type="radio" name="contact_type" id="radioCustomer" value="customer">
+                            <span class="icon-box">C</span> Customer
+                        </label>
+                        <label class="contact-type-btn" id="typeSupplierBtn" onclick="selectContactType('supplier')">
+                            <input type="radio" name="contact_type" id="radioSupplier" value="supplier">
+                            <span class="icon-box">S</span> Supplier
+                        </label>
+                        <label class="contact-type-btn" id="typeLeadBtn" onclick="selectContactType('lead')">
+                            <input type="radio" name="contact_type" id="radioLead" value="lead">
+                            <span class="icon-box">📋</span> Lead
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-form-group col-span-12">
+                    <label>Name <span class="required">*</span></label>
+                    <input type="text" name="contact_name" id="contactNameInput" placeholder="Name" required>
+                </div>
+
+                <div class="modal-form-group col-span-12">
+                    <label>Address</label>
+                    <input type="text" name="contact_address" placeholder="Address">
+                </div>
+
+                <div class="modal-grid-2">
+                    <div class="modal-form-group">
+                        <label>Code</label>
+                        <input type="text" name="contact_code" id="contactCodeInput" value="C0002" class="input-readonly" readonly>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>PAN</label>
+                        <input type="text" name="contact_pan" placeholder="PAN">
+                    </div>
+                </div>
+
+                <div class="modal-grid-2">
+                    <div class="modal-form-group">
+                        <label>Phone Number</label>
+                        <input type="text" name="contact_phone" placeholder="Phone Number">
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Group</label>
+                        <select name="contact_group">
+                            <option value="General" selected>General</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-save-btn" onclick="saveNewContact()">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
