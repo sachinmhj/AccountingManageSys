@@ -1,4 +1,14 @@
-<nav class="navbar">
+<div class="navbar">
+
+    <button
+        type="button"
+        class="mobile-menu-btn"
+        onclick="toggleSidebar()"
+        aria-label="Open menu">
+
+        <i class='bx bx-menu'></i>
+
+    </button>
 
     <div class="search-box">
 
@@ -6,19 +16,26 @@
 
         <input
             type="text"
-            placeholder="Search..."
-        >
+            placeholder="Search...">
 
     </div>
 
     <div class="nav-right">
 
         <span class="support">
+
             <i class='bx bx-headphone'></i>
-            Support
+
+            <span class="support-text">
+                Support
+            </span>
+
         </span>
+
         <div class="avatar">
             BR
         </div>
+
     </div>
-</nav>
+
+</div>

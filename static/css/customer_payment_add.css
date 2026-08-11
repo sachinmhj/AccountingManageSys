@@ -1,11 +1,24 @@
+
+
 .payment-add-page {
     display: flex;
     justify-content: center;
     padding: 24px;
     background-color: #f1f5f9;
     min-height: calc(100vh - 60px);
+
+    animation: paymentSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@keyframes paymentSlideIn {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
 #paymentReceivedView,
 #quickReceiptView {
     background: #ffffff;
@@ -17,6 +30,9 @@
     flex-direction: column;
 }
 
+/* ==========================================
+   2. HEADER & ACTION BUTTONS
+========================================== */
 .payment-header {
     display: flex;
     justify-content: space-between;
@@ -87,6 +103,9 @@
     color: #0f172a;
 }
 
+/* ==========================================
+   3. FORM GRID & INPUT CONTROLS
+========================================== */
 .payment-body {
     padding: 24px;
 }
@@ -163,6 +182,9 @@
     margin-bottom: 12px;
 }
 
+/* ==========================================
+   4. TOGGLE SWITCHES
+========================================== */
 .toggles-section {
     display: flex;
     flex-direction: column;
@@ -226,13 +248,17 @@ input:checked + .slider:before {
     transform: translateX(20px);
 }
 
+/* ==========================================
+   5. QUICK RECEIPT TABLE & SEARCHABLE DROPDOWN
+========================================== */
 .quick-receipt-table-container {
     margin: 24px 0;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
-    overflow: visible !important;
+    overflow: visible !important; /* Crucial for floating menu visibility */
 }
 
+/* Updated to flex layout matching 50/50 split */
 .quick-receipt-table-header {
     display: flex;
     align-items: center;
@@ -259,6 +285,7 @@ input:checked + .slider:before {
     overflow: visible !important;
 }
 
+/* Both Accounts and Amount columns take equal 50% width */
 .quick-receipt-table-row .row-col {
     flex: 1 1 50%;
     min-width: 0;
@@ -268,9 +295,10 @@ input:checked + .slider:before {
     width: 100%;
 }
 
+/* Large Input field for Amount matching dropdown styling exactly */
 .amount-input-large {
     width: 100%;
-    height: 38px;
+    height: 38px; /* Equal height matching custom-dropdown-trigger */
     padding: 8px 12px;
     font-size: 14px;
     font-weight: 400;
@@ -288,6 +316,7 @@ input:checked + .slider:before {
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
+/* Hide webkit arrows for a clean input */
 .amount-input-large::-webkit-outer-spin-button,
 .amount-input-large::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -320,6 +349,7 @@ input:checked + .slider:before {
     color: #1e293b;
 }
 
+/* Custom Dropdown Styling */
 .custom-dropdown-wrapper {
     position: relative;
     width: 100%;
@@ -329,7 +359,7 @@ input:checked + .slider:before {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 38px;
+    height: 38px; /* Explicit height matching amount input */
     padding: 8px 12px;
     background: #ffffff;
     border: 1px solid #cbd5e1;
@@ -424,6 +454,9 @@ input:checked + .slider:before {
     text-decoration: underline;
 }
 
+/* ==========================================
+   6. MODAL POPUP OVERLAY & CARDS
+========================================== */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -523,84 +556,9 @@ input:checked + .slider:before {
     background-color: #059669;
 }
 
-.contact-modal-card {
-    background: #ffffff;
-    border-radius: 8px;
-    width: 100%;
-    max-width: 520px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-}
-
-.modal-grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.contact-type-selector {
-    display: flex;
-    gap: 10px;
-    margin-top: 4px;
-}
-
-.contact-type-btn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 12px;
-    background-color: #f1f5f9;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    cursor: pointer !important;
-    font-size: 13px;
-    font-weight: 500;
-    color: #334155;
-    transition: all 0.2s ease;
-    user-select: none;
-}
-
-.contact-type-btn * {
-    cursor: pointer !important;
-    pointer-events: none;
-}
-
-.contact-type-btn input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-    pointer-events: none;
-}
-
-.contact-type-btn .icon-box {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 700;
-    color: #475569;
-}
-
-.contact-type-btn.active {
-    background-color: #ffffff;
-    border-color: #2563eb;
-    color: #1e293b;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
-}
-
-.contact-type-btn.active .icon-box {
-    border-color: #2563eb;
-    color: #2563eb;
-}
-
+/* ==========================================
+   7. RESPONSIVE BREAKPOINTS
+========================================== */
 @media (max-width: 768px) {
     .col-span-4,
     .col-span-6,

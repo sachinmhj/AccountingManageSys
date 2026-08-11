@@ -3,12 +3,20 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/customer_payment_add.css' %}">
+<link rel="stylesheet" href="{% static 'css/sales_add.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/sales_add.js' %}"></script>
 {% endblock %}
 
 {% block content %}
+{% comment %} Shared customer creation modal {% endcomment %}
+{% include "components/modal_sales/sales_add.html" %}
 
 <div class="payment-add-page">
 
+    <!-- Payment Received View -->
     <div id="paymentReceivedView">
         <div class="payment-header">
             <div class="payment-title-group">
@@ -188,6 +196,7 @@
         </div>
     </div>
 
+    <!-- Quick Receipt View -->
     <div id="quickReceiptView" style="display: none;">
         <div class="payment-header">
             <div class="payment-title-group">
@@ -303,75 +312,7 @@
 
 </div>
 
-<div class="modal-overlay" id="contactModalOverlay" style="display: none;">
-            <div class="modal-card contact-modal-card">
-                <div class="modal-header">
-                    <h3>New Received From</h3>
-                    <button type="button" class="modal-close-btn" onclick="closeContactModal()">×</button>
-                </div>
-
-                <div class="modal-body">
-                            <form id="newContactForm">
-                <div class="modal-form-group col-span-12">
-                    <label>Type of Contact <span class="required">*</span></label>
-                    <div class="contact-type-selector">
-                        <label class="contact-type-btn active" onclick="selectContactType(this, 'customer')">
-                            <input type="radio" name="contact_type" value="customer" checked>
-                            <span class="icon-box">C</span> Customer
-                        </label>
-                        <label class="contact-type-btn disabled">
-                            <input type="radio" name="contact_type" value="supplier" disabled>
-                            <span class="icon-box">S</span> Supplier
-                        </label>
-                        <label class="contact-type-btn disabled">
-                            <input type="radio" name="contact_type" value="lead" disabled>
-                            <span class="icon-box">📋</span> Lead
-                        </label>
-                    </div>
-                </div>
-
-                <div class="modal-form-group col-span-12">
-                    <label>Name <span class="required">*</span></label>
-                    <input type="text" name="contact_name" id="contactNameInput" placeholder="Name" required>
-                </div>
-
-                <div class="modal-form-group col-span-12">
-                    <label>Address</label>
-                    <input type="text" name="contact_address" placeholder="Address">
-                </div>
-
-                <div class="modal-grid-2">
-                    <div class="modal-form-group">
-                        <label>Code</label>
-                        <input type="text" name="contact_code" value="C0002" class="input-readonly" readonly>
-                    </div>
-                    <div class="modal-form-group">
-                        <label>PAN</label>
-                        <input type="text" name="contact_pan" placeholder="PAN">
-                    </div>
-                </div>
-
-                <div class="modal-grid-2">
-                    <div class="modal-form-group">
-                        <label>Phone Number</label>
-                        <input type="text" name="contact_phone" placeholder="Phone Number">
-                    </div>
-                    <div class="modal-form-group">
-                        <label>Group</label>
-                        <select name="contact_group">
-                            <option value="General" selected>General</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="modal-actions">
-                    <button type="button" class="modal-save-btn" onclick="saveNewContact()">Save</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
+<!-- New Account Quick Creation Modal -->
 <div class="modal-overlay" id="accountModalOverlay" style="display: none;">
     <div class="modal-card account-modal-card">
         <div class="modal-header">
@@ -517,49 +458,16 @@ function filterAccounts() {
 document.addEventListener("click", function (event) {
     const rfMenu = document.getElementById("receivedFromDropdownMenu");
     const rfTrigger = document.querySelector("#paymentReceivedView .custom-dropdown-trigger");
-    if (rfMenu && !rfMenu.contains(event.target) && !rfTrigger.contains(event.target)) {
+    if (rfMenu && !rfMenu.contains(event.target) && rfTrigger && !rfTrigger.contains(event.target)) {
         rfMenu.style.display = "none";
     }
 
     const accMenu = document.getElementById("accountDropdownMenu");
     const accTrigger = document.querySelector("#quickReceiptView .custom-dropdown-trigger");
-    if (accMenu && !accMenu.contains(event.target) && (!accTrigger || !accTrigger.contains(event.target))) {
+    if (accMenu && !accMenu.contains(event.target) && accTrigger && !accTrigger.contains(event.target)) {
         accMenu.style.display = "none";
     }
 });
-
-function openContactModal() {
-    document.getElementById("receivedFromDropdownMenu").style.display = "none";
-    document.getElementById("contactModalOverlay").style.display = "flex";
-}
-
-function closeContactModal() {
-    document.getElementById("contactModalOverlay").style.display = "none";
-}
-
-function selectContactType(element, typeValue) {
-    const buttons = document.querySelectorAll('.contact-type-btn');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    
-    element.classList.add('active');
-    const radio = element.querySelector('input[type="radio"]');
-    if (radio) {
-        radio.checked = true;
-    }
-}
-
-function saveNewContact() {
-    const nameInput = document.getElementById("contactNameInput");
-    const contactName = nameInput.value.trim();
-
-    if (contactName) {
-        selectReceivedFrom(contactName);
-        closeContactModal();
-        document.getElementById("newContactForm").reset();
-    } else {
-        alert("Please enter Name.");
-    }
-}
 
 function openAccountModal() {
     document.getElementById("accountDropdownMenu").style.display = "none";
@@ -583,5 +491,4 @@ function saveNewAccount() {
     }
 }
 </script>
-
 {% endblock %}
