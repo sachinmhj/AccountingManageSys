@@ -2,62 +2,160 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/invoice.css' %}">
+<link rel="stylesheet" href="{% static 'css/product-category.css' %}">
 {% endblock %}
 
+
 {% block content %}
-<div class="invoice-page">
-    {% include "components/erp_list_header.html" %}
-<div class="invoice-table-container">
+
+{% include "components/erp_list_header.html" %}
+
+
 <table class="invoice-table">
+
     <thead>
         <tr>
             <th>
-                <input 
+                <input
                     type="checkbox"
-                    class="select-checkbox"
-                    onclick="event.stopPropagation();">
+                    class="row-checkbox"
+                    id="name-checkbox">
+
                 Name
             </th>
-            <th>Parent</th>
+
+            <th>
+                Parent
+            </th>
         </tr>
     </thead>
 
-<tbody>
-{% for product in products %}
-<tr>
-    <td>
-        <div class="product-name">
-            <input type="checkbox" class="row-checkbox">
-            {{ product.name }}
-        </div>
 
-        <div class="general-row">
-            <label>
-                <input type="checkbox" class="row-checkbox">
-                General
-            </label>
+    <tbody>
 
-            <div class="action-menu">
-                <button class="dots-btn" onclick="toggleMenu(event,this)">
-                    ⋮
-                </button>
+        <tr class="general-row">
 
-                <div class="dropdown-menu">
-                    <a href="#">Edit</a>
-                    <a href="#">Delete</a>
+            <!-- General under Name -->
+            <td>
+
+                <div class="general-content">
+
+                    <label class="general-label">
+
+                        <input
+                            type="checkbox"
+                            class="row-checkbox"
+                            id="general-checkbox">
+
+                        <span>General</span>
+
+                    </label>
+
                 </div>
-            </div>
-        </div>
-    </td>
 
-    <td>
-        {{ product.parent }}
-    </td>
-</tr>
-{% endfor %}
-</tbody>
+            </td>
+
+
+            <!-- Three dots under Parent -->
+            <td>
+
+                <div class="general-action">
+
+                    <div class="action-menu">
+
+                        <button
+                            type="button"
+                            class="dots-btn"
+                            onclick="toggleMenu(event, this)">
+                            ⋮
+                        </button>
+
+                        <div class="dropdown-menu">
+
+                            <a href="#">Edit</a>
+                            <a href="#">Delete</a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+    </tbody>
+
 </table>
-</div>
-</div>
+
+
+<script>
+
+/* ==========================================
+   NAME ↔ GENERAL CHECKBOX
+========================================== */
+
+const nameCheckbox =
+    document.getElementById("name-checkbox");
+
+const generalCheckbox =
+    document.getElementById("general-checkbox");
+
+
+nameCheckbox.addEventListener("change", function () {
+
+    generalCheckbox.checked = this.checked;
+
+});
+
+
+generalCheckbox.addEventListener("change", function () {
+
+    nameCheckbox.checked = this.checked;
+
+});
+
+
+/* ==========================================
+   THREE DOTS MENU
+========================================== */
+
+function toggleMenu(event, button) {
+
+    event.stopPropagation();
+
+    const menu = button.nextElementSibling;
+
+    document
+        .querySelectorAll(".dropdown-menu")
+        .forEach(function (item) {
+
+            if (item !== menu) {
+                item.classList.remove("show");
+            }
+
+        });
+
+    menu.classList.toggle("show");
+}
+
+
+/* Close dropdown */
+
+document.addEventListener("click", function () {
+
+    document
+        .querySelectorAll(".dropdown-menu")
+        .forEach(function (menu) {
+
+            menu.classList.remove("show");
+
+        });
+
+});
+
+</script>
+
+
 {% endblock %}
