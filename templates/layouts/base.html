@@ -1,94 +1,80 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Accounting System{% endblock %}</title>
 
-    <title>
-        {% block title %}Accounting System{% endblock %}
-    </title>
-
+    <!-- Google Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
+    <!-- Global App Styles -->
     <link rel="stylesheet" href="{% static 'css/layout.css' %}">
-
     <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
-
     <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
-
     <link rel="stylesheet" href="{% static 'css/sales.css' %}">
-
     <link rel="stylesheet" href="{% static 'css/invoice.css' %}">
 
     {% block extra_css %}{% endblock %}
-
 </head>
 
 <body>
 
-<div class="app-layout">
-
-    <div class="sidebar-header">
-        ERP System
-    </div>
-
-    {% include 'includes/navbar.html' %}
-
-    {% include 'includes/sidebar.html' %}
-
-    <main class="main-content">
-
-        {% block content %}
-        {% endblock %}
-
-    </main>
-
-</div>
-
-<div class="activity-panel">
-
-    <div class="activity-header">
-
-        <h3>
-            Activity Log
-        </h3>
-
-        <button
-            type="button"
-            class="close-btn"
-            onclick="closeActivity()">
-            ✕
-        </button>
-
-    </div>
-
-    <div class="activity-content">
-
-        <div class="activity-item">
-            Invoice created
-            <small>Today</small>
+    <div class="app-layout">
+        <div class="sidebar-header">
+            ERP System
         </div>
 
-        <div class="activity-item">
-            Payment received
-            <small>Yesterday</small>
-        </div>
+        {% include 'includes/navbar.html' %}
+        {% include 'includes/sidebar.html' %}
 
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
     </div>
 
-</div>
+    <!-- Activity Log Slide-out Panel -->
+    <div class="activity-panel" id="activityPanel">
+        <div class="activity-header">
+            <h3>Activity Log</h3>
+            <button type="button" class="close-btn" onclick="closeActivity()">✕</button>
+        </div>
 
-{% block extra_js %}{% endblock %}
-<script src="{% static 'js/sidebar.js' %}"></script>
+        <div class="activity-content">
+            <div class="activity-item">
+                <span>Invoice created</span>
+                <small>Today</small>
+            </div>
+            <div class="activity-item">
+                <span>Payment received</span>
+                <small>Yesterday</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Panel Toggle Script -->
+    <script>
+        function openActivity() {
+            const panel = document.getElementById("activityPanel");
+            if (panel) {
+                panel.classList.add("open");
+            }
+        }
+
+        function closeActivity() {
+            const panel = document.getElementById("activityPanel");
+            if (panel) {
+                panel.classList.remove("open");
+            }
+        }
+    </script>
+
+    <script src="{% static 'js/sidebar.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+
 </body>
 </html>

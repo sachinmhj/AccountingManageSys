@@ -1,45 +1,76 @@
 {% extends "layouts/base.html" %}
 {% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/invoiceadd.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/sharedinvoice_add.js' %}"></script>
+{% endblock %}
+
 {% block content %}
+
+{% include "components/modal_sales/sales_add.html" %}
+{% include "components/modal_sales/invoice_inventory.html" %}
+
 <div class="invoice-page">
+
     {% include "components/erp_list_header.html" %}
-<div class="invoice-table-container">
-    <table class="invoice-table">
-        <thead>
-            <tr>
-                <th>
-                    <input 
-                        type="checkbox"
-                        class="select-checkbox"
-                        onclick="event.stopPropagation();">Code/SKU</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Tax</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for product in products %}
-            <tr>
-                <td>
-                    <input 
-                        type="checkbox"
-                        class="row-checkbox"
-                    >
-                    {{ product.code }}
-                </td>
-                <td>{{ product.name }}</td>
-                <td>{{ product.category }}</td>
-                <td>{{ product.tax }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" class="empty">
-                    No products found
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+    <div class="invoice-table-container">
+        <table class="invoice-table">
+
+            <thead>
+                <tr>
+                    <th>
+                        <input
+                            type="checkbox"
+                            class="select-checkbox"
+                            onclick="event.stopPropagation();">
+                        Code/SKU
+                    </th>
+
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Tax</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for product in products %}
+
+                <tr>
+                    <td>
+                        <input
+                            type="checkbox"
+                            class="row-checkbox"
+                            onclick="event.stopPropagation();">
+
+                        {{ product.code }}
+                    </td>
+
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.category }}</td>
+                    <td>{{ product.tax }}</td>
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="4" class="empty">
+                        No products found
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
 </div>
-</div>
+
 {% endblock %}

@@ -1,149 +1,182 @@
-/* =====================================================
-   Product Category
-===================================================== */
+/* Fix table container and table clipping so dropdowns overflow properly */
+    .invoice-table-container {
+        overflow: visible !important;
+        position: relative;
+        min-height: 250px;
+        padding-bottom: 60px; /* Provides breathing room for open menus */
+    }
 
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: visible !important;
+    }
 
-/* Make the table use the full available width */
+    .invoice-table th, 
+    .invoice-table td {
+        padding: 12px 16px;
+        text-align: left;
+        vertical-align: middle;
+        overflow: visible;
+    }
 
-.invoice-table {
-    width: 100%;
-    table-layout: fixed;
-}
+    .invoice-table th.text-right, 
+    .invoice-table td.text-right {
+        text-align: right;
+    }
 
+    /* Action Menu & Professional Dropdown Styling */
+    .action-menu {
+        position: relative;
+        display: inline-block;
+    }
 
-/* Name column */
+    .dots-btn {
+        background: transparent;
+        border: none;
+        font-size: 18px;
+        color: #64748b;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: background-color 0.2s, color 0.2s;
+    }
 
-.invoice-table th:first-child,
-.invoice-table td:first-child {
-    width: 50%;
-}
+    .dots-btn:hover {
+        background-color: #f1f5f9;
+        color: #0f172a;
+    }
 
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        margin-top: 4px;
+        background-color: #ffffff;
+        min-width: 140px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+        z-index: 999;
+        overflow: hidden;
+        text-align: left;
+    }
 
-/* Parent column */
+    .dropdown-menu.show {
+        display: block;
+    }
 
-.invoice-table th:last-child,
-.invoice-table td:last-child {
-    width: 50%;
-}
+    .dropdown-menu a {
+        display: block;
+        padding: 10px 16px;
+        font-size: 13px;
+        color: #334155;
+        text-decoration: none;
+        transition: background-color 0.15s, color 0.15s;
+    }
 
+    .dropdown-menu a:hover {
+        background-color: #f8fafc;
+        color: #0284c7;
+    }
 
-/* =====================================================
-   General Row
-===================================================== */
+    /* Category Modal Overlay */
+    .category-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(15, 23, 42, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
 
-.general-row td {
-    padding-top: 6px !important;
-    padding-bottom: 6px !important;
-}
+    .category-modal-card {
+        background: #ffffff;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
 
+    .category-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid #f1f5f9;
+    }
 
-/* General sits directly under Name */
+    .category-modal-header h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
 
-.general-content {
-    display: flex;
-    align-items: center;
+    .btn-close-modal {
+        background: transparent;
+        border: none;
+        font-size: 20px;
+        color: #64748b;
+        cursor: pointer;
+    }
 
-    width: 100%;
-    padding-left: 28px;
-}
+    .category-modal-body {
+        padding: 20px;
+    }
 
+    .category-form-group {
+        margin-bottom: 16px;
+    }
 
-.general-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    .category-form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 6px;
+    }
 
-    font-size: 13px;
-    color: #444;
-}
+    .category-form-group label span {
+        color: #ef4444;
+    }
 
+    .category-input, 
+    .category-select, 
+    .category-textarea {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        font-size: 14px;
+        outline: none;
+        box-sizing: border-box;
+    }
 
-/* =====================================================
-   Three Dots
-===================================================== */
+    .category-input:focus, 
+    .category-select:focus, 
+    .category-textarea:focus {
+        border-color: #0284c7;
+    }
 
-.general-action {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    .btn-save-category {
+        background-color: #10b981;
+        color: #ffffff;
+        border: none;
+        padding: 8px 24px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 8px;
+    }
 
-    width: 100%;
-}
-
-
-.action-menu {
-    position: relative;
-}
-
-
-.dots-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 32px;
-    height: 28px;
-
-    padding: 0;
-
-    border: none;
-    background: transparent;
-
-    font-size: 20px;
-    line-height: 1;
-
-    color: #555;
-
-    cursor: pointer;
-}
-
-
-.dots-btn:hover {
-    color: #198754;
-}
-
-
-/* =====================================================
-   Dropdown
-===================================================== */
-
-.dropdown-menu {
-    display: none;
-
-    position: absolute;
-    right: 0;
-    top: 30px;
-
-    min-width: 110px;
-
-    background: #fff;
-
-    border: 1px solid #ddd;
-    border-radius: 6px;
-
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
-
-    z-index: 1000;
-}
-
-
-.dropdown-menu.show {
-    display: block;
-}
-
-
-.dropdown-menu a {
-    display: block;
-
-    padding: 8px 12px;
-
-    color: #333;
-    text-decoration: none;
-
-    font-size: 13px;
-}
-
-
-.dropdown-menu a:hover {
-    background: #f5f5f5;
-}
+    .btn-save-category:hover {
+        background-color: #059669;
+    }

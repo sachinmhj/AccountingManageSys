@@ -31,6 +31,17 @@ class InvoiceAddView(TemplateView):
         context["title"] = "Add New Invoice"
         return context
 
+class CustomersView(TemplateView):
+    template_name="pages/sales/customers.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Customers"
+        context["tabs"] = ["Customer"]
+        context["customers"] = []
+        context["new_action"] = "openCustomerModal()"
+        return context
+
+
 
 class CustomerPaymentView(TemplateView):
     template_name = "pages/sales/customer_payment.html"
@@ -67,6 +78,7 @@ class InventoryProductView(TemplateView):
         context["title"] = "Products"
         context["tabs"] = ["Goods", "Services"]
         context["products"] = []
+        context["new_action"] = "openProductModal()"
         return context
 
 
@@ -76,8 +88,17 @@ class VariantProductView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Variant Products"
-        context["tabs"] = ["Product", "Service"]
+        context["tabs"] = ["Products", "Services"]
         context["products"] = []
+        context["new_url"] = "variant_product_add"
+        return context
+    
+class VariantProductAddView(TemplateView):
+    template_name = "pages/inventory/variant_product_add.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "New Variant Product"
         return context
 
 
@@ -88,6 +109,7 @@ class VariantAttributeView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "Variant Attributes"
         context["attributes"] = []
+        context["new_action"]="openAttributeModal()"
         return context
 
 
@@ -98,6 +120,17 @@ class ProductCategoryView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "Product Categories"
         context["categories"] = []
+        context["new_action"]="openCategoryModal()"
+        return context
+
+class UnitsMeasurementView(TemplateView):
+    template_name = "pages/inventory/units_measurement.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Units Of Measurement"
+        context["categories"] = []
+        context["new_action"]="openCreateUnitModal()"
         return context
 
 
@@ -109,6 +142,14 @@ class WarehouseTransferView(TemplateView):
         context["title"] = "Warehouse Transfer"
         context["tabs"] = ["Approved", "Draft"]
         context["transfers"] = []
+        context["new_url"] = "warehouse_add"
+        return context
+class WarehouseAddView(TemplateView):
+    template_name = "pages/inventory/warehouse_add.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "New Warehouse Transfer"
         return context
 
 
@@ -120,6 +161,14 @@ class InventoryAdjustmentView(TemplateView):
         context["title"] = "Inventory Adjustment"
         context["tabs"] = ["Approved", "Draft"]
         context["adjusts"] = []
+        context["new_url"] = "inventory_adjust_add"       
+        return context
+class InventoryAdjustAddView(TemplateView):
+    template_name = "pages/inventory/inventory_adjust_add.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "New Inventory Adjustment"
         return context
 
 
@@ -130,6 +179,14 @@ class BillMaterialView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "Bill of Materials"
         context["bills"] = []
+        context["new_url"] = "bill_material_add"       
+        return context
+class BillMaterialAddView(TemplateView):
+    template_name = "pages/inventory/bill_material_add.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Add New Bills Of Material"
         return context
 
 

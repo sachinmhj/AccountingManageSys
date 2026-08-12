@@ -2,160 +2,152 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/product-category.css' %}">
+<link rel="stylesheet" href="{% static 'css/product_category.css' %}">
 {% endblock %}
 
-
 {% block content %}
+<div class="invoice-page">
+    {% include "components/erp_list_header.html" %}
 
-{% include "components/erp_list_header.html" %}
+    <div class="invoice-table-container">
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">
+                        <input type="checkbox" class="row-checkbox" id="name-checkbox">
+                    </th>
+                    <th>Name</th>
+                    <th>Parent</th>
+                    <th class="text-right" style="width: 60px;"></th>
+                </tr>
+            </thead>
 
-
-<table class="invoice-table">
-
-    <thead>
-        <tr>
-            <th>
-                <input
-                    type="checkbox"
-                    class="row-checkbox"
-                    id="name-checkbox">
-
-                Name
-            </th>
-
-            <th>
-                Parent
-            </th>
-        </tr>
-    </thead>
-
-
-    <tbody>
-
-        <tr class="general-row">
-
-            <!-- General under Name -->
-            <td>
-
-                <div class="general-content">
-
-                    <label class="general-label">
-
-                        <input
-                            type="checkbox"
-                            class="row-checkbox"
-                            id="general-checkbox">
-
-                        <span>General</span>
-
-                    </label>
-
-                </div>
-
-            </td>
-
-
-            <!-- Three dots under Parent -->
-            <td>
-
-                <div class="general-action">
-
-                    <div class="action-menu">
-
-                        <button
-                            type="button"
-                            class="dots-btn"
-                            onclick="toggleMenu(event, this)">
-                            ⋮
-                        </button>
-
-                        <div class="dropdown-menu">
-
-                            <a href="#">Edit</a>
-                            <a href="#">Delete</a>
-
+            <tbody>
+                {% for category in categories %}
+                <tr class="general-row">
+                    <td>
+                        <input type="checkbox" class="row-checkbox general-checkbox">
+                    </td>
+                    <td>
+                        <span>{{ category.name }}</span>
+                    </td>
+                    <td>
+                        <span>{{ category.parent|default:"--" }}</span>
+                    </td>
+                    <td class="text-right">
+                        <div class="action-menu">
+                            <button type="button" class="dots-btn" onclick="toggleMenu(event, this)">⋮</button>
+                            <div class="dropdown-menu">
+                                <a href="javascript:void(0)" onclick="openEditCategoryModal('{{ category.id }}', '{{ category.name }}', '{{ category.parent }}', '{{ category.description }}')">Edit</a>
+                                <a href="#">Delete</a>
+                            </div>
                         </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr class="general-row">
+                    <td>
+                        <input type="checkbox" class="row-checkbox" id="general-checkbox">
+                    </td>
+                    <td>
+                        <span>General</span>
+                    </td>
+                    <td>
+                        <span>--</span>
+                    </td>
+                    <td class="text-right">
+                        <div class="action-menu">
+                            <button type="button" class="dots-btn" onclick="toggleMenu(event, this)">⋮</button>
+                            <div class="dropdown-menu">
+                                <a href="javascript:void(0)" onclick="openEditCategoryModal('', 'General', '', 'General Products Category')">Edit</a>
+                                <a href="#">Delete</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-                    </div>
+<!-- New Product Category Modal -->
+<div class="category-modal-overlay" id="createCategoryModalOverlay" style="display: none;">
+    <div class="category-modal-card">
+        <div class="category-modal-header">
+            <h3>New Product Category</h3>
+            <button type="button" class="btn-close-modal" onclick="closeCategoryModal('createCategoryModalOverlay')">×</button>
+        </div>
 
+        <div class="category-modal-body">
+            <form id="createCategoryForm" method="POST">
+                {% csrf_token %}
+                <div class="category-form-group">
+                    <label>Name <span>*</span></label>
+                    <input type="text" name="name" class="category-input" placeholder="Name" required>
                 </div>
 
-            </td>
+                <div class="category-form-group">
+                    <label>Under Category</label>
+                    <select name="parent" class="category-select">
+                        <option value="" selected>Category Name</option>
+                        <option value="General">General</option>
+                    </select>
+                </div>
 
-        </tr>
+                <div class="category-form-group">
+                    <label>Description</label>
+                    <input type="text" name="description" class="category-input" placeholder="Description">
+                </div>
 
-    </tbody>
+                <div>
+                    <button type="submit" class="btn-save-category">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-</table>
+<!-- Edit Product Category Modal -->
+<div class="category-modal-overlay" id="editCategoryModalOverlay" style="display: none;">
+    <div class="category-modal-card">
+        <div class="category-modal-header">
+            <h3>Edit Product Category</h3>
+            <button type="button" class="btn-close-modal" onclick="closeCategoryModal('editCategoryModalOverlay')">×</button>
+        </div>
 
+        <div class="category-modal-body">
+            <form id="editCategoryForm" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="category_id" id="editCategoryId">
 
-<script>
+                <div class="category-form-group">
+                    <label>Name <span>*</span></label>
+                    <input type="text" name="name" id="editCategoryName" class="category-input" placeholder="Name" required>
+                </div>
 
-/* ==========================================
-   NAME ↔ GENERAL CHECKBOX
-========================================== */
+                <div class="category-form-group">
+                    <label>Under Category</label>
+                    <select name="parent" id="editCategoryParent" class="category-select">
+                        <option value="">Category Name</option>
+                        <option value="General">General</option>
+                    </select>
+                </div>
 
-const nameCheckbox =
-    document.getElementById("name-checkbox");
+                <div class="category-form-group">
+                    <label>Description</label>
+                    <input type="text" name="description" id="editCategoryDescription" class="category-input" placeholder="Description">
+                </div>
 
-const generalCheckbox =
-    document.getElementById("general-checkbox");
+                <div>
+                    <button type="submit" class="btn-save-category">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-
-nameCheckbox.addEventListener("change", function () {
-
-    generalCheckbox.checked = this.checked;
-
-});
-
-
-generalCheckbox.addEventListener("change", function () {
-
-    nameCheckbox.checked = this.checked;
-
-});
-
-
-/* ==========================================
-   THREE DOTS MENU
-========================================== */
-
-function toggleMenu(event, button) {
-
-    event.stopPropagation();
-
-    const menu = button.nextElementSibling;
-
-    document
-        .querySelectorAll(".dropdown-menu")
-        .forEach(function (item) {
-
-            if (item !== menu) {
-                item.classList.remove("show");
-            }
-
-        });
-
-    menu.classList.toggle("show");
-}
-
-
-/* Close dropdown */
-
-document.addEventListener("click", function () {
-
-    document
-        .querySelectorAll(".dropdown-menu")
-        .forEach(function (menu) {
-
-            menu.classList.remove("show");
-
-        });
-
-});
-
-</script>
-
-
+{% block extra_js %}
+<script src="{% static 'js/product_category.js' %}"></script>
 {% endblock %}

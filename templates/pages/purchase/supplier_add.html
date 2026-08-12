@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-{% comment %} Shared customer creation modal {% endcomment %}
+{% comment %} Shared contact creation modal {% endcomment %}
 {% include "components/modal_sales/sales_add.html" %}
 
 <div class="payment-add-page">
@@ -20,7 +20,7 @@
     <div id="paymentReceivedView">
         <div class="payment-header">
             <div class="payment-title-group">
-                <h2>New Customer Payment</h2>
+                <h2>New Supplier Payment</h2>
             </div>
 
             <div class="payment-actions">
@@ -42,26 +42,27 @@
                     <div class="form-group col-span-8">
                         <label>Paid To<span class="required">*</span></label>
                         <div class="custom-dropdown-wrapper">
-                            <input type="hidden" name="customer" id="selectedReceivedFromValue" required>
+                            <input type="hidden" name="supplier" id="selectedReceivedFromValue" required>
                             <div class="custom-dropdown-trigger" onclick="toggleReceivedFromDropdown(event)">
-                                <span id="selectedReceivedFromText" class="placeholder-text">Paid To</span>
+                                <span id="selectedReceivedFromText" class="placeholder-text">Paid To (Supplier)</span>
                             </div>
                             <div class="custom-dropdown-menu" id="receivedFromDropdownMenu">
                                 <div class="dropdown-search-box">
-                                    <input type="text" placeholder="Received From" id="receivedFromSearchInput" onkeyup="filterReceivedFromOptions()">
+                                    <input type="text" placeholder="Search Supplier" id="receivedFromSearchInput" onkeyup="filterReceivedFromOptions()">
                                 </div>
 
                                 <div class="dropdown-options-list" id="receivedFromOptionsList">
-                                    <div class="dropdown-option" onclick="selectReceivedFrom('Cash Customer (Customer) (CUS0001)')">
-                                        Cash Customer (Customer) (CUS0001)
+                                    <div class="dropdown-option" onclick="selectReceivedFrom('Main Vendor (Supplier) (SUP0001)')">
+                                        Main Vendor (Supplier) (SUP0001)
                                     </div>
-                                    <div class="dropdown-option" onclick="selectReceivedFrom('Cash in Hand (BC0001)')">
-                                        Cash in Hand (BC0001)
+                                    <div class="dropdown-option" onclick="selectReceivedFrom('Cash Supplier (SUP0002)')">
+                                        Cash Supplier (SUP0002)
                                     </div>
                                 </div>
 
                                 <div class="dropdown-footer">
-                                    <button type="button" class="btn-add-new-account" onclick="openContactModal()">+ Add New</button>
+                                    <!-- Explicitly passes 'supplier' mode to the shared modal -->
+                                    <button type="button" class="btn-add-new-account" onclick="openContactModal('supplier')">+ Add New Supplier</button>
                                 </div>
                             </div>
                         </div>
@@ -272,16 +273,15 @@
                                 </div>
 
                                 <div class="dropdown-options-list" id="accountOptionsList">
-                                    <div class="dropdown-option" onclick="selectAccount('Cash Customer (CUS0001)')">Cash Customer (CUS0001)</div>
+                                    <div class="dropdown-option" onclick="selectAccount('Main Vendor (SUP0001)')">Main Vendor (SUP0001)</div>
                                     <div class="dropdown-option" onclick="selectAccount('Cash In Hand (BC0001)')">Cash In Hand (BC0001)</div>
                                     <div class="dropdown-option" onclick="selectAccount('Purchase Goods (DE0001)')">Purchase Goods (DE0001)</div>
                                     <div class="dropdown-option" onclick="selectAccount('Purchase Service (DE0002)')">Purchase Service (DE0002)</div>
                                     <div class="dropdown-option" onclick="selectAccount('Retained Earning (RS0001)')">Retained Earning (RS0001)</div>
-                                    <div class="dropdown-option" onclick="selectAccount('Sales Goods (DI0001)')">Sales Goods (DI0001)</div>
                                 </div>
 
                                 <div class="dropdown-footer">
-                                    <button type="button" class="btn-add-new-account" onclick="openAccountModal()">Add New</button>
+                                    <button type="button" class="btn-add-new-account" onclick="openAccountModal()">Add New Account</button>
                                 </div>
                             </div>
                         </div>
@@ -358,6 +358,10 @@
 <script>
 function goBackToPayments() {
     window.location.href = "{% url 'supplier_payment' %}";
+}
+
+function selectSupplier(supplierName) {
+    selectReceivedFrom(supplierName);
 }
 
 function switchToQuickReceipt() {

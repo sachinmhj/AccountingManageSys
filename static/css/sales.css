@@ -82,3 +82,31 @@
     color:#198754;
     font-weight:600;
 }
+/* SALES CUSTOMERS CSS*/
+.customer-avatar {
+    width: 32px;
+    height: 32px;
+    background-color: #fde047;
+    color: #854d0e;
+    font-weight: 600;
+    font-size: 12px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+}
+
+.table-footer-pagination {
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.filter-icon {
+    font-size: 10px;
+    margin-left: 4px;
+    color: #94a3b8;
+}
+
