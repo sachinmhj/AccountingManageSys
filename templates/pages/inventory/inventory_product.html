@@ -11,10 +11,10 @@
                     <input 
                         type="checkbox"
                         class="select-checkbox"
-                        onclick="event.stopPropagation();">Code/SKU</th>
-                <th>Name</th>
+                        onclick="event.stopPropagation();">Name</th>
                 <th>Category</th>
-                <th>Tax</th>
+                <th>Type</th>
+                <th>Selling Price</th>
             </tr>
         </thead>
         <tbody>
@@ -25,11 +25,11 @@
                         type="checkbox"
                         class="row-checkbox"
                     >
-                    {{ product.code }}
+                    {{ product.name }}
                 </td>
-                <td>{{ product.name }}</td>
-                <td>{{ product.category }}</td>
-                <td>{{ product.tax }}</td>
+                <td>{{ product.category.name|default:"-" }}</td>
+                <td>{{ product.product_type }}</td>
+                <td>{{ product.selling_price }}</td>
             </tr>
             {% empty %}
             <tr>

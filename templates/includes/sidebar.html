@@ -25,7 +25,7 @@
 
         <!-- ================= Sales ================= -->
 
-        <li class="menu-item has-submenu {% if request.resolver_match.url_name == 'invoice' or request.resolver_match.url_name == 'customer_payment' %}open{% endif %}">
+        <li class="menu-item has-submenu {% if request.resolver_match.url_name == 'invoice' or request.resolver_match.url_name == 'customer_payment' or request.resolver_match.url_name == 'customers' %}open{% endif %}">
 
             <div class="menu-link submenu-toggle">
 
@@ -42,19 +42,27 @@
 
                 <li>
                     <div class="submenu-item-wrapper">
+                        <a href="{% url 'customers' %}"
+                           class="{% if request.resolver_match.url_name == 'customers' %}submenu-active{% endif %}">
+                            Customers
+                        </a>
+                        <a href="{% url 'customers' %}?add_modal=true" class="add-icon">
+                            <i class='bx bx-plus'></i>
+                        </a>
+                    </div>
+                </li>
 
+                <li>
+                    <div class="submenu-item-wrapper">
                         <a href="{% url 'invoice' %}"
                            class="{% if request.resolver_match.url_name == 'invoice' %}submenu-active{% endif %}">
                             Invoices
                         </a>
-
                         <a href="#" class="add-icon">
                             <i class='bx bx-plus'></i>
                         </a>
-
                     </div>
                 </li>
-
                 <li>
                     <div class="submenu-item-wrapper">
 

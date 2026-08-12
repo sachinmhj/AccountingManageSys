@@ -5,106 +5,72 @@
 
 <div class="invoice-page">
 
-
     {% include "components/erp_list_header.html" %}
-
 
     <div class="invoice-table-container">
 
-        <table class="invoice-table">
-
+        <table class="invoice-table" id="purchaseTable">
             <thead>
-
                 <tr>
-
                     <th>
-
-                        <input 
-                            type="checkbox"
-                            class="select-checkbox"
-                        >
-
-                        Suppliers
-
+                        <input type="checkbox" class="select-checkbox">
+                        Supplier
                     </th>
-
-                    <th>
-                        Bill No
-                    </th>
-
-                    <th>
-                        Reference No
-                    </th>
-
-                    <th>
-                        Date
-                    </th>
-
-                    <th>
-                        Total
-                    </th>
-
+                    <th>Bill No</th>
+                    <th>Date</th>
+                    <th>Due Date</th>
+                    <th>Total</th>
+                    <th>Status</th>
                 </tr>
-
             </thead>
 
-
             <tbody>
-
                 {% for purchase in purchases %}
-
-                <tr>
-
+                <tr data-status="{{ purchase.status }}">
                     <td>
-
-                        <input 
-                            type="checkbox"
-                            class="row-checkbox"
-                        >
-
-                        {{ purchase.suppliers }}
-
+                        <input type="checkbox" class="row-checkbox">
+                        {{ purchase.supplier.name }}
                     </td>
-
+                    <td>#{{ purchase.id }}</td>
+                    <td>{{ purchase.date }}</td>
+                    <td>{{ purchase.due_date|default:"-" }}</td>
+                    <td>Rs. {{ purchase.total_amount }}</td>
                     <td>
-                        {{ purchase.bill_no }}
+                        <span class="status-badge status-{{ purchase.status|lower|slugify }}">
+                            {{ purchase.status }}
+                        </span>
                     </td>
-
-                    <td>
-                        {{ purchase.reference_no }}
-                    </td>
-
-                    <td>
-                        {{ purchase.date }}
-                    </td>
-
-                    <td>
-                        {{ purchase.total }}
-                    </td>
-
                 </tr>
-
-
                 {% empty %}
-
                 <tr>
-
-                    <td colspan="5" class="empty">
+                    <td colspan="6" class="empty" style="text-align:center; padding: 30px;">
                         No purchase bills found
                     </td>
-
                 </tr>
-
-
                 {% endfor %}
-
             </tbody>
-
         </table>
 
     </div>
 
 </div>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Tab filtering
+    document.querySelectorAll(".tab").forEach(function(tab) {
+        tab.addEventListener("click", function() {
+            const filter = this.textContent.trim();
+            document.querySelectorAll("#purchaseTable tbody tr[data-status]").forEach(function(row) {
+                if (filter === "All") {
+                    row.style.display = "";
+                } else {
+                    row.style.display = (row.getAttribute("data-status") === filter) ? "" : "none";
+                }
+            });
+        });
+    });
+});
+</script>
 
 {% endblock %}

@@ -1063,3 +1063,35 @@
     height: calc(100vh - 64px);
     overflow-y: auto;
 }
+
+/* =====================================================
+   Status Badges
+===================================================== */
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-draft {
+    background: #f0f0f0;
+    color: #555;
+}
+
+.status-unpaid {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-partially-paid {
+    background: #cff4fc;
+    color: #055160;
+}
+
+.status-paid {
+    background: #d1e7dd;
+    color: #0a3622;
+}

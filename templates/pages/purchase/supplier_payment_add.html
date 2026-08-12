@@ -24,8 +24,8 @@
 {% block content %}
 <div class="payment-add-page">
     <div class="payment-header">
-        <h2>New Customer Payment</h2>
-        <a href="{% url 'customer_payment' %}" style="text-decoration: none; color: #666; font-size: 1.2em;">&times;</a>
+        <h2>New Supplier Payment</h2>
+        <a href="{% url 'supplier_payment' %}" style="text-decoration: none; color: #666; font-size: 1.2em;">&times;</a>
     </div>
 
     <div class="payment-card">
@@ -33,25 +33,25 @@
         <div style="color: red; margin-bottom: 16px; padding: 10px; background: #fee2e2; border-radius: 6px;">{{ error }}</div>
         {% endif %}
 
-        <form method="POST" id="customerPaymentForm">
+        <form method="POST" id="supplierPaymentForm">
             {% csrf_token %}
             
             <div class="form-group">
-                <label>Customer <span>*</span></label>
-                <select name="customer" class="form-select" id="customerSelect" onchange="fetchUnpaidInvoices(this.value)" required>
-                    <option value="" disabled selected>-- Select Customer --</option>
-                    {% for customer in customers %}
-                    <option value="{{ customer.id }}">{{ customer.name }}</option>
+                <label>Supplier <span>*</span></label>
+                <select name="supplier" class="form-select" id="supplierSelect" onchange="fetchUnpaidBills(this.value)" required>
+                    <option value="" disabled selected>-- Select Supplier --</option>
+                    {% for supplier in suppliers %}
+                    <option value="{{ supplier.id }}">{{ supplier.name }}</option>
                     {% endfor %}
                 </select>
             </div>
 
-            <div class="form-group" id="invoicesSection" style="display: none;">
-                <label>Select Unpaid Invoice <span>*</span></label>
-                <div id="unpaidInvoicesContainer">
-                    <!-- Invoices injected here -->
+            <div class="form-group" id="billsSection" style="display: none;">
+                <label>Select Unpaid Bill <span>*</span></label>
+                <div id="unpaidBillsContainer">
+                    <!-- Bills injected here -->
                 </div>
-                <input type="hidden" name="invoice_id" id="selectedInvoiceId" required>
+                <input type="hidden" name="bill_id" id="selectedBillId" required>
             </div>
 
             <div class="form-group">
@@ -83,32 +83,32 @@
 </div>
 
 <script>
-function fetchUnpaidInvoices(customerId) {
-    const container = document.getElementById('unpaidInvoicesContainer');
-    const section = document.getElementById('invoicesSection');
+function fetchUnpaidBills(supplierId) {
+    const container = document.getElementById('unpaidBillsContainer');
+    const section = document.getElementById('billsSection');
     
-    container.innerHTML = '<p style="color: #666;">Loading invoices...</p>';
+    container.innerHTML = '<p style="color: #666;">Loading bills...</p>';
     section.style.display = 'block';
-    document.getElementById('selectedInvoiceId').value = '';
+    document.getElementById('selectedBillId').value = '';
     document.getElementById('paymentAmount').value = '';
     document.getElementById('amountHelpText').textContent = '';
 
-    fetch(`/api/unpaid-invoices/${customerId}/`)
+    fetch(`/api/unpaid-bills/${supplierId}/`)
         .then(response => response.json())
         .then(data => {
-            if (data.invoices && data.invoices.length > 0) {
+            if (data.bills && data.bills.length > 0) {
                 container.innerHTML = '';
-                data.invoices.forEach(inv => {
+                data.bills.forEach(bill => {
                     const div = document.createElement('div');
                     div.className = 'invoice-card';
                     div.innerHTML = `
                         <div>
-                            <strong>Invoice #${inv.id}</strong><br>
-                            <small>Date: ${inv.date}</small>
+                            <strong>Bill #${bill.id}</strong><br>
+                            <small>Date: ${bill.date}</small>
                         </div>
                         <div style="text-align: right;">
-                            <div>Total: Rs. ${parseFloat(inv.total_amount).toFixed(2)}</div>
-                            <div style="color: #e3342f; font-weight: bold;">Pending: Rs. ${parseFloat(inv.pending_amount).toFixed(2)}</div>
+                            <div>Total: Rs. ${parseFloat(bill.total_amount).toFixed(2)}</div>
+                            <div style="color: #e3342f; font-weight: bold;">Pending: Rs. ${parseFloat(bill.pending_amount).toFixed(2)}</div>
                         </div>
                     `;
                     div.onclick = function() {
@@ -116,19 +116,19 @@ function fetchUnpaidInvoices(customerId) {
                         document.querySelectorAll('.invoice-card').forEach(el => el.classList.remove('selected'));
                         div.classList.add('selected');
                         
-                        document.getElementById('selectedInvoiceId').value = inv.id;
-                        document.getElementById('paymentAmount').value = parseFloat(inv.pending_amount).toFixed(2);
-                        document.getElementById('paymentAmount').max = inv.pending_amount;
-                        document.getElementById('amountHelpText').textContent = `Max payable amount is Rs. ${parseFloat(inv.pending_amount).toFixed(2)}`;
+                        document.getElementById('selectedBillId').value = bill.id;
+                        document.getElementById('paymentAmount').value = parseFloat(bill.pending_amount).toFixed(2);
+                        document.getElementById('paymentAmount').max = bill.pending_amount;
+                        document.getElementById('amountHelpText').textContent = `Max payable amount is Rs. ${parseFloat(bill.pending_amount).toFixed(2)}`;
                     };
                     container.appendChild(div);
                 });
             } else {
-                container.innerHTML = '<p style="color: #666;">No unpaid invoices found for this customer.</p>';
+                container.innerHTML = '<p style="color: #666;">No unpaid bills found for this supplier.</p>';
             }
         })
         .catch(err => {
-            container.innerHTML = '<p style="color: red;">Error fetching invoices.</p>';
+            container.innerHTML = '<p style="color: red;">Error fetching bills.</p>';
         });
 }
 </script>

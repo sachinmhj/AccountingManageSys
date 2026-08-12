@@ -86,24 +86,36 @@ function saveNewContact() {
     const contactName = nameInput ? nameInput.value.trim() : "";
 
     if (contactName) {
+        let isPicker = false;
+
         // Handle Payment Received dropdown update
         if (typeof selectReceivedFrom === "function") {
             selectReceivedFrom(contactName);
+            isPicker = true;
         }
         // Handle Invoice/Sales Order dropdown update
         else if (typeof selectCustomer === "function") {
             selectCustomer(contactName);
+            isPicker = true;
         }
         // Handle Purchase Bill / Supplier dropdown update
         else if (typeof selectSupplier === "function") {
             selectSupplier(contactName);
+            isPicker = true;
         }
 
-        closeContactModal();
-
-        const form = document.getElementById("newContactForm");
-        if (form) {
-            form.reset();
+        if (isPicker) {
+            closeContactModal();
+            const form = document.getElementById("newContactForm");
+            if (form) {
+                form.reset();
+            }
+        } else {
+            // We are on the Customers list page, so actually submit to backend
+            const form = document.getElementById("newContactForm");
+            if (form) {
+                form.submit();
+            }
         }
     } else {
         alert("Please enter Name.");

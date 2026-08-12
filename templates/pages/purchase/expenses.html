@@ -11,44 +11,28 @@
         <table class="invoice-table">
             <thead>
                 <tr>
-                    <th>
-                        <input type="checkbox"class="select-checkbox">Supplier </th>
-                    <th>
-                        Bill No
-                    </th>
-                    <th>
-                        Date
-                    </th>
-                    <th>
-                        Reference No
-                    </th>
-                    <th>
-                        Total
-                    </th>
+                    <th><input type="checkbox" class="select-checkbox"> Category</th>
+                    <th>Date</th>
+                    <th>Payment Method</th>
+                    <th>Description</th>
+                    <th>Amount</th>
                 </tr>
             </thead>
             <tbody>
                 {% for expense in expenses %}
                 <tr>
                     <td>
-                        {{ expense.name }}
+                        <input type="checkbox" class="row-checkbox">
+                        {{ expense.category.name }}
                     </td>
-                    <td>
-                        {{ expense.reference }}
-                    </td>
-                    <td>
-                        {{ expense.date }}
-                    </td>
-                    <td>
-                        {{ expense.category }}
-                    </td>
-                    <td>
-                        {{ expense.amount }}
-                    </td>
+                    <td>{{ expense.date }}</td>
+                    <td>{{ expense.payment_method }}</td>
+                    <td>{{ expense.description|default:"-" }}</td>
+                    <td>Rs. {{ expense.amount }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="empty">
+                    <td colspan="5" class="empty" style="text-align:center; padding: 30px;">
                         No expenses found
                     </td>
                 </tr>

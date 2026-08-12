@@ -45,15 +45,15 @@
 
                     <div class="custom-dropdown-popup" id="customerDropdownPopup">
                         <div class="dropdown-options-list" id="customerOptionsList">
+                            {% for customer in customers %}
                             <div class="dropdown-option-item"
-                                onclick="selectCustomer('Cash Customer (Customer)', 'CUS0001', event)">
-                                <span class="customer-name">Cash Customer (Customer)</span>
-                                <span class="customer-code">CUS0001</span>
+                                onclick="selectCustomer('{{ customer.name }}', '{{ customer.id }}', event)">
+                                <span class="customer-name">{{ customer.name }}</span>
                             </div>
+                            {% endfor %}
                         </div>
                         <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
-                            <button type="button" class="btn-add-new" onclick="openContactModal(event)">+ Add
-                                New</button>
+                            <button type="button" class="btn-add-new" onclick="openContactModal(event)">+ Add New</button>
                         </div>
                     </div>
                 </div>
@@ -70,12 +70,12 @@
 
                 <div class="invoice-form-group col-span-4">
                     <label>Invoice Date <span>*</span></label>
-                    <input type="date" name="invoice_date" value="2026-08-11" required>
+                    <input type="date" name="invoice_date" value="{{ today }}" required>
                 </div>
 
                 <div class="invoice-form-group col-span-4">
                     <label>Due Date <span>*</span></label>
-                    <input type="date" name="due_date" value="2026-08-11" required>
+                    <input type="date" name="due_date" value="{{ today }}" required>
                 </div>
 
                 <div class="invoice-form-group col-span-6">
@@ -127,28 +127,21 @@
                 <div class="invoice-items-header">
                     <div>Product / service</div>
                     <div>Qty</div>
-                    <div>Rate</div>
-                    <div>Discount</div>
-                    <div>Tax</div>
+                    <div>Unit Price</div>
                     <div>Amount</div>
+                    <div></div>
                 </div>
 
-                <div class="invoice-item-row">
-                    <div class="product-picker-container" onclick="event.stopPropagation();">
-                        <input type="hidden" name="product" id="selectedProductId">
-                        <div class="custom-select-trigger" onclick="toggleProductDropdown(event)">
-                            <input type="text" id="productSearchInput" class="product-input-field"
-                                placeholder="Add Code or Product" readonly>
-                            <span class="chevron-icon">▼</span>
-                        </div>
+                <div id="invoiceItemsContainer">
+                </div>
 
-                        <div class="custom-dropdown-popup product-popup" id="productDropdownPopup">
-                            <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
-                                <button type="button" class="btn-add-new" onclick="openProductModal(event)">+ Add
-                                    New</button>
-                            </div>
-                        </div>
-                    </div>
+                <button type="button" class="invoice-add-option" onclick="addItemRow()" style="margin-top: 8px;">+ Add Item</button>
+
+                <!-- Totals -->
+                <div class="invoice-totals" style="margin-top: 16px; text-align: right;">
+                    <div>Subtotal: <strong id="subtotalDisplay">Rs. 0.00</strong></div>
+                    <div>VAT (13%): <strong id="vatDisplay">Rs. 0.00</strong></div>
+                    <div style="font-size: 1.1em; margin-top: 4px;">Total: <strong id="totalDisplay">Rs. 0.00</strong></div>
                 </div>
             </div>
 
@@ -711,5 +704,83 @@
 
         closeUnitModal();
     }
+
+    //  INVOICE LINE ITEMS
+
+    // All products from backend passed as JSON
+    const allProducts = [
+        {% for product in products %}
+        { id: {{ product.id }}, name: "{{ product.name }}", price: {{ product.selling_price }} },
+        {% endfor %}
+    ];
+
+    function addItemRow() {
+        const container = document.getElementById('invoiceItemsContainer');
+        const rowIndex = container.children.length;
+
+        const row = document.createElement('div');
+        row.className = 'invoice-item-row';
+        row.style.cssText = 'display:grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap:8px; align-items:center; margin-bottom:8px;';
+
+        // Product dropdown HTML
+        let productOptions = allProducts.map(p =>
+            `<option value="${p.id}" data-price="${p.price}">${p.name}</option>`
+        ).join('');
+
+        row.innerHTML = `
+            <select name="product_id[]" class="form-select" onchange="onProductChange(this)" required style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                <option value="">-- Select Product --</option>
+                ${productOptions}
+            </select>
+            <input type="number" name="quantity[]" class="form-control qty-input" value="1" min="1" step="1"
+                oninput="recalcRow(this)" style="padding:8px; border:1px solid #ddd; border-radius:4px; width:100%;">
+            <input type="number" name="unit_price[]" class="form-control price-input" value="0.00" step="0.01"
+                oninput="recalcRow(this)" style="padding:8px; border:1px solid #ddd; border-radius:4px; width:100%;">
+            <span class="row-total" style="font-weight:600; color:#333;">Rs. 0.00</span>
+            <button type="button" onclick="removeItemRow(this)" style="background:none; border:none; color:#e74c3c; font-size:1.2em; cursor:pointer;">✕</button>
+        `;
+        container.appendChild(row);
+    }
+
+    function onProductChange(select) {
+        const option = select.options[select.selectedIndex];
+        const price = parseFloat(option.getAttribute('data-price')) || 0;
+        const row = select.closest('.invoice-item-row');
+        const priceInput = row.querySelector('.price-input');
+        priceInput.value = price.toFixed(2);
+        recalcRow(priceInput);
+    }
+
+    function recalcRow(input) {
+        const row = input.closest('.invoice-item-row');
+        const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+        const price = parseFloat(row.querySelector('.price-input').value) || 0;
+        const total = qty * price;
+        row.querySelector('.row-total').textContent = 'Rs. ' + total.toFixed(2);
+        recalcTotals();
+    }
+
+    function removeItemRow(btn) {
+        btn.closest('.invoice-item-row').remove();
+        recalcTotals();
+    }
+
+    function recalcTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('.row-total').forEach(function(el) {
+            subtotal += parseFloat(el.textContent.replace('Rs. ', '')) || 0;
+        });
+        const vat = subtotal * 0.13;
+        const total = subtotal + vat;
+        document.getElementById('subtotalDisplay').textContent = 'Rs. ' + subtotal.toFixed(2);
+        document.getElementById('vatDisplay').textContent = 'Rs. ' + vat.toFixed(2);
+        document.getElementById('totalDisplay').textContent = 'Rs. ' + total.toFixed(2);
+    }
+
+    // Add one empty row on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        addItemRow();
+    });
+
 </script>
 {% endblock %}

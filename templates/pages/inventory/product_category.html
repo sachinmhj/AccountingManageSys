@@ -32,59 +32,38 @@
 
 
     <tbody>
-
+        {% for category in categories %}
         <tr class="general-row">
-
             <!-- General under Name -->
             <td>
-
                 <div class="general-content">
-
                     <label class="general-label">
-
-                        <input
-                            type="checkbox"
-                            class="row-checkbox"
-                            id="general-checkbox">
-
-                        <span>General</span>
-
+                        <input type="checkbox" class="row-checkbox">
+                        <span>{{ category.name }}</span>
                     </label>
-
                 </div>
-
             </td>
-
 
             <!-- Three dots under Parent -->
             <td>
-
                 <div class="general-action">
-
                     <div class="action-menu">
-
-                        <button
-                            type="button"
-                            class="dots-btn"
-                            onclick="toggleMenu(event, this)">
+                        <button type="button" class="dots-btn" onclick="toggleMenu(event, this)">
                             ⋮
                         </button>
-
                         <div class="dropdown-menu">
-
                             <a href="#">Edit</a>
                             <a href="#">Delete</a>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </td>
-
         </tr>
-
+        {% empty %}
+        <tr>
+            <td colspan="2" style="text-align: center; padding: 20px;">No categories found.</td>
+        </tr>
+        {% endfor %}
     </tbody>
 
 </table>

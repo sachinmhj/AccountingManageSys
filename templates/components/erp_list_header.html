@@ -25,7 +25,16 @@
 
         </button>
 
-        {% if new_url %}
+        {% if new_modal_action %}
+        <button class="new-btn"
+                type="button"
+                onclick="{{ new_modal_action }}">
+
+            <i class='bx bx-plus'></i>
+            <span>New</span>
+
+        </button>
+        {% elif new_url %}
         <button class="new-btn"
                 type="button"
                 onclick="window.location.href='{% url new_url %}'">

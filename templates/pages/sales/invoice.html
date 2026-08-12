@@ -8,7 +8,7 @@
     {% include "components/erp_list_header.html" %}
 
     <div class="invoice-table-container">
-        <table class="invoice-table">
+        <table class="invoice-table" id="invoiceTable">
             <thead>
                 <tr>
                     <th>
@@ -16,24 +16,33 @@
                         Customer
                     </th>
                     <th>Invoice No</th>
-                    <th>Reference No</th>
                     <th>Invoice Date</th>
+                    <th>Due Date</th>
                     <th>Total</th>
+                    <th>Status</th>
                 </tr>
             </thead>
 
             <tbody>
                 {% for invoice in invoices %}
-                <tr>
-                    <td>{{ invoice.customer }}</td>
-                    <td>{{ invoice.invoice_no }}</td>
-                    <td>{{ invoice.reference }}</td>
+                <tr data-status="{{ invoice.status }}">
+                    <td>
+                        <input type="checkbox" class="row-checkbox">
+                        {{ invoice.customer.name }}
+                    </td>
+                    <td>#{{ invoice.id }}</td>
                     <td>{{ invoice.date }}</td>
-                    <td>{{ invoice.total }}</td>
+                    <td>{{ invoice.due_date|default:"-" }}</td>
+                    <td>Rs. {{ invoice.total_amount }}</td>
+                    <td>
+                        <span class="status-badge status-{{ invoice.status|lower|slugify }}">
+                            {{ invoice.status }}
+                        </span>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="empty">
+                    <td colspan="6" class="empty" style="text-align:center; padding: 30px;">
                         No invoices found
                     </td>
                 </tr>
@@ -46,13 +55,18 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const newBtn = document.querySelector(".new-btn");
-
-    if (newBtn) {
-        newBtn.addEventListener("click", function() {
-            window.location.href = "{% url 'invoice_add' %}";
+    document.querySelectorAll(".tab").forEach(function(tab) {
+        tab.addEventListener("click", function() {
+            const filter = this.textContent.trim();
+            document.querySelectorAll("#invoiceTable tbody tr[data-status]").forEach(function(row) {
+                if (filter === "All") {
+                    row.style.display = "";
+                } else {
+                    row.style.display = (row.getAttribute("data-status") === filter) ? "" : "none";
+                }
+            });
         });
-    }
+    });
 });
 </script>
 
