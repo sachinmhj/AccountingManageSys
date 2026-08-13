@@ -1,0 +1,447 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/invoice_add.css' %}">
+
+<style>
+
+    .invoice-form-grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .col-span-2-custom {
+        grid-column: span 2;
+    }
+
+    .col-span-1-custom {
+        grid-column: span 1;
+    }
+
+    /* Styling for the Product Variant Section */
+    .variant-section-container {
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .variant-section-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 12px;
+    }
+
+    .variant-attribute-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+
+    .variant-attribute-row .form-col {
+        flex: 1;
+    }
+
+    .remove-variant-row-btn {
+        background: transparent;
+        border: none;
+        color: #ef4444;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        padding: 4px 8px;
+        margin-top: 18px;
+    }
+
+    .remove-variant-row-btn:hover {
+        color: #dc2626;
+    }
+
+    .variant-actions-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .btn-add-more-variants,
+    .btn-generate-variants {
+        background-color: #10b981;
+        color: #ffffff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-add-more-variants:hover,
+    .btn-generate-variants:hover {
+        background-color: #059669;
+    }
+
+    .variant-error-msg {
+        color: #ef4444;
+        font-size: 12px;
+        margin-top: 4px;
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/sharedinvoice_add.js' %}"></script>
+
+<script>
+    // Preserve the original shared JavaScript function
+    const originalSetProductType = window.setProductType;
+
+    // Extend setProductType for this page specifically without altering shared JS
+    window.setProductType = function (type) {
+        if (typeof originalSetProductType === "function") {
+            originalSetProductType(type);
+        }
+
+        const variantSection = document.querySelector(".variant-section-container");
+
+        if (type === "Services") {
+            // Hide the Variant Section below HS Code
+            if (variantSection) variantSection.style.display = "none";
+
+            // Remove required checks on hidden variant inputs so the form posts cleanly
+            document.querySelectorAll(".variant-attribute-select, .variant-option-input").forEach(el => {
+                el.removeAttribute("required");
+            });
+        } else {
+            // Show Variant Section for Goods
+            if (variantSection) variantSection.style.display = "block";
+
+            // Restore required checks
+            document.querySelectorAll(".variant-attribute-select, .variant-option-input").forEach(el => {
+                el.setAttribute("required", "required");
+            });
+        }
+    };
+</script>
+{% endblock %}
+
+{% block content %}
+{% comment %} Shared Sales/Contact Modal Component {% endcomment %}
+{% include "components/modal_sales/sales_add.html" %}
+{% include "components/modal_sales/invoice_inventory.html" %}
+
+<div class="invoice-add-page">
+
+    <div class="invoice-add-header">
+        <div class="modal-form-group">
+            <h2>New Product Variant</h2>
+        </div>
+
+        <div class="product-type-toggle">
+            <button type="submit" form="invoiceAddForm" class="invoice-save-btn">Save</button>
+            <button type="button" class="invoice-close-btn" onclick="goBackToVariantProduct()">×</button>
+        </div>
+    </div>
+
+    <div class="invoice-add-body">
+        <form id="invoiceAddForm" method="POST">
+            {% csrf_token %}
+
+            <div class="invoice-form-group" style="margin-bottom: 16px;">
+                <label>Type of Product <span>*</span></label>
+                <div class="product-type-toggle">
+                    <button type="button" class="type-btn active" id="typeGoodsBtn"
+                        onclick="setProductType('Goods')">Goods</button>
+                    <button type="button" class="type-btn" id="typeServicesBtn"
+                        onclick="setProductType('Services')">Services</button>
+                </div>
+                <input type="hidden" name="product_type" id="productTypeValue" value="Goods">
+            </div>
+
+            <!-- Form Fields Grid Layout matching the screenshot -->
+            <div class="invoice-form-grid-3">
+                <div class="invoice-form-group col-span-2-custom">
+                    <label>Name <span>*</span></label>
+                    <input type="text" name="name" placeholder="Name" required>
+                </div>
+
+                <div class="invoice-form-group col-span-1-custom">
+                    <label>Code <span>*</span></label>
+                    <input type="text" name="code" value="P0001" readonly class="input-readonly">
+                </div>
+
+                <div class="invoice-form-group category-picker-container" onclick="event.stopPropagation();">
+                    <label>Category <span>*</span></label>
+                    <input type="hidden" name="category" id="selectedCategoryId" required>
+
+                    <div class="custom-select-trigger" onclick="toggleCategoryDropdown(event)">
+                        <input type="text" id="categorySearchInput" class="modal-input-field"
+                            placeholder="Category Name" readonly>
+                        <span class="chevron-icon">▼</span>
+                    </div>
+
+                    <div class="custom-dropdown-popup category-popup" id="categoryDropdownPopup">
+                        <div class="dropdown-options-list" id="categoryOptionsList">
+                            <div class="dropdown-option-item" onclick="selectCategory('General', event)">General</div>
+                        </div>
+                        <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                            <button type="button" class="btn-add-new" onclick="openCategoryModal(event)">+ Add
+                                New</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="invoice-form-group">
+                    <label>Tax</label>
+                    <select name="tax">
+                        <option value="13% VAT" selected>13% VAT</option>
+                        <option value="0% VAT">0% VAT</option>
+                        <option value="No Vat">No Vat</option>
+                    </select>
+                </div>
+
+                <div class="invoice-form-group unit-picker-container" onclick="event.stopPropagation();">
+                    <label>Primary Unit <span>*</span></label>
+                    <input type="hidden" name="primary_unit" id="selectedUnitId" required>
+
+                    <div class="custom-select-trigger" onclick="toggleUnitDropdown(event)">
+                        <input type="text" id="unitSearchInput" class="modal-input-field" placeholder="Primary Unit"
+                            readonly>
+                        <span class="chevron-icon">▼</span>
+                    </div>
+
+                    <div class="unit-dropdown-card" id="unitDropdownPopup">
+                        <div class="dropdown-options-list" id="unitOptionsList">
+                            <div class="dropdown-option-item" onclick="selectUnit('Bag', event)">Bag</div>
+                            <div class="dropdown-option-item" onclick="selectUnit('Can', event)">Can</div>
+                            <div class="dropdown-option-item" onclick="selectUnit('Box', event)">Box</div>
+                            <div class="dropdown-option-item" onclick="selectUnit('Carton', event)">Carton</div>
+                            <div class="dropdown-option-item" onclick="selectUnit('Cubic Feet', event)">Cubic Feet</div>
+                            <div class="dropdown-option-item" onclick="selectUnit('Kg', event)">Kg</div>
+                            <div class="dropdown-option-item" onclick="selectUnit('Piece', event)">Piece</div>
+                        </div>
+                        <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                            <button type="button" class="btn-add-new" onclick="openUnitModal(event)">+ Add New</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="invoice-form-group">
+                    <label>Selling Price <span>*</span></label>
+                    <input type="number" name="selling_price" value="0" required>
+                </div>
+
+                <div class="invoice-form-group">
+                    <label>Purchase Price <span>*</span></label>
+                    <input type="number" name="purchase_price" value="0" required>
+                </div>
+
+                <div class="invoice-form-group">
+                    <label>HS Code</label>
+                    <input type="text" name="hs_code" placeholder="HS Code">
+                </div>
+            </div>
+
+            <!-- Product Information / Dynamic Attributes Section -->
+            <div class="variant-section-container">
+                <div class="variant-section-title">Product Information</div>
+
+                <div id="variantAttributesContainer">
+                    <div class="variant-attribute-row">
+                        <div class="form-col invoice-form-group">
+                            <label>Attributes <span>*</span></label>
+                            <select name="variant_attributes[]" class="variant-attribute-select" required>
+                                <option value="" disabled selected>Select Attributes</option>
+                                <option value="Color">Color</option>
+                                <option value="Size">Size</option>
+                                <option value="Material">Material</option>
+                            </select>
+                        </div>
+                        <div class="form-col invoice-form-group">
+                            <label>Options <span>*</span></label>
+                            <input type="text" name="variant_options[]" class="variant-option-input"
+                                placeholder="Please select" required>
+                        </div>
+                        <button type="button" class="remove-variant-row-btn"
+                            onclick="removeVariantAttributeRow(this)">✕</button>
+                    </div>
+                </div>
+
+                <div id="variantErrorMessage" class="variant-error-msg"></div>
+
+                <div class="variant-actions-group">
+                    <button type="button" class="btn-add-more-variants" onclick="addVariantAttributeRow()">+ Add More
+                        Variants</button>
+                    <button type="button" class="btn-generate-variants" onclick="generateVariants()">Generate
+                        Variants</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- Product/Service Creation Modal -->
+<div class="modal-overlay" id="productModalOverlay" style="display: none;">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>New Product/Service</h3>
+            <button type="button" class="modal-close-btn" onclick="closeProductModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <form id="newProductForm">
+                <div class="modal-form-group">
+                    <label>Type of Product <span>*</span></label>
+                    <div class="product-type-toggle">
+                        <button type="button" class="type-btn active" id="typeGoodsBtnModal"
+                            onclick="setProductType('Goods')">Goods</button>
+                        <button type="button" class="type-btn" id="typeServicesBtnModal"
+                            onclick="setProductType('Services')">Services</button>
+                    </div>
+                    <input type="hidden" name="product_type" id="productTypeValueModal" value="Goods">
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Name <span>*</span></label>
+                    <input type="text" name="product_name" placeholder="Name" required>
+                </div>
+
+                <div class="modal-grid-2">
+                    <div class="modal-form-group">
+                        <label>Code</label>
+                        <input type="text" name="product_code" value="P0001" readonly class="input-readonly">
+                    </div>
+
+                    <div class="modal-form-group category-picker-container" onclick="event.stopPropagation();">
+                        <label>Category <span>*</span></label>
+                        <input type="hidden" name="product_category" id="selectedCategoryIdModal" required>
+
+                        <div class="custom-select-trigger" onclick="toggleCategoryDropdown(event)">
+                            <input type="text" id="categorySearchInputModal" class="modal-input-field"
+                                placeholder="Category Name" readonly>
+                            <span class="chevron-icon">▼</span>
+                        </div>
+
+                        <div class="custom-dropdown-popup category-popup" id="categoryDropdownPopupModal">
+                            <div class="dropdown-options-list" id="categoryOptionsListModal">
+                                <div class="dropdown-option-item" onclick="selectCategory('General', event)">General
+                                </div>
+                            </div>
+                            <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                                <button type="button" class="btn-add-new" onclick="openCategoryModal(event)">+ Add
+                                    New</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-grid-2">
+                    <div class="modal-form-group">
+                        <label>Tax</label>
+                        <select name="product_tax">
+                            <option value="No Vat">No Vat</option>
+                            <option value="0 VAT">0 VAT</option>
+                            <option value="13% VAT">13% VAT</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-form-group unit-picker-container" onclick="event.stopPropagation();">
+                        <label>Primary Unit <span>*</span></label>
+                        <input type="hidden" name="primary_unit" id="selectedUnitIdModal" required>
+
+                        <div class="custom-select-trigger" onclick="toggleUnitDropdown(event)">
+                            <input type="text" id="unitSearchInputModal" class="modal-input-field"
+                                placeholder="Primary Unit" readonly>
+                            <span class="chevron-icon">▼</span>
+                        </div>
+
+                        <div class="custom-dropdown-popup unit-popup" id="unitDropdownPopupModal">
+                            <div class="dropdown-options-list" id="unitOptionsListModal">
+                                <div class="dropdown-option-item" onclick="selectUnit('Bag', event)">Bag</div>
+                                <div class="dropdown-option-item" onclick="selectUnit('Can', event)">Can</div>
+                                <div class="dropdown-option-item" onclick="selectUnit('Box', event)">Box</div>
+                                <div class="dropdown-option-item" onclick="selectUnit('Carton', event)">Carton</div>
+                                <div class="dropdown-option-item" onclick="selectUnit('Cubic Feet', event)">Cubic Feet
+                                </div>
+                                <div class="dropdown-option-item" onclick="selectUnit('Kg', event)">Kg</div>
+                                <div class="dropdown-option-item" onclick="selectUnit('Piece', event)">Piece</div>
+                            </div>
+                            <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                                <button type="button" class="btn-add-new" onclick="openUnitModal(event)">+ Add
+                                    New</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-grid-2">
+                    <div class="modal-form-group">
+                        <label>HS Code</label>
+                        <input type="text" name="hs_code" placeholder="HS Code">
+                    </div>
+
+                    <div class="modal-form-group">
+                        <label>Location</label>
+                        <div class="location-picker-container" onclick="event.stopPropagation();">
+                            <input type="hidden" name="location" id="selectedLocationInput" value="">
+
+                            <div class="location-select-trigger" onclick="toggleLocationDropdown()">
+                                <span id="locationDisplayLabel">Select Location</span>
+                                <span class="chevron-icon">▼</span>
+                            </div>
+
+                            <div class="location-dropdown-card" id="locationDropdownCard">
+                                <div class="location-dropdown-header">
+                                    <button type="button" class="select-all-btn"
+                                        onclick="toggleSelectAllLocations()">Select All</button>
+                                </div>
+
+                                <div class="location-options-list">
+                                    <label class="location-option-item">
+                                        <input type="checkbox" class="location-checkbox" value="Head Office"
+                                            onchange="updateLocationSelection()">
+                                        <span>Head Office</span>
+                                    </label>
+                                    <label class="location-option-item">
+                                        <input type="checkbox" class="location-checkbox" value="POS Restaurant"
+                                            onchange="updateLocationSelection()">
+                                        <span>POS Restaurant</span>
+                                    </label>
+                                    <label class="location-option-item">
+                                        <input type="checkbox" class="location-checkbox" value="POS Retail"
+                                            onchange="updateLocationSelection()">
+                                        <span>POS Retail</span>
+                                    </label>
+                                </div>
+
+                                <div class="location-dropdown-footer">
+                                    <button type="button" class="btn-apply-location"
+                                        onclick="applyLocationSelection()">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-toggle-group">
+                    <label class="invoice-switch">
+                        <input type="checkbox" name="available_for_sale" checked>
+                        <span class="invoice-slider"></span>
+                    </label>
+                    <strong>Available For Sale</strong>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-save-btn" onclick="saveNewProduct()">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

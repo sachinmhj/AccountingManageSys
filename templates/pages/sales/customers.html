@@ -5,66 +5,108 @@
 <link rel="stylesheet" href="{% static 'css/sales_add.css' %}">
 {% endblock %}
 
+{% block content %}
+
+{% comment %} Shared Sales/Contact Modal Component {% endcomment %}
+{% include "components/modal_sales/sales_add.html" %}
+
+<div class="erp-page">
+
+    {% include "components/erp_list_header.html" %}
+
+    <div class="invoice-table-container">
+        <table class="invoice-table" id="customersTable">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" class="select-checkbox" id="selectAllCheckbox">
+                        FULL NAME
+                    </th>
+                    <th>GROUP <span class="filter-icon">▼</span></th>
+                    <th>PHONE NUMBER</th>
+                    <th>EMAIL</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for customer in customers %}
+                <tr class="customer-row">
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="checkbox" class="select-checkbox row-checkbox">
+                            <span class="customer-avatar">{{ customer.avatar_initials|default:"CC" }}</span>
+                            <span class="fw-medium">{{ customer.full_name }}</span>
+                        </div>
+                    </td>
+                    <td>{{ customer.group|default:"--" }}</td>
+                    <td>{{ customer.phone_number|default:"--" }}</td>
+                    <td>{{ customer.email|default:"--" }}</td>
+                </tr>
+                {% empty %}
+                <!-- Fallback Mock Row matching UI screenshot -->
+                <tr class="customer-row">
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="checkbox" class="select-checkbox row-checkbox">
+                            <span class="customer-avatar">CC</span>
+                            <span class="fw-medium">Cash Customer</span>
+                        </div>
+                    </td>
+                    <td>--</td>
+                    <td>--</td>
+                    <td>--</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bottom Pagination and Row Count Footer -->
+    <div class="table-footer-pagination d-flex justify-content-end align-items-center gap-3 p-3">
+        <div class="d-flex align-items-center gap-2">
+            <span>Rows Count</span>
+            <select class="form-select form-select-sm" style="width: auto;">
+                <option value="20" selected>20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <div class="pagination-controls d-flex align-items-center gap-1">
+            <button type="button" class="btn btn-light btn-sm" disabled>&lt;</button>
+            <span class="px-2">1 - 1 / 1</span>
+            <button type="button" class="btn btn-light btn-sm" disabled>&gt;</button>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
 {% block extra_js %}
 <script src="{% static 'js/sales_add.js' %}"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('add_modal') === 'true') {
+    function openCustomerModal() {
+        // Calls the correct function from sales_add.js
+        if (typeof openContactModal === 'function') {
             openContactModal('customer');
-            
-            // Clean up the URL so refreshing doesn't pop it up again
-            const url = new URL(window.location);
-            url.searchParams.delete('add_modal');
-            window.history.replaceState({}, '', url);
+        } else {
+            // Direct DOM fallback with the correct overlay ID: contactModalOverlay
+            const modal = document.getElementById("contactModalOverlay");
+            if (modal) {
+                modal.style.display = "flex";
+            }
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Targets all common button selectors for "+ ADD NEW"
+        const newBtn = document.querySelector(".new-btn, .btn-add-new, button[onclick*='openCustomerModal']");
+        
+        if (newBtn) {
+            newBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                openCustomerModal();
+            });
         }
     });
 </script>
-{% endblock %}
-
-{% block content %}
-{% include "components/modal_sales/sales_add.html" %}
-<div class="invoice-page">
-    {% include "components/erp_list_header.html" %}
-<div class="invoice-table-container">
-    <table class="invoice-table">
-        <thead>
-            <tr>
-                <th>
-                    <input 
-                        type="checkbox"
-                        class="select-checkbox"
-                        onclick="event.stopPropagation();">Name</th>
-                <th>Type</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>PAN/VAT</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for customer in customers %}
-            <tr>
-                <td>
-                    <input 
-                        type="checkbox"
-                        class="row-checkbox"
-                    >
-                    {{ customer.name }}
-                </td>
-                <td>{{ customer.contact_type }}</td>
-                <td>{{ customer.email|default:"-" }}</td>
-                <td>{{ customer.phone|default:"-" }}</td>
-                <td>{{ customer.pan_vat_number|default:"-" }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" class="empty" style="text-align: center; padding: 20px;">
-                    No customers found
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-</div>
 {% endblock %}

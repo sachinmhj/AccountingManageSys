@@ -1,70 +1,87 @@
 {% extends "layouts/base.html" %}
 {% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/variant_attribute.css' %}">
+{% endblock %}
 {% block content %}
-
+<script src="{% static 'js/variant_attribute.js' %}"></script>
+{% block extra_js %}
+{% endblock %}
 <div class="invoice-page">
-    <div class="invoice-header">
+    
+    <!-- Shared ERP Header Component -->
+    {% include "components/erp_list_header.html" %}
 
-        <div class="invoice-tabs">
+    <div class="invoice-table-container">
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attribute in attributes %}
+                <tr>
+                    <td>{{ attribute.name }}</td>
+                    <td>{{ attribute.options }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="empty">
+                        No attributes found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-        <h2>{{ title }}</h2>
-
-        {% for tab in tabs %}
-        <button class="tab {% if forloop.first %}active{% endif %}"
-                onclick="changeTab(this)">
-            {{ tab }}
-        </button>
-        {% endfor %}
-
+<!-- New Variant Attribute Popup Modal -->
+<div class="variant-modal-overlay" id="attributeModalOverlay" style="display: none;">
+    <div class="variant-modal-card">
+        
+        <div class="variant-modal-header">
+            <h3>New Variant Attribute</h3>
+            <div class="variant-modal-actions">
+                <button type="button" class="btn-save-attribute" onclick="saveAttribute()">Save</button>
+                <button type="button" class="btn-close-modal" onclick="closeAttributeModal()">×</button>
+            </div>
         </div>
 
-        <div class="header-actions">
+        <div class="variant-modal-body">
+            <form id="variantAttributeForm" method="POST">
+                {% csrf_token %}
 
-        <button class="activity-btn"
-                type="button"
-                onclick="openActivity()">
+                <div class="variant-input-group">
+                    <label>Name <span>*</span></label>
+                    <input type="text" name="attribute_name" class="variant-text-input" placeholder="Name" required>
+                </div>
 
-            <i class='bx bx-history'></i>
+                <div class="variant-input-group">
+                    <label>Variant Options</label>
+                    
+                    <div class="options-table-container">
+                        <div class="options-header">Options Name</div>
 
-        </button>
+                        <div id="optionsListRows">
+                            <div class="option-row">
+                                <input type="text" name="options[]" placeholder="Enter Options" required>
+                                <button type="button" class="btn-remove-option" onclick="removeOptionRow(this)">✕</button>
+                            </div>
+                        </div>
 
-        <button class="new-btn" type="button">
-
-            <i class='bx bx-plus'></i>
-            <span>New</span>
-
-        </button>
-
+                        <button type="button" class="btn-add-option-row" onclick="addOptionRow()">
+                            + NEW
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
 
     </div>
-    <!-- {% include "components/erp_list_header.html" %}
-      -->
-<div class="invoice-table-container">
-    <table class="invoice-table">
-        <thead>
-            <tr>
-                <th>
-                <th>Name</th>
-                <th>Options</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for attribute in attributes %}
-            <tr>
-                <td>{{ attribute.name }}</td>
-                <td>{{ attribute.options }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" class="empty">
-                    No attributes found
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <div></div>
 </div>
-</div>
+
 {% endblock %}

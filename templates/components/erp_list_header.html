@@ -1,111 +1,75 @@
 <div class="invoice-header">
-
     <div class="invoice-tabs">
+        <h2>{{ title|default:"Units of Measurement" }}</h2>
 
-        <h2>{{ title }}</h2>
-
+        {% if tabs %}
         <div class="tab-group">
             {% for tab in tabs %}
-            <button class="tab {% if forloop.first %}active{% endif %}"
-                    onclick="changeTab(this)">
+            <button class="tab {% if forloop.first %}active{% endif %}" onclick="changeTab(this)">
                 {{ tab }}
             </button>
             {% endfor %}
         </div>
-
+        {% endif %}
     </div>
 
     <div class="header-actions">
-
-        <button class="activity-btn"
-                type="button"
-                onclick="openActivity()">
-
+        <button class="activity-btn" type="button" onclick="openActivity()">
             <i class='bx bx-history'></i>
-
         </button>
 
-        {% if new_modal_action %}
-        <button class="new-btn"
-                type="button"
-                onclick="{{ new_modal_action }}">
-
-            <i class='bx bx-plus'></i>
-            <span>New</span>
-
-        </button>
-        {% elif new_url %}
-        <button class="new-btn"
-                type="button"
-                onclick="window.location.href='{% url new_url %}'">
-
-            <i class='bx bx-plus'></i>
-            <span>New</span>
-
-        </button>
+        {% if new_url %}
+            <button class="new-btn" type="button" onclick="window.location.href='{% url new_url %}'">
+                + Add New
+            </button>
+        {% elif new_action %}
+            <button class="new-btn" type="button" onclick="{{ new_action }}">
+                + Add New
+            </button>
+        {% else %}
+            <!-- Default action for Units of Measurement Modal -->
+            <button class="new-btn" type="button" onclick="openCreateUnitModal()">
+                + Add New
+            </button>
         {% endif %}
-
     </div>
-
 </div>
 
-
-
 <div class="invoice-tools">
-
+    <!-- Main Integrated Search Field -->
     <div class="search-wrapper">
-
         <span class="search-icon">
-
             <i class='bx bx-search'></i>
-
         </span>
-
-        <input
-            type="text"
-            class="search-box"
-            placeholder="Search">
-
+        <input 
+            type="text" 
+            id="globalSearchInput" 
+            class="search-box" 
+            placeholder="Search For..."
+            autocomplete="off"
+        >
     </div>
 
-
     <div class="list-actions">
-
         <div class="pagination">
-
-            <button type="button">
-
+            <button type="button" id="prevPageBtn">
                 <i class='bx bx-chevron-left'></i>
-
             </button>
-
-            <span>0 - 0 of 0</span>
-
-            <button type="button">
-
+            <span>
+                <span id="visibleCount">0</span> - <span id="totalCount">0</span> of <span id="maxCount">0</span>
+            </span>
+            <button type="button" id="nextPageBtn">
                 <i class='bx bx-chevron-right'></i>
-
             </button>
-
         </div>
 
-
         <div class="options-dropdown">
-
-            <button
-                class="options-btn"
-                type="button"
-                onclick="toggleOptions(event)">
-
+            <button class="options-btn" type="button" onclick="toggleOptions(event)">
                 Options
-
                 <i class='bx bx-chevron-down'></i>
-
             </button>
 
-
             <div class="options-menu" id="optionsMenu">
-
                 <div>Export</div>
                 <div>Import</div>
                 <div>Voided Records</div>
@@ -114,19 +78,27 @@
     </div>
 </div>
 
-
 <script>
+    function changeTab(clickedTab) {
+        const tabs = clickedTab.parentElement.querySelectorAll(".tab");
+        tabs.forEach(function (tab) {
+            tab.classList.remove("active");
+        });
+        clickedTab.classList.add("active");
+    }
 
-function changeTab(clickedTab){
+    function toggleOptions(event) {
+        event.stopPropagation();
+        const optionsMenu = document.getElementById("optionsMenu");
+        if (optionsMenu) {
+            optionsMenu.classList.toggle("show");
+        }
+    }
 
-    const tabs = clickedTab.parentElement.querySelectorAll(".tab");
-
-    tabs.forEach(function(tab){
-        tab.classList.remove("active");
+    document.addEventListener("click", function () {
+        const optionsMenu = document.getElementById("optionsMenu");
+        if (optionsMenu) {
+            optionsMenu.classList.remove("show");
+        }
     });
-
-    clickedTab.classList.add("active");
-
-}
-
 </script>

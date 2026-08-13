@@ -25,7 +25,7 @@
 
         <!-- ================= Sales ================= -->
 
-        <li class="menu-item has-submenu {% if request.resolver_match.url_name == 'invoice' or request.resolver_match.url_name == 'customer_payment' or request.resolver_match.url_name == 'customers' %}open{% endif %}">
+        <li class="menu-item has-submenu {% if request.resolver_match.url_name == 'invoice' or request.resolver_match.url_name == 'customers' or request.resolver_match.url_name == 'customer_payment' %}open{% endif %}">
 
             <div class="menu-link submenu-toggle">
 
@@ -66,6 +66,21 @@
                 <li>
                     <div class="submenu-item-wrapper">
 
+                        <a href="{% url 'customers' %}"
+                           class="{% if request.resolver_match.url_name == 'customers' %}submenu-active{% endif %}">
+                            Customers
+                        </a>
+
+                        <a href="#" class="add-icon">
+                            <i class='bx bx-plus'></i>
+                        </a>
+
+                    </div>
+                </li>
+
+                <li>
+                    <div class="submenu-item-wrapper">
+
                         <a href="{% url 'customer_payment' %}"
                            class="{% if request.resolver_match.url_name == 'customer_payment' %}submenu-active{% endif %}">
                             Customer Payments
@@ -85,7 +100,7 @@
 
         <!-- ================= Inventory ================= -->
 
-        <li class="menu-item has-submenu {% if request.resolver_match.url_name == 'inventory_product' or request.resolver_match.url_name == 'variant_product' or request.resolver_match.url_name == 'variant_attribute' or request.resolver_match.url_name == 'product_category' or request.resolver_match.url_name == 'unit_measurement' or request.resolver_match.url_name == 'warehouse_transfer' or request.resolver_match.url_name == 'inventory_adjustment' or request.resolver_match.url_name == 'bill_material' or request.resolver_match.url_name == 'production_order' or request.resolver_match.url_name == 'production_journal' %}open{% endif %}">
+        <li class="menu-item has-submenu {% if request.resolver_match.url_name == 'inventory_product' or request.resolver_match.url_name == 'variant_product' or request.resolver_match.url_name == 'variant_attribute' or request.resolver_match.url_name == 'product_category' or request.resolver_match.url_name == 'units_measurement' or request.resolver_match.url_name == 'warehouse_transfer' or request.resolver_match.url_name == 'inventory_adjustment' or request.resolver_match.url_name == 'bill_material' or request.resolver_match.url_name == 'production_order' or request.resolver_match.url_name == 'production_journal' %}open{% endif %}">
 
             <div class="menu-link submenu-toggle">
 
@@ -138,7 +153,7 @@
 
                 <li>
                     <div class="submenu-item-wrapper">
-                        <a href="#" class="{% if request.resolver_match.url_name == 'unit_measurement' %}submenu-active{% endif %}">
+                        <a href="{% url 'units_measurement'%}" class="{% if request.resolver_match.url_name == 'units_measurement' %}submenu-active{% endif %}">
                             Units of Measurement
                         </a>
                         <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
@@ -175,7 +190,7 @@
                 <li>
                     <div class="submenu-item-wrapper">
                         <a href="{% url 'production_order' %}" class="{% if request.resolver_match.url_name == 'production_order' %}submenu-active{% endif %}">
-                            Production Orders
+                            Production Order
                         </a>
                         <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
                     </div>

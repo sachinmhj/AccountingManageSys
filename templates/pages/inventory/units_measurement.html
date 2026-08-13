@@ -1,0 +1,260 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/units_measurement.css' %}">
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/units_measurement.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="invoice-page">
+    
+    <!-- Shared ERP Header -->
+    {% include "components/erp_list_header.html" %}
+
+    <div class="invoice-table-container">
+        <!-- Live Table Stats / Pagination Header -->
+        <div class="table-top-bar d-flex justify-content-end mb-3">
+            <div class="pagination-info">
+                <span>1 - <span id="visibleCount">0</span> / <span id="totalCount">{{ units|length }}</span></span>
+            </div>
+        </div>
+
+        <table class="invoice-table" id="unitsTable">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">
+                        <input type="checkbox" class="row-checkbox" id="selectAllCheckbox">
+                    </th>
+                    <th>NAME</th>
+                    <th>SHORT NAME</th>
+                    <th class="text-right" style="width: 60px;"></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for unit in units %}
+                <tr class="unit-row">
+                    <td>
+                        <input type="checkbox" class="row-checkbox unit-checkbox">
+                    </td>
+                    <td class="unit-name">{{ unit.name }}</td>
+                    <td class="unit-short-name">{{ unit.short_name }}</td>
+                    <td class="text-right">
+                        <div class="action-menu">
+                            <button type="button" class="dots-btn" onclick="toggleMenu(event, this)">⋮</button>
+                            <div class="dropdown-menu">
+                                <a href="javascript:void(0)" onclick="openEditUnitModal('{{ unit.id }}', '{{ unit.name }}', '{{ unit.short_name }}', '{{ unit.description }}', '{{ unit.accepts_fraction|yesno:'true,false' }}')">Edit</a>
+                                <a href="#">Delete</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <!-- Default mockup rows matching the exact image list -->
+                <tr class="unit-row">
+                    <td><input type="checkbox" class="row-checkbox unit-checkbox"></td>
+                    <td class="unit-name">Bag</td>
+                    <td class="unit-short-name">BG</td>
+                    <td class="text-right">
+                        <div class="action-menu">
+                            <button type="button" class="dots-btn" onclick="toggleMenu(event, this)">⋮</button>
+                            <div class="dropdown-menu">
+                                <a href="javascript:void(0)" onclick="openEditUnitModal('1', 'Bag', 'BG', '', 'true')">Edit</a>
+                                <a href="#">Delete</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="unit-row">
+                    <td><input type="checkbox" class="row-checkbox unit-checkbox"></td>
+                    <td class="unit-name">Box</td>
+                    <td class="unit-short-name">BX</td>
+                    <td class="text-right">
+                        <div class="action-menu">
+                            <button type="button" class="dots-btn" onclick="toggleMenu(event, this)">⋮</button>
+                            <div class="dropdown-menu">
+                                <a href="javascript:void(0)" onclick="openEditUnitModal('2', 'Box', 'BX', '', 'false')">Edit</a>
+                                <a href="#">Delete</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="unit-row">
+                    <td><input type="checkbox" class="row-checkbox unit-checkbox"></td>
+                    <td class="unit-name">Can</td>
+                    <td class="unit-short-name">CN</td>
+                    <td class="text-right">
+                        <div class="action-menu">
+                            <button type="button" class="dots-btn" onclick="toggleMenu(event, this)">⋮</button>
+                            <div class="dropdown-menu">
+                                <a href="javascript:void(0)" onclick="openEditUnitModal('3', 'Can', 'CN', '', 'false')">Edit</a>
+                                <a href="#">Delete</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="unit-row">
+                    <td><input type="checkbox" class="row-checkbox unit-checkbox"></td>
+                    <td class="unit-name">Carton</td>
+                    <td class="unit-short-name">CT</td>
+                    <td class="text-right">
+                        <div class="action-menu">
+                            <button type="button" class="dots-btn" onclick="toggleMenu(event, this)">⋮</button>
+                            <div class="dropdown-menu">
+                                <a href="javascript:void(0)" onclick="openEditUnitModal('4', 'Carton', 'CT', '', 'false')">Edit</a>
+                                <a href="#">Delete</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="unit-row">
+                    <td><input type="checkbox" class="row-checkbox unit-checkbox"></td>
+                    <td class="unit-name">Case</td>
+                    <td class="unit-short-name">CS</td>
+                    <td class="text-right">
+                        <div class="action-menu">
+                            <button type="button" class="dots-btn" onclick="toggleMenu(event, this)">⋮</button>
+                            <div class="dropdown-menu">
+                                <a href="javascript:void(0)" onclick="openEditUnitModal('5', 'Case', 'CS', '', 'false')">Edit</a>
+                                <a href="#">Delete</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="unit-row">
+                    <td><input type="checkbox" class="row-checkbox unit-checkbox"></td>
+                    <td class="unit-name">Cubic Centimeter</td>
+                    <td class="unit-short-name">CC</td>
+                    <td class="text-right">
+                        <div class="action-menu">
+                            <button type="button" class="dots-btn" onclick="toggleMenu(event, this)">⋮</button>
+                            <div class="dropdown-menu">
+                                <a href="javascript:void(0)" onclick="openEditUnitModal('6', 'Cubic Centimeter', 'CC', '', 'false')">Edit</a>
+                                <a href="#">Delete</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="unit-row">
+                    <td><input type="checkbox" class="row-checkbox unit-checkbox"></td>
+                    <td class="unit-name">Cubic Feet</td>
+                    <td class="unit-short-name">CF</td>
+                    <td class="text-right">
+                        <div class="action-menu">
+                            <button type="button" class="dots-btn" onclick="toggleMenu(event, this)">⋮</button>
+                            <div class="dropdown-menu">
+                                <a href="javascript:void(0)" onclick="openEditUnitModal('7', 'Cubic Feet', 'CF', '', 'false')">Edit</a>
+                                <a href="#">Delete</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="unit-row">
+                    <td><input type="checkbox" class="row-checkbox unit-checkbox"></td>
+                    <td class="unit-name">Cubic Yard</td>
+                    <td class="unit-short-name">CY</td>
+                    <td class="text-right">
+                        <div class="action-menu">
+                            <button type="button" class="dots-btn" onclick="toggleMenu(event, this)">⋮</button>
+                            <div class="dropdown-menu">
+                                <a href="javascript:void(0)" onclick="openEditUnitModal('8', 'Cubic Yard', 'CY', '', 'false')">Edit</a>
+                                <a href="#">Delete</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- New Unit of Measurement Modal -->
+<div class="unit-modal-overlay" id="createUnitModalOverlay" style="display: none;">
+    <div class="unit-modal-card">
+        <div class="unit-modal-header">
+            <h3>New Unit of Measurement</h3>
+            <button type="button" class="btn-close-modal" onclick="closeUnitModal('createUnitModalOverlay')">×</button>
+        </div>
+
+        <div class="unit-modal-body">
+            <form id="createUnitForm" method="POST">
+                {% csrf_token %}
+                <div class="unit-form-group">
+                    <label>Name <span>*</span></label>
+                    <input type="text" name="name" class="unit-input" placeholder="Name" required>
+                </div>
+
+                <div class="unit-form-group">
+                    <label>Short Name <span>*</span></label>
+                    <input type="text" name="short_name" class="unit-input" placeholder="Short Name" required>
+                </div>
+
+                <div class="unit-form-group">
+                    <label>Description</label>
+                    <input type="text" name="description" class="unit-input" placeholder="Description">
+                </div>
+
+                <div class="toggle-group">
+                    <label class="switch">
+                        <input type="checkbox" name="accepts_fraction" value="true">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label">Accepts Fraction</span>
+                </div>
+
+                <div>
+                    <button type="submit" class="btn-save-unit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Unit of Measurement Modal -->
+<div class="unit-modal-overlay" id="editUnitModalOverlay" style="display: none;">
+    <div class="unit-modal-card">
+        <div class="unit-modal-header">
+            <h3>Edit Unit of Measurement</h3>
+            <button type="button" class="btn-close-modal" onclick="closeUnitModal('editUnitModalOverlay')">×</button>
+        </div>
+
+        <div class="unit-modal-body">
+            <form id="editUnitForm" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="unit_id" id="editUnitId">
+
+                <div class="unit-form-group">
+                    <label>Name <span>*</span></label>
+                    <input type="text" name="name" id="editUnitName" class="unit-input" placeholder="Name" required>
+                </div>
+
+                <div class="unit-form-group">
+                    <label>Short Name <span>*</span></label>
+                    <input type="text" name="short_name" id="editUnitShortName" class="unit-input" placeholder="Short Name" required>
+                </div>
+
+                <div class="unit-form-group">
+                    <label>Description</label>
+                    <input type="text" name="description" id="editUnitDescription" class="unit-input" placeholder="Description">
+                </div>
+
+                <div class="toggle-group">
+                    <label class="switch">
+                        <input type="checkbox" name="accepts_fraction" id="editUnitAcceptsFraction" value="true">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label">Accepts Fraction</span>
+                </div>
+
+                <div>
+                    <button type="submit" class="btn-save-unit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

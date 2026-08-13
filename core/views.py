@@ -135,6 +135,17 @@ class InvoiceAddView(View):
 
         return redirect('invoice')
 
+class CustomersView(TemplateView):
+    template_name="pages/sales/customers.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Customers"
+        context["tabs"] = ["Customer"]
+        context["customers"] = []
+        context["new_action"] = "openCustomerModal()"
+        return context
+
+
 
 class CustomerPaymentView(TemplateView):
     template_name = "pages/sales/customer_payment.html"
@@ -230,19 +241,7 @@ class InventoryProductView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "Products"
         context["tabs"] = ["Goods", "Services"]
-        context["products"] = Product.objects.all()
-        context["new_url"] = "inventory_product_add"
-        return context
-
-class InventoryProductAddView(CreateView):
-    model = Product
-    form_class = ProductForm
-    template_name = "pages/inventory/inventory_product_add.html"
-    success_url = reverse_lazy("inventory_product")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = "Add New Product"
+        context["products"] = []
         return context
 
 
@@ -252,8 +251,17 @@ class VariantProductView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Variant Products"
-        context["tabs"] = ["Product", "Service"]
+        context["tabs"] = ["Products", "Services"]
         context["products"] = []
+        context["new_url"] = "variant_product_add"
+        return context
+    
+class VariantProductAddView(TemplateView):
+    template_name = "pages/inventory/variant_product_add.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "New Variant Product"
         return context
 
 
@@ -264,6 +272,7 @@ class VariantAttributeView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "Variant Attributes"
         context["attributes"] = []
+        context["new_action"]="openAttributeModal()"
         return context
 
 
@@ -273,19 +282,7 @@ class ProductCategoryView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Product Categories"
-        context["categories"] = ProductCategory.objects.all()
-        context["new_url"] = "product_category_add"
-        return context
-
-class ProductCategoryAddView(CreateView):
-    model = ProductCategory
-    form_class = ProductCategoryForm
-    template_name = "pages/inventory/product_category_add.html"
-    success_url = reverse_lazy("product_category")
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = "Add New Category"
+        context["categories"] = []
         return context
 
 
@@ -297,6 +294,14 @@ class WarehouseTransferView(TemplateView):
         context["title"] = "Warehouse Transfer"
         context["tabs"] = ["Approved", "Draft"]
         context["transfers"] = []
+        context["new_url"] = "warehouse_add"
+        return context
+class WarehouseAddView(TemplateView):
+    template_name = "pages/inventory/warehouse_add.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "New Warehouse Transfer"
         return context
 
 
@@ -308,6 +313,14 @@ class InventoryAdjustmentView(TemplateView):
         context["title"] = "Inventory Adjustment"
         context["tabs"] = ["Approved", "Draft"]
         context["adjusts"] = []
+        context["new_url"] = "inventory_adjust_add"       
+        return context
+class InventoryAdjustAddView(TemplateView):
+    template_name = "pages/inventory/inventory_adjust_add.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "New Inventory Adjustment"
         return context
 
 
@@ -318,6 +331,14 @@ class BillMaterialView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "Bill of Materials"
         context["bills"] = []
+        context["new_url"] = "bill_material_add"       
+        return context
+class BillMaterialAddView(TemplateView):
+    template_name = "pages/inventory/bill_material_add.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Add New Bills Of Material"
         return context
 
 
@@ -525,3 +546,21 @@ class UnpaidPurchaseBillsJsonView(View):
                     'pending_amount': str(pending),
                 })
         return JsonResponse({'bills': data})
+
+class UnitsMeasurementView(TemplateView):
+    template_name = "pages/inventory/units_measurement.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Units Of Measurement"
+        context["categories"] = []
+        context["new_action"]="openCreateUnitModal()"
+        return context
+
+
+class SupplierAddView(TemplateView):
+    template_name ="pages/purchase/supplier_add.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "New Supplier"
+        return context

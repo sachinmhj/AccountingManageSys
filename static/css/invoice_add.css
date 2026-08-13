@@ -1,117 +1,6 @@
-.location-picker-container {
-    position: relative;
-    width: 100%;
-}
-
-.location-select-trigger {
-    height: 38px;
-    padding: 0 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 4px;
-    font-size: 13px;
-    color: #1e293b;
-    background-color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    user-select: none;
-}
-
-/* Upward Opening Popup Card */
-.location-dropdown-card {
-    display: none;
-    position: absolute;
-    bottom: calc(100% + 4px);
-    left: 0;
-    right: 0;
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    box-shadow: 0 -10px 15px -3px rgba(0, 0, 0, 0.1), 0 -4px 6px -2px rgba(0, 0, 0, 0.05);
-    z-index: 1000;
-    overflow: hidden;
-}
-
-.location-dropdown-card.active {
-    display: block;
-}
-
-/* Scrollable Options Area */
-.location-options-list {
-    max-height: 120px;
-    overflow-y: auto;
-    padding: 4px 0;
-}
-
-.location-option-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    font-size: 13px;
-    color: #334155;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.location-option-item:hover {
-    background-color: #f1f5f9;
-}
-
-.location-option-item input[type="checkbox"] {
-    width: 15px;
-    height: 15px;
-    accent-color: #10b981;
-    cursor: pointer;
-}
-
-/* Header & Footer Actions */
-.location-dropdown-header,
-.location-dropdown-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding: 8px 12px;
-    background-color: #f8fafc;
-}
-
-.location-dropdown-header {
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.location-dropdown-footer {
-    border-top: 1px solid #e2e8f0;
-}
-
-.select-all-btn {
-    background: none;
-    border: none;
-    color: #2563eb;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 0;
-}
-
-.select-all-btn:hover {
-    text-decoration: underline;
-}
-
-.btn-apply-location {
-    background-color: #10b981;
-    color: #ffffff;
-    border: none;
-    padding: 6px 16px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.btn-apply-location:hover {
-    background-color: #059669;
-}
+/* =====================================================
+   INVOICE ADD PAGE
+===================================================== */
 
 .invoice-add-page {
     width: 100%;
@@ -128,11 +17,15 @@
     from {
         transform: translateX(100%);
     }
-
     to {
         transform: translateX(0);
     }
 }
+
+
+/* =====================================================
+   HEADER
+===================================================== */
 
 .invoice-add-header {
     height: 60px;
@@ -194,6 +87,12 @@
     cursor: pointer;
     padding: 4px 8px;
 }
+
+
+/* =====================================================
+   BODY & GRID LAYOUT
+===================================================== */
+
 .invoice-add-body {
     padding: 24px 28px 60px;
     max-width: 1100px;
@@ -217,6 +116,11 @@
 .col-span-4 {
     grid-column: span 4;
 }
+
+
+/* =====================================================
+   FORM GROUPS & INPUTS
+===================================================== */
 
 .invoice-form-group {
     display: flex;
@@ -251,9 +155,18 @@
     color: #64748b;
 }
 
+
+/* =====================================================
+   PICKER CONTAINERS & TRIGGERS
+===================================================== */
+
 .customer-picker-container,
-.product-picker-container {
+.product-picker-container,
+.category-picker-container,
+.unit-picker-container,
+.location-picker-container {
     position: relative;
+    width: 100%;
 }
 
 .custom-select-trigger {
@@ -281,6 +194,19 @@
     color: #94a3b8;
 }
 
+.modal-input-field {
+    width: 100%;
+    height: 38px;
+    padding: 0 32px 0 12px !important;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #1e293b;
+    outline: none;
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
 .search-icon,
 .chevron-icon {
     position: absolute;
@@ -291,6 +217,314 @@
     color: #94a3b8;
     font-size: 10px;
 }
+
+.location-select-trigger {
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #1e293b;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+}
+
+
+/* =====================================================
+   DROPDOWN POPUPS (STANDARD DOWNWARD)
+===================================================== */
+
+.custom-dropdown-popup {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    bottom: auto;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.custom-dropdown-popup.active {
+    display: block;
+}
+
+
+/* =====================================================
+   UPWARD DROPDOWNS (PRIMARY UNIT, CATEGORY, LOCATION)
+===================================================== */
+
+.category-picker-container .custom-dropdown-popup,
+.unit-dropdown-card,
+.location-dropdown-card {
+    display: none;
+    position: absolute;
+    top: auto !important;
+    bottom: calc(100% + 2px) !important;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12);
+    z-index: 10050 !important;
+    overflow: hidden;
+}
+
+.unit-dropdown-card.active,
+.location-dropdown-card.active,
+.category-picker-container .custom-dropdown-popup.active {
+    display: block;
+}
+
+
+/* =====================================================
+   DROPDOWN OPTIONS & LISTS (MATCHING TARGET UI)
+===================================================== */
+
+.dropdown-options-list {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.dropdown-option-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #334155;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.dropdown-option-item:hover {
+    background-color: #e2e8f0;
+}
+
+.location-options-list {
+    max-height: 120px;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.location-option-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #334155;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.location-option-item:hover {
+    background-color: #f1f5f9;
+}
+
+.location-option-item input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: #10b981;
+    cursor: pointer;
+}
+
+
+/* =====================================================
+   ADD NEW ROW (GREEN TEXT STYLING LIKE SCREENSHOT)
+===================================================== */
+
+.dropdown-add-new-row {
+    padding: 10px 12px;
+    background-color: #ffffff;
+    border-top: 1px solid #f1f5f9;
+    text-align: center;
+}
+
+.btn-add-new {
+    width: 100%;
+    padding: 0;
+    background: transparent;
+    color: #10b981;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: color 0.15s ease;
+}
+
+.btn-add-new:hover {
+    color: #059669;
+    text-decoration: underline;
+}
+
+
+/* =====================================================
+   LOCATION FOOTER & BUTTONS
+===================================================== */
+
+.location-dropdown-header,
+.location-dropdown-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 12px;
+    background-color: #f8fafc;
+}
+
+.location-dropdown-header {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.location-dropdown-footer {
+    border-top: 1px solid #e2e8f0;
+}
+
+.select-all-btn {
+    background: none;
+    border: none;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.select-all-btn:hover {
+    text-decoration: underline;
+}
+
+.btn-apply-location {
+    background-color: #10b981;
+    color: #ffffff;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.btn-apply-location:hover {
+    background-color: #059669;
+}
+
+
+/* =====================================================
+   PRODUCT TYPE TOGGLE
+===================================================== */
+
+.product-type-toggle {
+    display: flex;
+    background-color: #f1f5f9;
+    border-radius: 6px;
+    padding: 3px;
+    border: 1px solid #cbd5e1;
+    gap: 2px;
+    margin-top: 6px;
+}
+
+.product-type-toggle .type-btn {
+    flex: 1;
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    outline: none;
+}
+
+.product-type-toggle .type-btn:hover:not(.active) {
+    color: #1e293b;
+    background-color: #e2e8f0;
+}
+
+.product-type-toggle .type-btn.active {
+    background-color: #ffffff;
+    color: #2563eb;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.1),
+        0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+
+/* =====================================================
+   MODALS
+===================================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99990;
+    overflow-y: auto;
+}
+
+.modal-card {
+    background: #ffffff;
+    border-radius: 8px;
+    width: 500px;
+    max-width: 90%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    overflow: visible !important;
+}
+
+.category-modal-card,
+.unit-modal-card {
+    width: 440px;
+    max-width: 90%;
+}
+
+.nested-modal-overlay {
+    z-index: 999999 !important;
+}
+
+.category-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    outline: none;
+}
+
+.category-select:focus {
+    border-color: #0066cc;
+    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+}
+
+
+/* =====================================================
+   INVOICE EXPORT & TDS SECTIONS
+===================================================== */
 
 .invoice-export-section {
     margin: 12px 0 16px 0;
@@ -312,9 +546,22 @@
     accent-color: #10b981;
 }
 
-.export-fields-grid {
+.export-fields-grid,
+.tds-fields-grid {
     margin-bottom: 20px;
 }
+
+.invoice-tds-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0 16px;
+}
+
+
+/* =====================================================
+   INVOICE ITEMS TABLE
+===================================================== */
 
 .invoice-items-section {
     border: 1px solid #e2e8f0;
@@ -356,12 +603,10 @@
     box-sizing: border-box;
 }
 
-.invoice-tds-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 20px 0 16px;
-}
+
+/* =====================================================
+   TOGGLE SWITCH & UTILITY BUTTONS
+===================================================== */
 
 .invoice-switch {
     position: relative;
@@ -408,10 +653,6 @@ input:checked + .invoice-slider:before {
     transform: translateX(20px);
 }
 
-.tds-fields-grid {
-    margin-bottom: 20px;
-}
-
 .invoice-add-option {
     display: block;
     background: none;
@@ -427,54 +668,12 @@ input:checked + .invoice-slider:before {
     text-decoration: underline;
 }
 
-.category-picker-container,
-.unit-picker-container {
-    position: relative;
-}
 
-.modal-input-field {
-    width: 100%;
-    height: 38px;
-    padding: 0 32px 0 12px !important;
-    border: 1px solid #cbd5e1;
-    border-radius: 4px;
-    font-size: 13px;
-    color: #1e293b;
-    outline: none;
-    background-color: #ffffff;
-    cursor: pointer;
-}
-
-.nested-modal-overlay {
-    z-index: 999999 !important;
-}
-
-.category-modal-card,
-.unit-modal-card {
-    width: 440px;
-    max-width: 90%;
-}
-
-.category-select {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background-color: #fff;
-    font-size: 14px;
-    color: #333;
-    cursor: pointer;
-    outline: none;
-}
-
-.category-select:focus {
-    border-color: #0066cc;
-    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
-}
-
+/* =====================================================
+   RESPONSIVE
+===================================================== */
 
 @media (max-width: 768px) {
-
     .col-span-4,
     .col-span-6,
     .col-span-8 {
@@ -497,131 +696,75 @@ input:checked + .invoice-slider:before {
         padding: 20px 16px 40px;
     }
 }
-
-.custom-dropdown-popup {
-    display: none;
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    right: 0;
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    z-index: 1000;
-    overflow: hidden;
+/* Warehouse transfer */
+/* Layout & Grid Helpers */
+.col-span-6 {
+    grid-column: span 6 / span 6;
 }
 
-.custom-dropdown-popup.active {
-    display: block;
+.col-span-12 {
+    grid-column: span 12 / span 12;
 }
 
-.dropdown-options-list {
-    max-height: 200px;
-    overflow-y: auto;
+.mt-3 {
+    margin-top: 1rem;
 }
 
-.dropdown-option-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 14px;
-    font-size: 13px;
-    color: #1e293b;
-    cursor: pointer;
-    transition: background-color 0.15s ease;
+.mt-4 {
+    margin-top: 1.5rem;
 }
 
-.dropdown-option-item:hover {
-    background-color: #f1f5f9;
+/* Form Styles */
+.required {
+    color: #e53e3e;
 }
 
-.dropdown-add-new-row {
-    padding: 8px 12px;
-    background-color: #f8fafc;
-    border-top: 1px solid #e2e8f0;
-}
-
-.btn-add-new {
-    width: 100%;
-    padding: 8px 12px;
-    background: #4f46e5;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-    transition: background-color 0.15s ease;
-}
-
-.btn-add-new:hover {
-    background-color: #4338ca;
-}
-
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(15, 23, 42, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 99990;
-}
-
-.nested-modal-overlay {
-    z-index: 999999 !important;
-}
-
-.modal-card {
-    background: #ffffff;
-    border-radius: 8px;
-    width: 500px;
-    max-width: 90%;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-.product-type-toggle {
-    display: flex;
-    background-color: #f1f5f9;
-    border-radius: 6px;
-    padding: 3px;
-    border: 1px solid #cbd5e1;
-    gap: 2px;
-    margin-top: 6px;
-}
-
-.product-type-toggle .type-btn {
-    flex: 1;
-    padding: 8px 16px;
-    border: none;
-    background: transparent;
+.bg-readonly {
+    background-color: #f1f5f9 !important;
     color: #64748b;
-    font-size: 13px;
+    cursor: not-allowed;
+}
+
+/* Items Header & Row Alignment */
+.invoice-items-header {
+    display: grid;
+    grid-template-columns: 1fr 120px;
+    background-color: #475569;
+    color: #ffffff;
+    padding: 8px 16px;
     font-weight: 600;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
+    font-size: 14px;
+    border-radius: 4px 4px 0 0;
+}
+
+.invoice-item-row {
+    display: grid;
+    grid-template-columns: 1fr 120px;
+    gap: 12px;
+    padding: 8px 0;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
+}
+
+.qty-input {
+    width: 100%;
+    text-align: right;
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+}
+
+/* Notes Textarea */
+.notes-textarea {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.notes-textarea:focus {
     outline: none;
-}
-
-.product-type-toggle .type-btn:hover:not(.active) {
-    color: #1e293b;
-    background-color: #e2e8f0;
-}
-
-.product-type-toggle .type-btn.active {
-    background-color: #ffffff;
-    color: #2563eb; 
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    border-color: #3b82f6;
 }

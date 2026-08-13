@@ -1,0 +1,164 @@
+
+    .variant-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(15, 23, 42, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    /* Modal Card */
+    .variant-modal-card {
+        background: #ffffff;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    .variant-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .variant-modal-header h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .variant-modal-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .btn-save-attribute {
+        background-color: #10b981;
+        color: #ffffff;
+        border: none;
+        padding: 6px 18px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-save-attribute:hover {
+        background-color: #059669;
+    }
+
+    .btn-close-modal {
+        background: transparent;
+        border: none;
+        font-size: 20px;
+        color: #64748b;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+    }
+
+    .variant-modal-body {
+        padding: 20px;
+    }
+
+    .variant-input-group {
+        margin-bottom: 20px;
+    }
+
+    .variant-input-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 6px;
+    }
+
+    .variant-input-group label span {
+        color: #ef4444;
+    }
+
+    .variant-text-input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        font-size: 14px;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .variant-text-input:focus {
+        border-color: #0284c7;
+    }
+
+    /* Options Table / List Container */
+    .options-table-container {
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .options-header {
+        background-color: #334155;
+        color: #ffffff;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .option-row {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 6px 10px;
+        background: #ffffff;
+    }
+
+    .option-row input {
+        width: 100%;
+        border: none;
+        outline: none;
+        font-size: 14px;
+        padding: 4px 6px;
+        color: #1e293b;
+    }
+
+    .btn-remove-option {
+        background: transparent;
+        border: none;
+        color: #ef4444;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 0 6px;
+    }
+
+    .btn-add-option-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        padding: 10px 14px;
+        background-color: #ffffff;
+        border: none;
+        color: #475569;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: left;
+    }
+
+    .btn-add-option-row:hover {
+        background-color: #f8fafc;
+        color: #0284c7;
+    }
