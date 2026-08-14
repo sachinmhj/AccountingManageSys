@@ -32,7 +32,9 @@ from .views import (
     ProductionJournalView,
     SupplierPaymentAddView,
     UnpaidInvoicesJsonView,
-    UnpaidPurchaseBillsJsonView
+    UnpaidPurchaseBillsJsonView,
+    ProductionOrderAddView,
+    ProductionJournalAddView,
 )
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
@@ -67,6 +69,7 @@ urlpatterns = [
     path("inventory/bill-material/",BillMaterialView.as_view(),name="bill_material"),
     path("inventory/bill-material/add",BillMaterialAddView.as_view(),name="bill_material_add"),
     path("inventory/production-order/",ProductionOrderView.as_view(),name="production_order"),
+    path("inventory/production-order/add/",ProductionOrderAddView.as_view(),name="production_order_add"),
     path("inventory/production-journal/",ProductionJournalView.as_view(),name="production_journal"),
-
+    path("inventory/production-journal/add/",ProductionJournalAddView.as_view(),name="production_journal_add"),
 ]

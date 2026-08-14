@@ -50,14 +50,18 @@
             </tbody>
         </table>
     </div>
-
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll(".tab").forEach(function(tab) {
+    document.querySelectorAll(".tab, .invoice-tabs button, .tab-group button").forEach(function(tab) {
         tab.addEventListener("click", function() {
             const filter = this.textContent.trim();
+            
+            // Toggle active styling
+            document.querySelectorAll(".tab, .invoice-tabs button, .tab-group button").forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+            
             document.querySelectorAll("#invoiceTable tbody tr[data-status]").forEach(function(row) {
                 if (filter === "All") {
                     row.style.display = "";

@@ -1,56 +1,34 @@
 <aside class="sidebar">
 
-    <!-- <div class="brand">
-        <div class="brand-icon"></div>
-        <span>ERP System</span>
-    </div> -->
-
     <ul class="menu">
 
         <!-- ================= Dashboard ================= -->
 
         <li class="menu-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
-
             <a href="{% url 'home' %}" class="menu-link">
-
                 <div class="menu-left">
                     <i class='bx bx-home-alt'></i>
                     <span>Dashboard</span>
                 </div>
-
             </a>
-
         </li>
 
 
         <!-- ================= Sales ================= -->
 
-        <li class="menu-item has-submenu {% if request.resolver_match.url_name == 'invoice' or request.resolver_match.url_name == 'customers' or request.resolver_match.url_name == 'customer_payment' %}open{% endif %}">
+        {% with sales_urls="invoice invoice_add customers customer_payment customer_payment_add" %}
+        <li class="menu-item has-submenu {% if request.resolver_match.url_name in sales_urls.split %}open{% endif %}">
+        {% endwith %}
 
             <div class="menu-link submenu-toggle">
-
                 <div class="menu-left">
                     <i class='bx bx-line-chart'></i>
                     <span>Sales</span>
                 </div>
-
                 <i class='bx bx-chevron-right submenu-arrow'></i>
-
             </div>
 
             <ul class="submenu">
-
-                <li>
-                    <div class="submenu-item-wrapper">
-                        <a href="{% url 'customers' %}"
-                           class="{% if request.resolver_match.url_name == 'customers' %}submenu-active{% endif %}">
-                            Customers
-                        </a>
-                        <a href="{% url 'customers' %}?add_modal=true" class="add-icon">
-                            <i class='bx bx-plus'></i>
-                        </a>
-                    </div>
-                </li>
 
                 <li>
                     <div class="submenu-item-wrapper">
@@ -58,38 +36,38 @@
                            class="{% if request.resolver_match.url_name == 'invoice' %}submenu-active{% endif %}">
                             Invoices
                         </a>
-                        <a href="#" class="add-icon">
+                        <a href="{% url 'invoice_add' %}" class="add-icon" title="Add New Invoice">
                             <i class='bx bx-plus'></i>
                         </a>
                     </div>
                 </li>
                 <li>
                     <div class="submenu-item-wrapper">
-
                         <a href="{% url 'customers' %}"
                            class="{% if request.resolver_match.url_name == 'customers' %}submenu-active{% endif %}">
                             Customers
                         </a>
-
-                        <a href="#" class="add-icon">
-                            <i class='bx bx-plus'></i>
-                        </a>
-
+                        {% if request.resolver_match.url_name == 'customers' %}
+                            <a href="javascript:void(0);" onclick="openCustomerModal()" class="add-icon" title="Add Customer">
+                                <i class='bx bx-plus'></i>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'customers' %}" class="add-icon" title="Add Customer">
+                                <i class='bx bx-plus'></i>
+                            </a>
+                        {% endif %}
                     </div>
                 </li>
 
                 <li>
                     <div class="submenu-item-wrapper">
-
                         <a href="{% url 'customer_payment' %}"
                            class="{% if request.resolver_match.url_name == 'customer_payment' %}submenu-active{% endif %}">
                             Customer Payments
                         </a>
-
-                        <a href="#" class="add-icon">
+                        <a href="{% url 'customer_payment_add' %}" class="add-icon" title="Add Customer Payment">
                             <i class='bx bx-plus'></i>
                         </a>
-
                     </div>
                 </li>
 
@@ -100,17 +78,16 @@
 
         <!-- ================= Inventory ================= -->
 
-        <li class="menu-item has-submenu {% if request.resolver_match.url_name == 'inventory_product' or request.resolver_match.url_name == 'variant_product' or request.resolver_match.url_name == 'variant_attribute' or request.resolver_match.url_name == 'product_category' or request.resolver_match.url_name == 'units_measurement' or request.resolver_match.url_name == 'warehouse_transfer' or request.resolver_match.url_name == 'inventory_adjustment' or request.resolver_match.url_name == 'bill_material' or request.resolver_match.url_name == 'production_order' or request.resolver_match.url_name == 'production_journal' %}open{% endif %}">
+        {% with inv_urls="inventory_product variant_product variant_product_add variant_attribute product_category units_measurement warehouse_transfer warehouse_add inventory_adjustment inventory_adjust_add bill_material bill_material_add production_order production_order_add production_journal production_journal_add" %}
+        <li class="menu-item has-submenu {% if request.resolver_match.url_name in inv_urls.split %}open{% endif %}">
+        {% endwith %}
 
             <div class="menu-link submenu-toggle">
-
                 <div class="menu-left">
                     <i class='bx bx-package'></i>
                     <span>Inventory</span>
                 </div>
-
                 <i class='bx bx-chevron-right submenu-arrow'></i>
-
             </div>
 
             <ul class="submenu">
@@ -120,7 +97,15 @@
                         <a href="{% url 'inventory_product' %}" class="{% if request.resolver_match.url_name == 'inventory_product' %}submenu-active{% endif %}">
                             Products
                         </a>
-                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                        {% if request.resolver_match.url_name == 'inventory_product' %}
+                            <a href="javascript:void(0);" onclick="openProductModal()" class="add-icon" title="Add Product">
+                                <i class='bx bx-plus'></i>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'inventory_product' %}" class="add-icon" title="Add Product">
+                                <i class='bx bx-plus'></i>
+                            </a>
+                        {% endif %}
                     </div>
                 </li>
 
@@ -129,7 +114,9 @@
                         <a href="{% url 'variant_product' %}" class="{% if request.resolver_match.url_name == 'variant_product' %}submenu-active{% endif %}">
                             Variant Products
                         </a>
-                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                        <a href="{% url 'variant_product_add' %}" class="add-icon" title="Add Variant Product">
+                            <i class='bx bx-plus'></i>
+                        </a>
                     </div>
                 </li>
 
@@ -138,7 +125,15 @@
                         <a href="{% url 'variant_attribute' %}" class="{% if request.resolver_match.url_name == 'variant_attribute' %}submenu-active{% endif %}">
                             Variant Attributes
                         </a>
-                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                        {% if request.resolver_match.url_name == 'variant_attribute' %}
+                            <a href="javascript:void(0);" onclick="openAttributeModal()" class="add-icon" title="Add Attribute">
+                                <i class='bx bx-plus'></i>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'variant_attribute' %}" class="add-icon" title="Add Attribute">
+                                <i class='bx bx-plus'></i>
+                            </a>
+                        {% endif %}
                     </div>
                 </li>
 
@@ -147,16 +142,32 @@
                         <a href="{% url 'product_category' %}" class="{% if request.resolver_match.url_name == 'product_category' %}submenu-active{% endif %}">
                             Product Category
                         </a>
-                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                        {% if request.resolver_match.url_name == 'product_category' %}
+                            <a href="javascript:void(0);" onclick="openCategoryModal()" class="add-icon" title="Add Category">
+                                <i class='bx bx-plus'></i>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'product_category' %}" class="add-icon" title="Add Category">
+                                <i class='bx bx-plus'></i>
+                            </a>
+                        {% endif %}
                     </div>
                 </li>
 
                 <li>
                     <div class="submenu-item-wrapper">
-                        <a href="{% url 'units_measurement'%}" class="{% if request.resolver_match.url_name == 'units_measurement' %}submenu-active{% endif %}">
+                        <a href="{% url 'units_measurement' %}" class="{% if request.resolver_match.url_name == 'units_measurement' %}submenu-active{% endif %}">
                             Units of Measurement
                         </a>
-                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                        {% if request.resolver_match.url_name == 'units_measurement' %}
+                            <a href="javascript:void(0);" onclick="openCreateUnitModal()" class="add-icon" title="Add Unit">
+                                <i class='bx bx-plus'></i>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'units_measurement' %}" class="add-icon" title="Add Unit">
+                                <i class='bx bx-plus'></i>
+                            </a>
+                        {% endif %}
                     </div>
                 </li>
 
@@ -165,7 +176,9 @@
                         <a href="{% url 'warehouse_transfer' %}" class="{% if request.resolver_match.url_name == 'warehouse_transfer' %}submenu-active{% endif %}">
                             Warehouse Transfer
                         </a>
-                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                        <a href="{% url 'warehouse_add' %}" class="add-icon" title="Add Warehouse Transfer">
+                            <i class='bx bx-plus'></i>
+                        </a>
                     </div>
                 </li>
 
@@ -174,7 +187,9 @@
                         <a href="{% url 'inventory_adjustment' %}" class="{% if request.resolver_match.url_name == 'inventory_adjustment' %}submenu-active{% endif %}">
                             Inventory Adjustment
                         </a>
-                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                        <a href="{% url 'inventory_adjust_add' %}" class="add-icon" title="Add Inventory Adjustment">
+                            <i class='bx bx-plus'></i>
+                        </a>
                     </div>
                 </li>
 
@@ -183,7 +198,9 @@
                         <a href="{% url 'bill_material' %}" class="{% if request.resolver_match.url_name == 'bill_material' %}submenu-active{% endif %}">
                             Bills of Materials
                         </a>
-                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                        <a href="{% url 'bill_material_add' %}" class="add-icon" title="Add Bill of Materials">
+                            <i class='bx bx-plus'></i>
+                        </a>
                     </div>
                 </li>
 
@@ -192,7 +209,9 @@
                         <a href="{% url 'production_order' %}" class="{% if request.resolver_match.url_name == 'production_order' %}submenu-active{% endif %}">
                             Production Order
                         </a>
-                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                        <a href="{% url 'production_order_add' %}" class="add-icon" title="Add Production Order">
+                            <i class='bx bx-plus'></i>
+                        </a>
                     </div>
                 </li>
 
@@ -201,7 +220,9 @@
                         <a href="{% url 'production_journal' %}" class="{% if request.resolver_match.url_name == 'production_journal' %}submenu-active{% endif %}">
                             Production Journal
                         </a>
-                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                        <a href="{% url 'production_journal_add' %}" class="add-icon" title="Add Production Journal">
+                            <i class='bx bx-plus'></i>
+                        </a>
                     </div>
                 </li>
 
@@ -212,17 +233,16 @@
 
         <!-- ================= Purchase ================= -->
 
-        <li class="menu-item has-submenu {% if request.resolver_match.url_name == 'purchase' or request.resolver_match.url_name == 'expenses' or request.resolver_match.url_name == 'supplier_payment' %}open{% endif %}">
+        {% with purchase_urls="purchase purchase_add expenses expenses_add supplier_payment supplier_add" %}
+        <li class="menu-item has-submenu {% if request.resolver_match.url_name in purchase_urls.split %}open{% endif %}">
+        {% endwith %}
 
             <div class="menu-link submenu-toggle">
-
                 <div class="menu-left">
                     <i class='bx bx-cart'></i>
                     <span>Purchase</span>
                 </div>
-
                 <i class='bx bx-chevron-right submenu-arrow'></i>
-
             </div>
 
             <ul class="submenu">
@@ -232,7 +252,9 @@
                         <a href="{% url 'purchase' %}" class="{% if request.resolver_match.url_name == 'purchase' %}submenu-active{% endif %}">
                             Purchase Bills
                         </a>
-                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                        <a href="{% url 'purchase_add' %}" class="add-icon" title="Add Purchase Bill">
+                            <i class='bx bx-plus'></i>
+                        </a>
                     </div>
                 </li>
 
@@ -241,15 +263,15 @@
                         <a href="{% url 'expenses' %}" class="{% if request.resolver_match.url_name == 'expenses' %}submenu-active{% endif %}">
                             Expenses
                         </a>
-                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                        <a href="{% url 'expenses_add' %}" class="add-icon" title="Add Expense">
+                            <i class='bx bx-plus'></i>
+                        </a>
                     </div>
                 </li>
 
                 <li>
                     <div class="submenu-item-wrapper">
-                        <a href="#">
-                            Assets
-                        </a>
+                        <a href="#">Assets</a>
                         <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
                     </div>
                 </li>
@@ -259,7 +281,9 @@
                         <a href="{% url 'supplier_payment' %}" class="{% if request.resolver_match.url_name == 'supplier_payment' %}submenu-active{% endif %}">
                             Supplier Payments
                         </a>
-                        <a href="#" class="add-icon"><i class='bx bx-plus'></i></a>
+                        <a href="{% url 'supplier_add' %}" class="add-icon" title="Add Supplier Payment">
+                            <i class='bx bx-plus'></i>
+                        </a>
                     </div>
                 </li>
 

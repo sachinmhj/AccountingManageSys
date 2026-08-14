@@ -4,27 +4,28 @@
 {% block content %}
 
 <div class="invoice-page">
-    <div class="erp-list-header" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid #eee; background: white;">
-        <h1 style="margin: 0; font-size: 24px; color: #111;">{{ title }}</h1>
-        <a href="{% url new_url %}" class="btn-add-new" style="background: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none;">+ Add New</a>
-    </div>
+    {% include "components/erp_list_header.html" %}
 
     <div class="invoice-table-container">
         <table class="invoice-table">
             <thead>
                 <tr>
-                    <th><input type="checkbox" class="select-checkbox"> Customer</th>
+                    <th>
+                        <input type="checkbox" class="select-checkbox" onclick="event.stopPropagation();">
+                        Customer
+                    </th>
                     <th>Invoice No</th>
                     <th>Payment Date</th>
                     <th>Payment Method</th>
                     <th>Amount Paid</th>
                 </tr>
             </thead>
-            <tbody>
+            
+            <tbody id="approvedPaymentsBody" class="tab-content-body">
                 {% for payment in payments %}
                 <tr>
                     <td>
-                        <input type="checkbox" class="row-checkbox">
+                        <input type="checkbox" class="row-checkbox" onclick="event.stopPropagation();">
                         {{ payment.invoice.customer.name }}
                     </td>
                     <td>#{{ payment.invoice.id }}</td>
@@ -43,4 +44,46 @@
         </table>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    // 1. New Customer Payment Redirect (Update 'customer_payment_add' to match your URL name if different)
+    const newBtn = document.querySelector(".new-btn");
+    if (newBtn) {
+        newBtn.addEventListener("click", function() {
+            window.location.href = "{% url 'customer_payment_add' %}";
+        });
+    }
+
+    // 2. Dynamic Tab Switching
+    const approvedBody = document.getElementById("approvedPaymentsBody");
+    const draftBody = document.getElementById("draftPaymentsBody");
+
+    const tabButtons = document.querySelectorAll(".tab, .invoice-tabs button, .tab-group button");
+
+    tabButtons.forEach(btn => {
+        btn.addEventListener("click", function(e) {
+            e.preventDefault();
+
+            const tabText = this.textContent.trim().toLowerCase();
+
+            // Active visual state toggle
+            tabButtons.forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+
+            // Switch visible table body
+            if (tabText.includes("draft")) {
+                if (approvedBody) approvedBody.style.display = "none";
+                if (draftBody) draftBody.style.display = "table-row-group";
+            } else {
+                if (draftBody) draftBody.style.display = "none";
+                if (approvedBody) approvedBody.style.display = "table-row-group";
+            }
+        });
+    });
+
+});
+</script>
+
 {% endblock %}

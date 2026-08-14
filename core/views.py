@@ -136,12 +136,14 @@ class InvoiceAddView(View):
         return redirect('invoice')
 
 class CustomersView(TemplateView):
-    template_name="pages/sales/customers.html"
+    template_name = "pages/sales/customers.html"
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Customers"
-        context["tabs"] = ["Customer"]
-        context["customers"] = []
+        context["tabs"] = ["Customer", "Draft"]  # Added Draft tab
+        context["approved_customers"] = []  # Pass your approved customers here
+        context["draft_customers"] = []     # Pass your draft customers here
         context["new_action"] = "openCustomerModal()"
         return context
 
@@ -350,6 +352,14 @@ class ProductionOrderView(TemplateView):
         context["title"] = "Production Order"
         context["tabs"] = ["Approved", "Draft"]
         context["orders"] = []
+        context["new_url"] = "production_order_add"
+        return context
+class ProductionOrderAddView(TemplateView):
+    template_name = "pages/inventory/production_order_add.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Add New Production Order"
         return context
 
 
@@ -361,7 +371,14 @@ class ProductionJournalView(TemplateView):
         context["title"] = "Production Journal"
         context["tabs"] = ["Approved", "Draft"]
         context["journals"] = []
+        context["new_url"]="production_journal_add"
         return context
+class ProductionJournalAddView(TemplateView):
+    template_name="pages/inventory/production_journal_add.html"
+    def get_context_data(self, **kwargs):
+        context= super().get_context_data(**kwargs)
+        context["title"]="Add New Production Journal"
+        return context 
 
 
 # ==================== PURCHASE ====================
