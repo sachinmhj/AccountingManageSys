@@ -1,0 +1,522 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/invoice_add.css' %}">
+<link rel="stylesheet" href="{% static 'css/sales_add.css' %}">
+
+<style>
+    /* Layout Styles for Production Order Form */
+    .bom-section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Custom Table Layout Containers */
+    .bom-table-container {
+        width: 100%;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+        background: #ffffff;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: visible !important; /* Allow popups to overlay subsequent elements */
+    }
+
+    /* Dynamic relative z-index hierarchy for table containers to avoid stacking overlaps */
+    .bom-table-container.section-raw {
+        z-index: 30;
+    }
+
+    .bom-table-container.section-expense {
+        z-index: 20;
+    }
+
+    .bom-table-container.section-byproduct {
+        z-index: 10;
+    }
+
+    .bom-grid-header {
+        background-color: #4a5568;
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 10px 12px;
+        display: grid;
+        align-items: center;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+    }
+
+    .bom-grid-row {
+        display: grid;
+        gap: 8px;
+        padding: 8px 12px;
+        align-items: center;
+        border-bottom: 1px solid #edf2f7;
+        position: relative;
+    }
+
+    .bom-grid-row input,
+    .bom-grid-row select {
+        width: 100%;
+        height: 38px;
+        border: 1px solid #cbd5e0;
+        border-radius: 4px;
+        padding: 0 10px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .bom-grid-row input:focus,
+    .bom-grid-row select:focus {
+        outline: none;
+        border-color: #3182ce;
+    }
+
+    /* Grid Column Distributions */
+    .grid-raw-material {
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+    }
+
+    .grid-by-product {
+        grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    }
+
+    .grid-production-expense {
+        grid-template-columns: 3fr 1fr;
+    }
+
+    /* Float Product Picker & Expense Dropdowns Above Container */
+    .product-picker-container,
+    .expense-picker-container {
+        position: relative;
+        z-index: 50;
+    }
+
+    .custom-dropdown-popup.product-popup,
+    .expense-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        min-width: 260px;
+        background: #ffffff;
+        border: 1px solid #cbd5e0;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 99999;
+        margin-top: 4px;
+        display: none;
+        max-height: 250px;
+        overflow-y: auto;
+    }
+
+    .dropdown-add-new-row {
+        padding: 8px 12px;
+        border-bottom: 1px solid #edf2f7;
+        background-color: #f7fafc;
+    }
+
+    .btn-add-new {
+        background: none;
+        border: none;
+        color: #3182ce;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .btn-add-new:hover {
+        text-decoration: underline;
+    }
+
+    .expense-dropdown-item {
+        padding: 10px 12px;
+        font-size: 13px;
+        color: #2d3748;
+        cursor: pointer;
+        border-bottom: 1px solid #f7fafc;
+    }
+
+    .expense-dropdown-item:hover {
+        background-color: #edf2f7;
+    }
+
+    /* Side-by-Side Notes and Cost Summary Layout */
+    .notes-cost-summary-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-top: 16px;
+        margin-bottom: 24px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cost-summary-box {
+        background-color: #f7fafc;
+        border: 1px solid #edf2f7;
+        border-radius: 4px;
+        padding: 16px;
+    }
+
+    .cost-summary-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        color: #4a5568;
+        margin-bottom: 12px;
+    }
+
+    .cost-summary-row.total-row {
+        font-weight: 700;
+        font-size: 14px;
+        color: #2d3748;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 12px;
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/sales_add.js' %}"></script>
+<script src="{% static 'js/sharedinvoice_add.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+{% comment %} Modals for adding products/categories/units {% endcomment %}
+{% include "components/modal_sales/sales_add.html" %}
+{% include "components/modal_sales/invoice_inventory.html" %}
+
+<div class="invoice-add-header">
+    <div class="invoice-add-title">
+        <h2>Add New Production Journal</h2>
+    </div>
+
+    <div class="invoice-add-actions">
+        <button type="submit" form="bomAddForm" class="invoice-save-btn">Save</button>
+        <a href="{% url 'production_journal' %}" class="invoice-close-btn" title="Close">×</a>
+    </div>
+</div>
+
+<div class="invoice-add-body">
+    <form id="bomAddForm" method="POST">
+        {% csrf_token %}
+
+        <!-- Top Row Fields: Date, Reference, Code -->
+        <div class="invoice-form-grid mb-4">
+            <div class="invoice-form-group col-span-4">
+                <label>Date <span class="required">*</span></label>
+                <input type="date" name="production_date" value="2026-08-13" required>
+            </div>
+
+            <div class="invoice-form-group col-span-4">
+                <label>Reference</label>
+                <input type="text" name="reference" placeholder="Reference">
+            </div>
+
+            <div class="invoice-form-group col-span-4">
+                <label>Code</label>
+                <input type="text" name="production_code" value="DRAFT" class="bg-readonly" readonly>
+            </div>
+        </div>
+
+        <!-- Finished Goods Input Section -->
+        <div class="bom-section-title mt-4">
+            <span>Finished Goods Input</span>
+        </div>
+        <div class="invoice-form-grid mb-4" style="position: relative; z-index: 40;">
+            <div class="invoice-form-group col-span-12 product-picker-container" onclick="event.stopPropagation();">
+                <label>Product Name <span class="required">*</span></label>
+                <input type="hidden" name="main_product" id="selectedMainProductId">
+                <div class="custom-select-trigger" onclick="toggleDropdown('mainProductPopup', event)">
+                    <input type="text" id="mainProductSearchInput" class="product-input-field" placeholder="Product" readonly>
+                    <span class="chevron-icon">▼</span>
+                </div>
+
+                <div class="custom-dropdown-popup product-popup" id="mainProductPopup">
+                    <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-add-new" onclick="openProductModal(event)">+ Add New Goods/Service</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="invoice-form-group col-span-6">
+                <label>Output Quantity <span class="required">*</span></label>
+                <input type="number" name="output_quantity" placeholder="" step="any">
+            </div>
+
+            <div class="invoice-form-group col-span-6">
+                <label>Warehouse <span class="required">*</span></label>
+                <select name="warehouse">
+                    <option value="" selected disabled hidden>Warehouse</option>
+                    <option value="Main Warehouse">Main Warehouse</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Raw Material (Input) Section -->
+        <div class="bom-section-title">
+            <span>Raw Material (Input)</span>
+            <span class="chevron-icon">˅</span>
+        </div>
+        <div class="bom-table-container section-raw">
+            <div class="bom-grid-header grid-raw-material">
+                <div>Product</div>
+                <div style="text-align: right;">Quantity</div>
+                <div style="text-align: right;">Rate</div>
+                <div style="text-align: right;">Amount</div>
+            </div>
+
+            <div class="bom-grid-row grid-raw-material">
+                <div class="product-picker-container" onclick="event.stopPropagation();">
+                    <input type="hidden" name="raw_material_product" id="selectedRawProductId">
+                    <div class="custom-select-trigger" onclick="toggleDropdown('rawProductPopup', event)">
+                        <input type="text" id="rawProductSearchInput" class="product-input-field" placeholder="Add Code or Product" readonly>
+                        <span class="chevron-icon">▼</span>
+                    </div>
+
+                    <div class="custom-dropdown-popup product-popup" id="rawProductPopup">
+                        <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                            <button type="button" class="btn-add-new" onclick="openProductModal(event)">+ Add New Goods/Service</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <input type="number" name="raw_material_quantity" style="text-align: right;" placeholder="0" min="0" step="any">
+                </div>
+                <div>
+                    <input type="number" name="raw_material_rate" style="text-align: right;" placeholder="0.00" step="0.01">
+                </div>
+                <div>
+                    <input type="number" name="raw_material_amount" style="text-align: right;" placeholder="0.00" step="0.01">
+                </div>
+            </div>
+        </div>
+
+        <!-- Production Expenses (Input) Section -->
+        <div class="bom-section-title">
+            <span>Production Expenses (Input)</span>
+            <span class="chevron-icon">˅</span>
+        </div>
+        <div class="bom-table-container section-expense">
+            <div class="bom-grid-header grid-production-expense">
+                <div>Production Cost Terms</div>
+                <div style="text-align: right;">Amount</div>
+            </div>
+
+            <div class="bom-grid-row grid-production-expense">
+                <div class="expense-picker-container" onclick="event.stopPropagation();">
+                    <input type="hidden" name="production_cost_term" id="selectedExpenseTermValue">
+                    <div class="custom-select-trigger" onclick="toggleDropdown('expenseDropdownMenu', event)">
+                        <input type="text" id="expenseSearchInput" placeholder="Add Code or Expense Term" readonly>
+                        <span class="chevron-icon">▼</span>
+                    </div>
+
+                    <div class="expense-dropdown-menu" id="expenseDropdownMenu">
+                        <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                            <button type="button" class="btn-add-new" onclick="openProductModal(event)">+ Add New Goods/Service</button>
+                        </div>
+                        <div class="expense-dropdown-item" onclick="selectExpenseTerm('Overhead Expenses')">Overhead Expenses</div>
+                        <div class="expense-dropdown-item" onclick="selectExpenseTerm('Direct Labor Costs')">Direct Labor Costs</div>
+                        <div class="expense-dropdown-item" onclick="selectExpenseTerm('Packaging Costs')">Packaging Costs</div>
+                        <div class="expense-dropdown-item" onclick="selectExpenseTerm('Machine or Equipment Costs')">Machine or Equipment Costs</div>
+                        <div class="expense-dropdown-item" onclick="selectExpenseTerm('Tooling Costs')">Tooling Costs</div>
+                        <div class="expense-dropdown-item" onclick="selectExpenseTerm('Quality Control Costs')">Quality Control Costs</div>
+                    </div>
+                </div>
+
+                <div>
+                    <input type="number" name="production_cost_amount" style="text-align: right;" placeholder="0.00" step="0.01">
+                </div>
+            </div>
+        </div>
+
+        <!-- By product (Output) Section -->
+        <div class="bom-section-title">
+            <span>By product (Output)</span>
+            <span class="chevron-icon">˅</span>
+        </div>
+        <div class="bom-table-container section-byproduct">
+            <div class="bom-grid-header grid-by-product">
+                <div>Product</div>
+                <div style="text-align: right;">% of Cost</div>
+                <div style="text-align: right;">Quantity</div>
+                <div style="text-align: right;">Rate</div>
+                <div style="text-align: right;">Amount</div>
+            </div>
+
+            <div class="bom-grid-row grid-by-product">
+                <div class="product-picker-container" onclick="event.stopPropagation();">
+                    <input type="hidden" name="by_product" id="selectedByProductId">
+                    <div class="custom-select-trigger" onclick="toggleDropdown('byProductPopup', event)">
+                        <input type="text" id="byProductSearchInput" class="product-input-field" placeholder="Add Code or Product" readonly>
+                        <span class="chevron-icon">▼</span>
+                    </div>
+
+                    <div class="custom-dropdown-popup product-popup" id="byProductPopup">
+                        <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                            <button type="button" class="btn-add-new" onclick="openProductModal(event)">+ Add New Goods/Service</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <input type="number" name="by_product_cost_percentage" style="text-align: right;" placeholder="0.00" step="0.01">
+                </div>
+
+                <div>
+                    <input type="number" name="by_product_quantity" style="text-align: right;" placeholder="0" min="0" step="any">
+                </div>
+
+                <div>
+                    <input type="number" name="by_product_rate" style="text-align: right;" placeholder="0.00" step="0.01">
+                </div>
+
+                <div>
+                    <input type="number" name="by_product_amount" style="text-align: right;" placeholder="0.00" step="0.01">
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes & Cost Summary Side-by-Side Section -->
+        <div class="notes-cost-summary-grid">
+            <div class="invoice-form-group">
+                <label>Notes</label>
+                <textarea name="notes" rows="6" class="notes-textarea" placeholder=""></textarea>
+            </div>
+
+            <div class="cost-summary-box">
+                <div class="cost-summary-row">
+                    <span>Raw Material Cost</span>
+                    <span></span>
+                </div>
+                <div class="cost-summary-row">
+                    <span>Production Expenses</span>
+                    <span></span>
+                </div>
+                <div class="cost-summary-row">
+                    <span>Total Cost of Production</span>
+                    <span>NaN</span>
+                </div>
+                <div class="cost-summary-row">
+                    <span>Cost Allocated to By-product</span>
+                    <span>0</span>
+                </div>
+                <div class="cost-summary-row">
+                    <span>Finished Goods Cost</span>
+                    <span>NaN</span>
+                </div>
+                <div class="cost-summary-row total-row">
+                    <span>Cost Per Unit</span>
+                    <span>0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Fields Section -->
+        <div class="bom-section-title mt-4">
+            <span>Custom Fields</span>
+        </div>
+        <div class="invoice-form-grid">
+            <div class="invoice-form-group col-span-4">
+                <label>s</label>
+                <input type="text" name="custom_s" placeholder="s">
+            </div>
+
+            <div class="invoice-form-group col-span-4">
+                <label>Color</label>
+                <input type="text" name="custom_color" id="customColorInput" list="colorOptions" placeholder="Color">
+                <datalist id="colorOptions">
+                    <option value="Red">
+                    <option value="Blue">
+                    <option value="Green">
+                    <option value="Black">
+                    <option value="White">
+                    <option value="Yellow">
+                </datalist>
+            </div>
+
+            <div class="invoice-form-group col-span-4">
+                <label>Serial Number</label>
+                <input type="text" name="custom_serial_number" placeholder="Serial Number">
+            </div>
+
+            <div class="invoice-form-group col-span-12">
+                <label>MFD</label>
+                <input type="text" name="custom_mfd" placeholder="MFD">
+            </div>
+        </div>
+
+        <!-- Add Reporting Tags Link -->
+        <div class="mt-4 mb-2">
+            <button type="button" class="invoice-add-option">+ Add Reporting Tags</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Generic dropdown toggler with proper popup management
+    function toggleDropdown(popupId, event) {
+        if (event) {
+            event.stopPropagation();
+        }
+
+        const allPopups = document.querySelectorAll('.product-popup, .expense-dropdown-menu');
+        allPopups.forEach(popup => {
+            if (popup.id !== popupId) {
+                popup.style.display = 'none';
+            }
+        });
+
+        const target = document.getElementById(popupId);
+        if (target) {
+            target.style.display = (target.style.display === 'block') ? 'none' : 'block';
+        }
+    }
+
+    function selectExpenseTerm(val) {
+        document.getElementById("expenseSearchInput").value = val;
+        document.getElementById("selectedExpenseTermValue").value = val;
+        document.getElementById("expenseDropdownMenu").style.display = "none";
+    }
+
+    // Modal Handler Trigger for Products/Goods/Services
+    function openProductModal(event) {
+        if (event) {
+            event.stopPropagation();
+        }
+
+        // Hide open dropdowns
+        const allPopups = document.querySelectorAll('.product-popup, .expense-dropdown-menu');
+        allPopups.forEach(popup => popup.style.display = 'none');
+
+        // Trigger shared inventory modal if function exists, or show targeted modal
+        if (typeof openInventoryModal === 'function') {
+            openInventoryModal();
+        } else if (typeof openSalesModal === 'function') {
+            openSalesModal();
+        } else {
+            const modal = document.getElementById('salesModal') || document.getElementById('inventoryModal');
+            if (modal) {
+                modal.style.display = 'block';
+            }
+        }
+    }
+
+    // Global click listener to dismiss active popups
+    document.addEventListener("click", function () {
+        const allPopups = document.querySelectorAll('.product-popup, .expense-dropdown-menu');
+        allPopups.forEach(popup => popup.style.display = 'none');
+    });
+</script>
+{% endblock %}

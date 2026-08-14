@@ -22,8 +22,9 @@
                 </tr>
             </thead>
 
-            <tbody>
-                {% for invoice in invoices %}
+            <!-- APPROVED INVOICES TABLE BODY -->
+            <tbody id="approvedInvoicesBody" class="tab-content-body">
+                {% for invoice in approved_invoices %}
                 <tr>
                     <td>{{ invoice.customer }}</td>
                     <td>{{ invoice.invoice_no }}</td>
@@ -39,6 +40,25 @@
                 </tr>
                 {% endfor %}
             </tbody>
+
+            <!-- DRAFT INVOICES TABLE BODY -->
+            <tbody id="draftInvoicesBody" class="tab-content-body" style="display: none;">
+                {% for invoice in draft_invoices %}
+                <tr>
+                    <td>{{ invoice.customer }}</td>
+                    <td>{{ invoice.invoice_no }}</td>
+                    <td>{{ invoice.reference }}</td>
+                    <td>{{ invoice.date }}</td>
+                    <td>{{ invoice.total }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty">
+                        No drafts available
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
 
@@ -46,13 +66,43 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const newBtn = document.querySelector(".new-btn");
 
+    // 1. New Invoice Redirect
+    const newBtn = document.querySelector(".new-btn");
     if (newBtn) {
         newBtn.addEventListener("click", function() {
             window.location.href = "{% url 'invoice_add' %}";
         });
     }
+
+    // 2. Table Bodies
+    const approvedBody = document.getElementById("approvedInvoicesBody");
+    const draftBody = document.getElementById("draftInvoicesBody");
+
+    // 3. Robust Tab Selector (Matches any tab matching your CSS classes)
+    const tabButtons = document.querySelectorAll(".tab, .invoice-tabs button, .tab-group button");
+
+    tabButtons.forEach(btn => {
+        btn.addEventListener("click", function(e) {
+            e.preventDefault();
+
+            const tabText = this.textContent.trim().toLowerCase();
+
+            // Toggle active styling
+            tabButtons.forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+
+            // Switch visibility
+            if (tabText.includes("draft")) {
+                if (approvedBody) approvedBody.style.display = "none";
+                if (draftBody) draftBody.style.display = "table-row-group";
+            } else {
+                if (draftBody) draftBody.style.display = "none";
+                if (approvedBody) approvedBody.style.display = "table-row-group";
+            }
+        });
+    });
+
 });
 </script>
 
