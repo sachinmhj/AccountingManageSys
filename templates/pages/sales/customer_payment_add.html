@@ -4,17 +4,6 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/customer_payment_add.css' %}">
 <link rel="stylesheet" href="{% static 'css/sales_add.css' %}">
-<style>
-    .payment-add-page { padding: 24px; max-width: 800px; margin: 0 auto; }
-    .payment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    .payment-card { background: white; padding: 32px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; font-weight: 500; margin-bottom: 8px; }
-    .form-control, .form-select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
-    .btn-save { background: #2563eb; color: white; padding: 10px 24px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; }
-    .invoice-card { padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-    .invoice-card.selected { border-color: #2563eb; background: #eff6ff; }
-</style>
 {% endblock %}
 
 {% block extra_js %}
@@ -22,114 +11,543 @@
 {% endblock %}
 
 {% block content %}
+{% comment %} Shared customer creation modal {% endcomment %}
+{% include "components/modal_sales/sales_add.html" %}
+
 <div class="payment-add-page">
-    <div class="payment-header">
-        <h2>New Customer Payment</h2>
-        <a href="{% url 'customer_payment' %}" style="text-decoration: none; color: #666; font-size: 1.2em;">&times;</a>
+
+    <!-- Payment Received View -->
+    <div id="paymentReceivedView">
+        <div class="payment-header">
+            <div class="payment-title-group">
+                <h2>New Customer Payment</h2>
+                <a href="#" class="branch-link">HeadOffice (HO)</a>
+            </div>
+
+            <div class="payment-actions">
+                <button type="button" class="btn-quick-receipt" onclick="switchToQuickReceipt()">
+                    Quick Receipt
+                </button>
+                <button type="submit" form="customerPaymentForm" class="btn-save">
+                    Save
+                </button>
+                <button type="button" class="btn-close" onclick="goBackToPayments()">×</button>
+            </div>
+        </div>
+
+        <div class="payment-body">
+            {% if error %}
+            <div style="color: red; margin-bottom: 16px; padding: 10px; background: #fee2e2; border-radius: 6px;">{{ error }}</div>
+            {% endif %}
+            
+            <form id="customerPaymentForm" method="POST">
+                {% csrf_token %}
+
+                <div class="payment-grid main-grid">
+                    <div class="form-group col-span-8">
+                        <label>Received From <span class="required">*</span></label>
+                        <div class="custom-dropdown-wrapper">
+                            <input type="hidden" name="customer" id="selectedReceivedFromValue" required>
+                            <div class="custom-dropdown-trigger" onclick="toggleReceivedFromDropdown(event)">
+                                <span id="selectedReceivedFromText" class="placeholder-text">Received From</span>
+                            </div>
+                            <div class="custom-dropdown-menu" id="receivedFromDropdownMenu">
+                                <div class="dropdown-search-box">
+                                    <input type="text" placeholder="Search Customer..." id="receivedFromSearchInput" onkeyup="filterReceivedFromOptions()">
+                                </div>
+
+                                <div class="dropdown-options-list" id="receivedFromOptionsList">
+                                    {% for customer in customers %}
+                                    <div class="dropdown-option" onclick="selectReceivedFrom('{{ customer.id }}', '{{ customer.name|escapejs }}')">
+                                        {{ customer.name }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="dropdown-footer">
+                                    <button type="button" class="btn-add-new-account" onclick="openContactModal()">+ Add New</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-span-4" id="invoicesSection">
+                        <label>Select Unpaid Invoice <span class="required">*</span></label>
+                        <select name="invoice_id" id="selectedInvoiceId" required disabled onchange="setPaymentAmount(this)">
+                            <option value="" disabled selected hidden>Select Customer First</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Received Account <span class="required">*</span></label>
+                        <select name="received_account">
+                            <option value="" disabled selected hidden>Select Account</option>
+                            <option value="cash">Cash in Hand</option>
+                            <option value="bank">Bank Account</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Payment Code</label>
+                        <input type="text" value="DRAFT" readonly class="input-readonly">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Received Date <span class="required">*</span></label>
+                        <!-- Changed name to payment_date for backend compatibility -->
+                        <input type="date" name="payment_date" value="{{ today|date:'Y-m-d' }}" required>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Amount <span class="required">*</span></label>
+                        <input type="number" name="amount" id="paymentAmount" placeholder="Amount" step="0.01" required>
+                    </div>
+
+                    <div class="form-group col-span-6">
+                        <label>Currency</label>
+                        <select name="currency">
+                            <option value="NPR" selected>Nepalese Rupee</option>
+                            <option value="USD">US Dollar</option>
+                            <option value="EUR">Euro</option>
+                            <option value="INR">Indian Rupee</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-span-6">
+                        <label>Exchange Rate To NPR <span class="required">*</span></label>
+                        <input type="number" name="exchange_rate" value="1" step="0.01" required>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <div class="payment-mode-section">
+                    <h3 class="section-title">Payment Mode</h3>
+                    <div class="payment-grid">
+                        <div class="form-group col-span-6">
+                            <label>Payment Mode</label>
+                            <!-- Changed name to payment_method for backend compatibility -->
+                            <select name="payment_method" required>
+                                <option value="" disabled selected hidden>Payment Mode</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Cheque">Cheque</option>
+                                <option value="Bank Transfer">Online Transfer</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-span-6">
+                            <label>Payment Reference#</label>
+                            <input type="text" name="payment_reference" placeholder="Payment Reference#">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <div class="toggles-section">
+                    <div class="toggle-group">
+                        <label class="switch">
+                            <input type="checkbox" id="bankChargeToggle" name="has_bank_charge" onchange="toggleBankChargeFields()">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">Bank charge</span>
+                    </div>
+
+                    <div id="bankChargeFields" class="payment-grid sub-grid" style="display:none;">
+                        <div class="form-group col-span-6">
+                            <label>Bank Charge Account</label>
+                            <select name="bank_charge_account">
+                                <option value="" disabled selected hidden>Select Account</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-span-6">
+                            <label>Bank Charge Amount</label>
+                            <input type="number" name="bank_charge_amount" placeholder="0.00" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="toggle-group">
+                        <label class="switch">
+                            <input type="checkbox" id="tdsToggle" name="has_tds" onchange="toggleTdsFields()">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">TDS</span>
+                    </div>
+
+                    <div id="tdsFields" class="payment-grid sub-grid" style="display:none;">
+                        <div class="form-group col-span-6">
+                            <label>TDS Account <span>*</span></label>
+                            <select name="tds_account">
+                                <option value="" disabled selected hidden>Select Account</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-span-6">
+                            <label>TDS Type <span>*</span></label>
+                            <select name="tds_type">
+                                <option value="" disabled selected hidden>TDS type</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-span-6">
+                            <label>TDS Amount <span>*</span></label>
+                            <input type="number" name="tds_amount" placeholder="0.00" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <div class="notes-section">
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea name="notes" placeholder="Notes" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <button type="button" class="invoice-add-option">+ Add Reporting Tags</button>
+            </form>
+        </div>
     </div>
 
-    <div class="payment-card">
-        {% if error %}
-        <div style="color: red; margin-bottom: 16px; padding: 10px; background: #fee2e2; border-radius: 6px;">{{ error }}</div>
-        {% endif %}
-
-        <form method="POST" id="customerPaymentForm">
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label>Customer <span>*</span></label>
-                <select name="customer" class="form-select" id="customerSelect" onchange="fetchUnpaidInvoices(this.value)" required>
-                    <option value="" disabled selected>-- Select Customer --</option>
-                    {% for customer in customers %}
-                    <option value="{{ customer.id }}">{{ customer.name }}</option>
-                    {% endfor %}
-                </select>
+    <!-- Quick Receipt View -->
+    <div id="quickReceiptView" style="display: none;">
+        <div class="payment-header">
+            <div class="payment-title-group">
+                <h2>New Quick Receipt</h2>
             </div>
 
-            <div class="form-group" id="invoicesSection" style="display: none;">
-                <label>Select Unpaid Invoice <span>*</span></label>
-                <div id="unpaidInvoicesContainer">
-                    <!-- Invoices injected here -->
+            <div class="payment-actions">
+                <button type="submit" form="quickReceiptForm" class="btn-save">
+                    Save
+                </button>
+                <button type="button" class="btn-close" onclick="switchToPaymentReceived()">×</button>
+            </div>
+        </div>
+
+        <div class="payment-body">
+            <form id="quickReceiptForm" method="POST">
+                {% csrf_token %}
+                <div class="payment-grid main-grid">
+                    <div class="form-group col-span-8">
+                        <label>Deposited To <span class="required">*</span></label>
+                        <select name="deposited_to" required>
+                            <option value="" disabled selected hidden>Select Account</option>
+                            <option value="cash">Cash in Hand</option>
+                            <option value="bank">Bank Account</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Date <span class="required">*</span></label>
+                        <input type="date" name="receipt_date" value="2026-08-10" required>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>#Payment</label>
+                        <input type="text" value="DRAFT" readonly class="input-readonly">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Reference</label>
+                        <input type="text" name="reference" placeholder="Reference">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Currency</label>
+                        <select name="currency">
+                            <option value="NPR" selected>Nepalese Rupee</option>
+                            <option value="USD">US Dollar</option>
+                            <option value="EUR">Euro</option>
+                            <option value="INR">Indian Rupee</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                        <label>Exchange Rate To NPR <span class="required">*</span></label>
+                        <input type="number" name="exchange_rate" value="1" step="0.01" required>
+                    </div>
                 </div>
-                <input type="hidden" name="invoice_id" id="selectedInvoiceId" required>
-            </div>
 
-            <div class="form-group">
-                <label>Payment Date <span>*</span></label>
-                <input type="date" name="payment_date" class="form-control" value="{{ today|date:'Y-m-d' }}" required>
-            </div>
+                <div class="quick-receipt-table-container">
+                    <div class="quick-receipt-table-header">
+                        <div class="header-col">Accounts</div>
+                        <div class="header-col text-right">Amount</div>
+                    </div>
 
-            <div class="form-group">
-                <label>Payment Method <span>*</span></label>
-                <select name="payment_method" class="form-select" required>
-                    <option value="Cash">Cash</option>
-                    <option value="Bank Transfer">Bank Transfer</option>
-                    <option value="Cheque">Cheque</option>
-                    <option value="Online">Online</option>
-                </select>
-            </div>
+                    <div class="quick-receipt-table-row">
+                        <div class="row-col custom-dropdown-wrapper">
+                            <input type="hidden" name="account_item" id="selectedAccountValue">
+                            <div class="custom-dropdown-trigger" onclick="toggleAccountDropdown(event)">
+                                <span id="selectedAccountText" class="placeholder-text">Select Account</span>
+                            </div>
+                            <div class="custom-dropdown-menu" id="accountDropdownMenu">
+                                <div class="dropdown-search-box">
+                                    <input type="text" placeholder="Select Account" id="accountSearchInput" onkeyup="filterAccounts()">
+                                </div>
 
-            <div class="form-group">
-                <label>Amount to Pay <span>*</span></label>
-                <input type="number" name="amount" id="paymentAmount" class="form-control" step="0.01" min="0.01" placeholder="0.00" required>
-                <small id="amountHelpText" style="color: #6b7280; margin-top: 4px; display: block;"></small>
-            </div>
+                                <div class="dropdown-options-list" id="accountOptionsList">
+                                    <div class="dropdown-option" onclick="selectAccount('Cash Customer (CUS0001)')">Cash Customer (CUS0001)</div>
+                                    <div class="dropdown-option" onclick="selectAccount('Cash In Hand (BC0001)')">Cash In Hand (BC0001)</div>
+                                    <div class="dropdown-option" onclick="selectAccount('Purchase Goods (DE0001)')">Purchase Goods (DE0001)</div>
+                                    <div class="dropdown-option" onclick="selectAccount('Purchase Service (DE0002)')">Purchase Service (DE0002)</div>
+                                    <div class="dropdown-option" onclick="selectAccount('Retained Earning (RS0001)')">Retained Earning (RS0001)</div>
+                                    <div class="dropdown-option" onclick="selectAccount('Sales Goods (DI0001)')">Sales Goods (DI0001)</div>
+                                </div>
 
-            <div style="text-align: right; margin-top: 32px;">
-                <button type="submit" class="btn-save">Save Payment</button>
-            </div>
-        </form>
+                                <div class="dropdown-footer">
+                                    <button type="button" class="btn-add-new-account" onclick="openAccountModal()">Add New</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row-col row-col-amount" id="amountContainer" style="display: none;">
+                            <input type="number" name="account_amount" id="accountAmountInput" placeholder="0.00" step="0.01" class="amount-input-large text-right" oninput="updateTotalAmount(this)">
+                        </div>
+                    </div>
+
+                    <div class="quick-receipt-table-footer">
+                        <div>Total</div>
+                        <div id="receiptTotalAmount">0.00</div>
+                    </div>
+                </div>
+
+                <div class="notes-section">
+                    <div class="form-group">
+                        <label>Note</label>
+                        <textarea name="note" rows="4"></textarea>
+                    </div>
+                </div>
+
+                <button type="button" class="invoice-add-option">+ Add Reporting Tags</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- New Account Quick Creation Modal -->
+<div class="modal-overlay" id="accountModalOverlay" style="display: none;">
+    <div class="modal-card account-modal-card">
+        <div class="modal-header">
+            <h3>New Account</h3>
+            <button type="button" class="modal-close-btn" onclick="closeAccountModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <form id="newAccountForm">
+                <div class="modal-form-group">
+                    <label>Account Name <span class="required">*</span></label>
+                    <input type="text" name="account_name" placeholder="Account Name" required>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Under <span class="required">*</span></label>
+                    <select name="parent_group" required>
+                        <option value="" disabled selected hidden>Parent Group</option>
+                        <option value="current_asset">Current Assets</option>
+                        <option value="direct_income">Direct Income</option>
+                        <option value="indirect_expense">Indirect Expense</option>
+                        <option value="deposit_assets">Deposits Assets</option>
+                    </select>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Description</label>
+                    <input type="text" name="description" placeholder="Description">
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Code</label>
+                    <input type="text" name="account_code" placeholder="Code">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-save-btn" onclick="saveNewAccount()">Save</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 <script>
+let currentInvoices = [];
+
 function fetchUnpaidInvoices(customerId) {
-    const container = document.getElementById('unpaidInvoicesContainer');
-    const section = document.getElementById('invoicesSection');
+    const invoiceSelect = document.getElementById('selectedInvoiceId');
+    const amountInput = document.getElementById('paymentAmount');
     
-    container.innerHTML = '<p style="color: #666;">Loading invoices...</p>';
-    section.style.display = 'block';
-    document.getElementById('selectedInvoiceId').value = '';
-    document.getElementById('paymentAmount').value = '';
-    document.getElementById('amountHelpText').textContent = '';
+    invoiceSelect.innerHTML = '<option value="" disabled selected>Loading...</option>';
+    invoiceSelect.disabled = true;
+    amountInput.value = '';
 
     fetch(`/api/unpaid-invoices/${customerId}/`)
         .then(response => response.json())
         .then(data => {
-            if (data.invoices && data.invoices.length > 0) {
-                container.innerHTML = '';
-                data.invoices.forEach(inv => {
-                    const div = document.createElement('div');
-                    div.className = 'invoice-card';
-                    div.innerHTML = `
-                        <div>
-                            <strong>Invoice #${inv.id}</strong><br>
-                            <small>Date: ${inv.date}</small>
-                        </div>
-                        <div style="text-align: right;">
-                            <div>Total: Rs. ${parseFloat(inv.total_amount).toFixed(2)}</div>
-                            <div style="color: #e3342f; font-weight: bold;">Pending: Rs. ${parseFloat(inv.pending_amount).toFixed(2)}</div>
-                        </div>
-                    `;
-                    div.onclick = function() {
-                        // Clear previously selected
-                        document.querySelectorAll('.invoice-card').forEach(el => el.classList.remove('selected'));
-                        div.classList.add('selected');
-                        
-                        document.getElementById('selectedInvoiceId').value = inv.id;
-                        document.getElementById('paymentAmount').value = parseFloat(inv.pending_amount).toFixed(2);
-                        document.getElementById('paymentAmount').max = inv.pending_amount;
-                        document.getElementById('amountHelpText').textContent = `Max payable amount is Rs. ${parseFloat(inv.pending_amount).toFixed(2)}`;
-                    };
-                    container.appendChild(div);
+            currentInvoices = data.invoices || [];
+            invoiceSelect.innerHTML = '<option value="" disabled selected>Select Invoice</option>';
+            
+            if (currentInvoices.length > 0) {
+                invoiceSelect.disabled = false;
+                currentInvoices.forEach(inv => {
+                    const opt = document.createElement('option');
+                    opt.value = inv.id;
+                    opt.textContent = `Invoice #${inv.id} - Pending: Rs. ${parseFloat(inv.pending_amount).toFixed(2)}`;
+                    opt.dataset.pending = inv.pending_amount;
+                    invoiceSelect.appendChild(opt);
                 });
             } else {
-                container.innerHTML = '<p style="color: #666;">No unpaid invoices found for this customer.</p>';
+                invoiceSelect.innerHTML = '<option value="" disabled selected>No unpaid invoices</option>';
             }
         })
         .catch(err => {
-            container.innerHTML = '<p style="color: red;">Error fetching invoices.</p>';
+            invoiceSelect.innerHTML = '<option value="" disabled selected>Error loading</option>';
         });
+}
+
+function setPaymentAmount(selectElement) {
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const pendingAmount = selectedOption.dataset.pending;
+    if (pendingAmount) {
+        const amt = document.getElementById('paymentAmount');
+        amt.value = parseFloat(pendingAmount).toFixed(2);
+        amt.max = pendingAmount;
+    }
+}
+
+function goBackToPayments() {
+    window.location.href = "{% url 'customer_payment' %}";
+}
+
+function switchToQuickReceipt() {
+    document.getElementById("paymentReceivedView").style.display = "none";
+    document.getElementById("quickReceiptView").style.display = "block";
+}
+
+function switchToPaymentReceived() {
+    document.getElementById("quickReceiptView").style.display = "none";
+    document.getElementById("paymentReceivedView").style.display = "block";
+}
+
+function toggleBankChargeFields() {
+    const toggle = document.getElementById("bankChargeToggle");
+    const fields = document.getElementById("bankChargeFields");
+    fields.style.display = toggle.checked ? "grid" : "none";
+}
+
+function toggleTdsFields() {
+    const toggle = document.getElementById("tdsToggle");
+    const fields = document.getElementById("tdsFields");
+    fields.style.display = toggle.checked ? "grid" : "none";
+}
+
+function updateTotalAmount(input) {
+    const totalEl = document.getElementById("receiptTotalAmount");
+    totalEl.textContent = input.value ? parseFloat(input.value).toFixed(2) : "0.00";
+}
+
+function toggleReceivedFromDropdown(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById("receivedFromDropdownMenu");
+    const isVisible = dropdown.style.display === "block";
+    dropdown.style.display = isVisible ? "none" : "block";
+
+    if (!isVisible) {
+        setTimeout(() => {
+            document.getElementById("receivedFromSearchInput").focus();
+        }, 50);
+    }
+}
+
+function selectReceivedFrom(id, name) {
+    document.getElementById("selectedReceivedFromValue").value = id;
+    const textEl = document.getElementById("selectedReceivedFromText");
+    textEl.textContent = name;
+    textEl.classList.remove("placeholder-text");
+    document.getElementById("receivedFromDropdownMenu").style.display = "none";
+    
+    // Fetch unpaid invoices dynamically
+    fetchUnpaidInvoices(id);
+}
+
+function filterReceivedFromOptions() {
+    const input = document.getElementById("receivedFromSearchInput").value.toLowerCase();
+    const options = document.querySelectorAll("#receivedFromOptionsList .dropdown-option");
+
+    options.forEach(option => {
+        const text = option.textContent.toLowerCase();
+        option.style.display = text.includes(input) ? "block" : "none";
+    });
+}
+
+function toggleAccountDropdown(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById("accountDropdownMenu");
+    const isVisible = dropdown.style.display === "block";
+    dropdown.style.display = isVisible ? "none" : "block";
+
+    if (!isVisible) {
+        setTimeout(() => {
+            document.getElementById("accountSearchInput").focus();
+        }, 50);
+    }
+}
+
+function selectAccount(val) {
+    document.getElementById("selectedAccountValue").value = val;
+    const textEl = document.getElementById("selectedAccountText");
+    textEl.textContent = val;
+    textEl.classList.remove("placeholder-text");
+    document.getElementById("accountDropdownMenu").style.display = "none";
+
+    const amountContainer = document.getElementById("amountContainer");
+    const amountInput = document.getElementById("accountAmountInput");
+    amountContainer.style.display = "block";
+    amountInput.focus();
+}
+
+function filterAccounts() {
+    const input = document.getElementById("accountSearchInput").value.toLowerCase();
+    const options = document.querySelectorAll("#accountOptionsList .dropdown-option");
+
+    options.forEach(option => {
+        const text = option.textContent.toLowerCase();
+        option.style.display = text.includes(input) ? "block" : "none";
+    });
+}
+
+document.addEventListener("click", function (event) {
+    const rfMenu = document.getElementById("receivedFromDropdownMenu");
+    const rfTrigger = document.querySelector("#paymentReceivedView .custom-dropdown-trigger");
+    if (rfMenu && !rfMenu.contains(event.target) && rfTrigger && !rfTrigger.contains(event.target)) {
+        rfMenu.style.display = "none";
+    }
+
+    const accMenu = document.getElementById("accountDropdownMenu");
+    const accTrigger = document.querySelector("#quickReceiptView .custom-dropdown-trigger");
+    if (accMenu && !accMenu.contains(event.target) && accTrigger && !accTrigger.contains(event.target)) {
+        accMenu.style.display = "none";
+    }
+});
+
+function openAccountModal() {
+    document.getElementById("accountDropdownMenu").style.display = "none";
+    document.getElementById("accountModalOverlay").style.display = "flex";
+}
+
+function closeAccountModal() {
+    document.getElementById("accountModalOverlay").style.display = "none";
+}
+
+function saveNewAccount() {
+    const form = document.getElementById("newAccountForm");
+    const accountName = form.account_name.value.trim();
+
+    if (accountName) {
+        selectAccount(accountName);
+        closeAccountModal();
+        form.reset();
+    } else {
+        alert("Please enter Account Name.");
+    }
 }
 </script>
 {% endblock %}

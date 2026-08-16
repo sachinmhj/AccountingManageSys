@@ -12,64 +12,586 @@
 <script src="{% static 'js/sales_add.js' %}"></script>
 {% endblock %}
 
-
-
 {% block content %}
-<div class="erp-page" style="padding: 24px;">
+{% comment %} Shared Sales/Contact Modal Component {% endcomment %}
+{% include "components/modal_sales/sales_add.html" %}
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-        <h2>Add New Expense</h2>
-        <a href="{% url 'expenses' %}" style="text-decoration: none; color: #666; font-size: 1.2em;">&times;</a>
+<!-- Category Creation Modal -->
+<div class="modal-overlay nested-modal-overlay" id="categoryModalOverlay" style="display: none;">
+    <div class="modal-card category-modal-card">
+        <div class="modal-header">
+            <h3>New Category</h3>
+            <button type="button" class="modal-close-btn" onclick="closeCategoryModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <form id="newCategoryForm" onsubmit="event.preventDefault(); saveNewCategory();">
+                <div class="modal-form-group">
+                    <label>Name <span>*</span></label>
+                    <input type="text" id="newCategoryName" name="category_name" placeholder="Name" required>
+                </div>
+
+                <div class="modal-form-group">
+                    <label for="underCategorySelect">Under Category</label>
+                    <select id="underCategorySelect" name="parent_category" class="category-select" required>
+                        <option value="" disabled selected hidden>Select a category...</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Description</label>
+                    <input type="text" id="newCategoryDescription" name="category_description" placeholder="Description">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="modal-save-btn" onclick="saveNewCategory()">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Account Creation Modal Overlay -->
+<div class="custom-modal-overlay" id="accountModalOverlay" style="display: none;">
+    <div class="custom-modal-card">
+        <div class="custom-modal-header">
+            <h3>New Account</h3>
+            <button type="button" class="close-modal-btn" onclick="closeAccountModal()">&times;</button>
+        </div>
+        <div class="custom-modal-body">
+            <div class="modal-form-group">
+                <label>Account Name <span class="required">*</span></label>
+                <input type="text" id="newAccountName" placeholder="Account Name">
+            </div>
+            <div class="modal-form-group">
+                <label>Under <span class="required">*</span></label>
+                <select id="newAccountUnder">
+                    <option value="" disabled selected>Parent Group</option>
+                    <option value="Expense">Expense</option>
+                    <option value="Direct Expense">Direct Expense</option>
+                    <option value="Indirect Expense">Indirect Expense</option>
+                </select>
+            </div>
+            <div class="modal-form-group">
+                <label>Description</label>
+                <input type="text" id="newAccountDescription" placeholder="Description">
+            </div>
+            <div class="modal-form-group">
+                <label>Code</label>
+                <input type="text" id="newAccountCode" placeholder="Code">
+            </div>
+        </div>
+        <div class="custom-modal-footer">
+            <button type="button" class="btn-modal-save" onclick="saveNewAccount()">Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="invoice-add-page">
+
+    <div class="invoice-add-header">
+        <div class="invoice-add-title">
+            <h2>Add New Expense</h2>
+        </div>
+
+        <div class="invoice-add-actions">
+            <button type="submit" form="invoiceAddForm" class="invoice-save-btn">Save</button>
+            <button type="button" class="invoice-close-btn" onclick="goBackToInvoices()">×</button>
+        </div>
     </div>
 
-    <div style="background: white; padding: 32px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto;">
-        <form method="POST">
+    <div class="invoice-add-body">
+        <form id="invoiceAddForm" method="POST">
             {% csrf_token %}
-            
-            <div style="margin-bottom: 16px;">
-                <label style="display: block; font-weight: 500; margin-bottom: 8px;">Category <span>*</span></label>
-                {{ form.category }}
-                {% if form.category.errors %}
-                <div style="color: red; font-size: 0.9em; margin-top: 4px;">{{ form.category.errors }}</div>
-                {% endif %}
+
+            <div class="invoice-form-grid">
+                <div class="invoice-form-group col-span-8 customer-picker-container" onclick="event.stopPropagation();">
+                    <label>Supplier Name <span>*</span></label>
+                    <input type="hidden" name="customer" id="selectedCustomerId" required>
+                    <div class="custom-select-trigger" onclick="toggleCustomerDropdown(event)">
+                        <input type="text" id="customerSearchInput" class="customer-input-field"
+                            placeholder="Supplier Name" oninput="filterCustomers()">
+                    </div>
+
+                    <div class="custom-dropdown-popup" id="customerDropdownPopup">
+                        <div class="dropdown-options-list" id="customerOptionsList">
+                            {% for supplier in suppliers %}
+                            <div class="dropdown-option-item" onclick="selectSupplier('{{ supplier.id }}', '{{ supplier.name|escapejs }}', event)">
+                                <span class="customer-name">{{ supplier.name }}</span>
+                            </div>
+                            {% empty %}
+                            <label style="padding: 10px; display: block; color: #94a3b8; font-size: 13px; text-align: center;">No suppliers found</label>
+                            {% endfor %}
+                        </div>
+                        <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                            <button type="button" class="btn-add-new" onclick="openContactModal('supplier', event)">+ Add New</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>Supplier Invoice Reference No</label>
+                    <input type="text" name="reference" placeholder="Reference Number">
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>#Expense</label>
+                    <input type="text" value="DRAFT" readonly class="input-readonly">
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>Date <span>*</span></label>
+                    <input type="date" name="invoice_date" value="2026-08-11" required>
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>Due Date <span>*</span></label>
+                    <input type="date" name="due_date" value="2026-08-11" required>
+                </div>
+
+                <div class="invoice-form-group col-span-6">
+                    <label>Currency</label>
+                    <select name="currency">
+                        <option value="NPR" selected>Nepalese Rupee</option>
+                        <option value="JPY">Japanese Yen</option>
+                        <option value="USD">US Dollar</option>
+                        <option value="EUR">Euro</option>
+                        <option value="CNY">Chinese Yuan</option>
+                        <option value="CHF">Swiss Franc</option>
+                        <option value="INR">Indian Rupee</option>
+                    </select>
+                </div>
+
+                <div class="invoice-form-group col-span-6">
+                    <label>Exchange Rate To NPR <span>*</span></label>
+                    <input type="number" name="exchange_rate" value="1" step="0.01" required>
+                </div>
             </div>
 
-            <div style="margin-bottom: 16px;">
-                <label style="display: block; font-weight: 500; margin-bottom: 8px;">Amount <span>*</span></label>
-                {{ form.amount }}
-                {% if form.amount.errors %}
-                <div style="color: red; font-size: 0.9em; margin-top: 4px;">{{ form.amount.errors }}</div>
-                {% endif %}
+            <!-- Accounts / Amount / Tax Table Section -->
+            <div class="invoice-items-section">
+                <div class="invoice-items-header">
+                    <div>Accounts</div>
+                    <div>Amount</div>
+                    <div>Tax</div>
+                    <div></div>
+                </div>
+
+                <!-- Dynamic Account Rows Container -->
+                <div id="accountRowsContainer"></div>
+
+                <!-- Account Picker Trigger Field -->
+                <div class="invoice-item-row">
+                    <div class="product-picker-container" onclick="event.stopPropagation();">
+                        <div class="custom-select-trigger" onclick="toggleAccountPickerDropdown(event)">
+                            <input type="text" id="productSearchInput" class="product-input-field"
+                                placeholder="Select Account" readonly>
+                            <span class="chevron-icon">▼</span>
+                        </div>
+
+                        <!-- Options Popup List -->
+                        <div class="custom-dropdown-popup account-popup" id="accountPickerDropdownPopup">
+                            <div class="dropdown-options-list" id="accountOptionsList">
+                                <div class="dropdown-option-item" onclick="addAccountRow('Purchase Goods (DE0001)', event)">Purchase Goods (DE0001)</div>
+                                <div class="dropdown-option-item" onclick="addAccountRow('Purchase Service (DE0002)', event)">Purchase Service (DE0002)</div>
+                                <div class="dropdown-option-item" onclick="addAccountRow('Retained Earning (RS0001)', event)">Retained Earning (RS0001)</div>
+                                <div class="dropdown-option-item" onclick="addAccountRow('Sales Goods (DI0001)', event)">Sales Goods (DI0001)</div>
+                                <div class="dropdown-option-item" onclick="addAccountRow('Sales Service (DI0002)', event)">Sales Service (DI0002)</div>
+                                <div class="dropdown-option-item" onclick="addAccountRow('Share Capital (C0001)', event)">Share Capital (C0001)</div>
+                            </div>
+                            <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                                <button type="button" class="btn-add-new" onclick="openAccountModal(event)">+ Add New Account</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div style="margin-bottom: 16px;">
-                <label style="display: block; font-weight: 500; margin-bottom: 8px;">Date <span>*</span></label>
-                {{ form.date }}
-                {% if form.date.errors %}
-                <div style="color: red; font-size: 0.9em; margin-top: 4px;">{{ form.date.errors }}</div>
-                {% endif %}
+            <!-- Middle Section: Notes & Total Calculation Summary -->
+            <div class="expense-middle-grid">
+                <div class="expense-notes-card">
+                    <label>Notes</label>
+                    <textarea name="expense_notes" placeholder="Notes" rows="4"></textarea>
+                    <span class="notes-hint">This will appear on print</span>
+                </div>
+
+                <div class="expense-summary-card">
+                    <div class="summary-line">
+                        <span>Sub Total</span>
+                        <span id="summarySubTotal">0.00</span>
+                    </div>
+                    <div class="summary-line">
+                        <span>Non-Taxable Total</span>
+                        <span id="summaryNonTaxableTotal">0.00</span>
+                    </div>
+                    <div class="summary-line">
+                        <span>Taxable Total</span>
+                        <span id="summaryTaxableTotal">0.00</span>
+                    </div>
+                    <div class="summary-line">
+                        <span>VAT</span>
+                        <span id="summaryVatTotal">0.00</span>
+                    </div>
+                    <div class="summary-line summary-grand-total">
+                        <strong>Grand Total</strong>
+                        <strong id="summaryGrandTotal">0.00</strong>
+                    </div>
+                </div>
             </div>
 
-            <div style="margin-bottom: 16px;">
-                <label style="display: block; font-weight: 500; margin-bottom: 8px;">Payment Method <span>*</span></label>
-                {{ form.payment_method }}
-                {% if form.payment_method.errors %}
-                <div style="color: red; font-size: 0.9em; margin-top: 4px;">{{ form.payment_method.errors }}</div>
-                {% endif %}
+            <!-- TDS Switch Section -->
+            <div class="invoice-tds-section">
+                <label class="invoice-switch">
+                    <input type="checkbox" id="tdsApplicableToggle" name="tds_applicable" onchange="toggleTdsFields()">
+                    <span class="invoice-slider"></span>
+                </label>
+                <strong>TDS is applicable</strong>
             </div>
 
-            <div style="margin-bottom: 24px;">
-                <label style="display: block; font-weight: 500; margin-bottom: 8px;">Description</label>
-                {{ form.description }}
-                {% if form.description.errors %}
-                <div style="color: red; font-size: 0.9em; margin-top: 4px;">{{ form.description.errors }}</div>
-                {% endif %}
+            <div id="tdsFieldsGroup" class="invoice-form-grid tds-fields-grid" style="display: none;">
+                <div class="invoice-form-group col-span-4">
+                    <label>TDS Account <span>*</span></label>
+                    <select name="tds_account">
+                        <option value="" disabled selected>Select Account</option>
+                    </select>
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>TDS Type <span>*</span></label>
+                    <select name="tds_type">
+                        <option value="" disabled selected>TDS Type</option>
+                    </select>
+                </div>
+
+                <div class="invoice-form-group col-span-4">
+                    <label>TDS Amount <span>*</span></label>
+                    <input type="number" name="tds_amount" placeholder="TDS Amount" step="0.01">
+                </div>
             </div>
 
-            <div style="text-align: right;">
-                <button type="submit" style="background: #2563eb; color: white; padding: 10px 24px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer;">Save Expense</button>
-            </div>
+            <button type="button" class="invoice-add-option">+ Add Reporting Tags</button>
         </form>
     </div>
 </div>
+
+<script>
+    let accountRowIndex = 0;
+    const accountListOptions = [
+        "Purchase Goods (DE0001)",
+        "Purchase Service (DE0002)",
+        "Retained Earning (RS0001)",
+        "Sales Goods (DI0001)",
+        "Sales Service (DI0002)",
+        "Share Capital (C0001)"
+    ];
+
+    function goBackToInvoices() {
+        window.location.href = "{% url 'expenses' %}";
+    }
+
+    function toggleTdsFields() {
+        const checkBox = document.getElementById("tdsApplicableToggle");
+        const tdsFields = document.getElementById("tdsFieldsGroup");
+        if (tdsFields && checkBox) {
+            tdsFields.style.display = checkBox.checked ? "grid" : "none";
+        }
+    }
+
+    function closeAllPopups() {
+        const popups = document.querySelectorAll(".custom-dropdown-popup");
+        popups.forEach(popup => popup.classList.remove("active"));
+    }
+
+    document.addEventListener("click", function () {
+        closeAllPopups();
+    });
+
+    /* Contact / Supplier Modal Handler */
+    function openContactModal(type, e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        closeAllPopups();
+        
+        const contactModal = document.getElementById("contactModalOverlay") || document.getElementById("salesModalOverlay");
+        if (contactModal) {
+            contactModal.style.display = "flex";
+        } else if (typeof showContactModal === "function") {
+            showContactModal(type);
+        } else {
+            alert("Contact modal component is missing or loading.");
+        }
+    }
+
+    /* Category Modal Handlers */
+    function openCategoryModal(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        closeAllPopups();
+        const modal = document.getElementById("categoryModalOverlay");
+        if (modal) modal.style.display = "flex";
+    }
+
+    function closeCategoryModal() {
+        const modal = document.getElementById("categoryModalOverlay");
+        if (modal) {
+            modal.style.display = "none";
+            document.getElementById("newCategoryForm").reset();
+        }
+    }
+
+    function saveNewCategory() {
+        const categoryNameInput = document.getElementById("newCategoryName");
+        const parentCategorySelect = document.getElementById("underCategorySelect");
+
+        if (!categoryNameInput.value.trim()) {
+            alert("Please enter a Category Name.");
+            return;
+        }
+
+        if (!parentCategorySelect.value) {
+            alert("Please select a parent category.");
+            return;
+        }
+
+        const categoryName = categoryNameInput.value.trim();
+        const parentCategory = parentCategorySelect.value;
+        const description = document.getElementById("newCategoryDescription").value;
+
+        // Populate newly added category into the under-category dropdown options
+        const newOption = document.createElement("option");
+        newOption.value = categoryName.toLowerCase().replace(/\s+/g, '-');
+        newOption.textContent = categoryName;
+        parentCategorySelect.appendChild(newOption);
+
+        closeCategoryModal();
+    }
+
+    function selectSupplier(id, name, e) {
+        if (e) e.stopPropagation();
+        
+        if (name === undefined) {
+            name = id;
+            id = "";
+        }
+        
+        document.getElementById("selectedCustomerId").value = id;
+        document.getElementById("customerSearchInput").value = name;
+        closeAllPopups();
+    }
+
+    function toggleCustomerDropdown(e) {
+        if (e) e.stopPropagation();
+        const popup = document.getElementById("customerDropdownPopup");
+        const isActive = popup.classList.contains("active");
+        closeAllPopups();
+        if (!isActive) popup.classList.add("active");
+    }
+
+    function filterCustomers() {
+        const filter = document.getElementById("customerSearchInput").value.toLowerCase();
+        const items = document.querySelectorAll("#customerDropdownPopup .dropdown-option-item");
+        items.forEach(item => {
+            item.style.display = item.textContent.toLowerCase().includes(filter) ? "flex" : "none";
+        });
+    }
+
+    function openProductModal(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        closeAllPopups();
+        const modal = document.getElementById("productModalOverlay");
+        if (modal) {
+            modal.style.display = "flex";
+        } else {
+            openCategoryModal(e);
+        }
+    }
+
+    /* Account Modal Handlers */
+    function openAccountModal(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        closeAllPopups();
+        const modal = document.getElementById("accountModalOverlay");
+        if (modal) modal.style.display = "flex";
+    }
+
+    function closeAccountModal() {
+        const modal = document.getElementById("accountModalOverlay");
+        if (modal) modal.style.display = "none";
+    }
+
+    function saveNewAccount() {
+        const nameInput = document.getElementById("newAccountName");
+        const codeInput = document.getElementById("newAccountCode");
+
+        if (!nameInput.value.trim()) {
+            alert("Please enter an Account Name.");
+            return;
+        }
+
+        const accountFormatted = `${nameInput.value.trim()} ${codeInput.value.trim() ? '(' + codeInput.value.trim() + ')' : ''}`;
+
+        accountListOptions.push(accountFormatted);
+        addAccountRow(accountFormatted);
+
+        nameInput.value = "";
+        document.getElementById("newAccountDescription").value = "";
+        codeInput.value = "";
+        closeAccountModal();
+    }
+
+    function toggleAccountPickerDropdown(e) {
+        if (e) e.stopPropagation();
+        const popup = document.getElementById("accountPickerDropdownPopup");
+        const isActive = popup.classList.contains("active");
+        closeAllPopups();
+        if (!isActive) popup.classList.add("active");
+    }
+
+    function toggleRowAccountDropdown(index, e) {
+        if (e) e.stopPropagation();
+        const popup = document.getElementById(`rowAccountPopup_${index}`);
+        const isActive = popup.classList.contains("active");
+        closeAllPopups();
+        if (!isActive) popup.classList.add("active");
+    }
+
+    function selectRowAccount(index, accountName, e) {
+        if (e) e.stopPropagation();
+        const input = document.getElementById(`rowAccountInput_${index}`);
+        const hidden = document.getElementById(`rowAccountHidden_${index}`);
+        const clearBtn = document.getElementById(`clearAccountBtn_${index}`);
+
+        input.value = accountName;
+        hidden.value = accountName;
+        if (clearBtn) clearBtn.style.display = "inline-block";
+        closeAllPopups();
+    }
+
+    function clearAccountSelection(index, e) {
+        if (e) e.stopPropagation();
+        const input = document.getElementById(`rowAccountInput_${index}`);
+        const hidden = document.getElementById(`rowAccountHidden_${index}`);
+        const clearBtn = document.getElementById(`clearAccountBtn_${index}`);
+
+        input.value = "";
+        hidden.value = "";
+        if (clearBtn) clearBtn.style.display = "none";
+    }
+
+    function filterRowAccounts(index) {
+        const filter = document.getElementById(`rowAccountSearch_${index}`).value.toLowerCase();
+        const items = document.querySelectorAll(`#rowAccountPopup_${index} .dropdown-option-item`);
+        items.forEach(item => {
+            item.style.display = item.textContent.toLowerCase().includes(filter) ? "block" : "none";
+        });
+    }
+
+    function renderAccountOptionsHTML(index) {
+        return accountListOptions.map(opt =>
+            `<div class="dropdown-option-item" onclick="selectRowAccount(${index}, '${opt}', event)">${opt}</div>`
+        ).join('');
+    }
+
+    function addAccountRow(accountName = '', e) {
+        if (e) e.stopPropagation();
+
+        const container = document.getElementById("accountRowsContainer");
+        const currentIndex = accountRowIndex++;
+
+        const row = document.createElement("div");
+        row.className = "account-item-row";
+        row.innerHTML = `
+            <div class="row-account-picker" onclick="event.stopPropagation();">
+                <div class="custom-select-trigger" onclick="toggleRowAccountDropdown(${currentIndex}, event)">
+                    <input type="text" id="rowAccountInput_${currentIndex}" value="${accountName}" placeholder="Select Account" readonly>
+                    <button type="button" class="clear-selection-btn" id="clearAccountBtn_${currentIndex}" onclick="clearAccountSelection(${currentIndex}, event)" style="display: ${accountName ? 'inline-block' : 'none'}">&otimes;</button>
+                    <span class="chevron-icon">▼</span>
+                </div>
+                <input type="hidden" name="account_name[]" id="rowAccountHidden_${currentIndex}" value="${accountName}">
+                
+                <div class="custom-dropdown-popup account-popup" id="rowAccountPopup_${currentIndex}">
+                    <div class="dropdown-search-box" onclick="event.stopPropagation();">
+                        <input type="text" id="rowAccountSearch_${currentIndex}" placeholder="Search..." oninput="filterRowAccounts(${currentIndex})">
+                    </div>
+                    <div class="dropdown-options-list">
+                        ${renderAccountOptionsHTML(currentIndex)}
+                    </div>
+                    <div class="dropdown-add-new-btn-container" onclick="event.stopPropagation();">
+                        <button type="button" class="btn-add-new-full" onclick="openAccountModal(event)">Add New</button>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <input type="number" name="account_amount[]" placeholder="0" step="0.01" class="row-amount-input text-right" oninput="calculateExpenseTotals()">
+            </div>
+            <div class="row-tax-picker">
+                <select name="account_tax[]" class="row-tax-select" onchange="calculateExpenseTotals()">
+                    <option value="Non-Taxable">Non-Taxable</option>
+                    <option value="13% VAT" selected>13% Vat</option>
+                    <option value="0 VAT">0 Vat</option>
+                </select>
+            </div>
+            <div>
+                <button type="button" class="remove-account-row-btn" onclick="removeAccountRow(this)" title="Remove">&times;</button>
+            </div>
+        `;
+
+        container.appendChild(row);
+        document.getElementById("accountPickerDropdownPopup").classList.remove("active");
+        calculateExpenseTotals();
+    }
+
+    function removeAccountRow(btn) {
+        const row = btn.closest(".account-item-row");
+        if (row) {
+            row.remove();
+            calculateExpenseTotals();
+        }
+    }
+
+    function calculateExpenseTotals() {
+        let subTotal = 0;
+        let nonTaxableTotal = 0;
+        let taxableTotal = 0;
+        let vatTotal = 0;
+
+        const rows = document.querySelectorAll(".account-item-row");
+
+        rows.forEach(row => {
+            const amountInput = row.querySelector(".row-amount-input");
+            const taxSelect = row.querySelector(".row-tax-select");
+
+            const amount = parseFloat(amountInput.value) || 0;
+            const taxType = taxSelect ? taxSelect.value : "Non-Taxable";
+
+            subTotal += amount;
+
+            if (taxType === "13% VAT") {
+                taxableTotal += amount;
+                vatTotal += (amount * 0.13);
+            } else {
+                nonTaxableTotal += amount;
+            }
+        });
+
+        const grandTotal = subTotal + vatTotal;
+
+        document.getElementById("summarySubTotal").textContent = subTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById("summaryNonTaxableTotal").textContent = nonTaxableTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById("summaryTaxableTotal").textContent = taxableTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById("summaryVatTotal").textContent = vatTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById("summaryGrandTotal").textContent = grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+</script>
 {% endblock %}

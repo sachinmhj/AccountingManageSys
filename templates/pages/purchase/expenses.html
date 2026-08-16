@@ -5,34 +5,50 @@
 
 <div class="invoice-page">
 
-    {% include "components/erp_list_header.html" %}
+    {% include "components/erp_list_header.html" with title=title tabs=tabs new_url=new_url %}
 
     <div class="invoice-table-container">
         <table class="invoice-table">
             <thead>
                 <tr>
-                    <th><input type="checkbox" class="select-checkbox"> Category</th>
-                    <th>Date</th>
-                    <th>Payment Method</th>
-                    <th>Description</th>
-                    <th>Amount</th>
+                    <th>
+                        <input type="checkbox"class="select-checkbox">Supplier </th>
+                    <th>
+                        Bill No
+                    </th>
+                    <th>
+                        Date
+                    </th>
+                    <th>
+                        Reference No
+                    </th>
+                    <th>
+                        Total
+                    </th>
                 </tr>
             </thead>
             <tbody>
                 {% for expense in expenses %}
                 <tr>
                     <td>
-                        <input type="checkbox" class="row-checkbox">
-                        {{ expense.category.name }}
+                        {{ expense.name }}
                     </td>
-                    <td>{{ expense.date }}</td>
-                    <td>{{ expense.payment_method }}</td>
-                    <td>{{ expense.description|default:"-" }}</td>
-                    <td>Rs. {{ expense.amount }}</td>
+                    <td>
+                        {{ expense.reference }}
+                    </td>
+                    <td>
+                        {{ expense.date }}
+                    </td>
+                    <td>
+                        {{ expense.category }}
+                    </td>
+                    <td>
+                        {{ expense.amount }}
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="empty" style="text-align:center; padding: 30px;">
+                    <td colspan="5" class="empty">
                         No expenses found
                     </td>
                 </tr>

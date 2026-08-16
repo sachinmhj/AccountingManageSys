@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView, CreateView, View
 from django.urls import reverse_lazy
+from decimal import Decimal
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.utils import timezone
@@ -182,13 +183,13 @@ class CustomerPaymentAddView(View):
             return redirect('customer_payment_add')
         
         try:
-            amount = float(amount_str)
+            amount = Decimal(amount_str)
             invoice = Invoice.objects.get(id=invoice_id, customer_id=customer_id)
-        except (ValueError, Invoice.DoesNotExist):
+        except (ValueError, Invoice.DoesNotExist, Exception):
             return redirect('customer_payment_add')
 
         # Enforce that payment cannot exceed total amount
-        pending_amount = float(invoice.total_amount - invoice.paid_amount)
+        pending_amount = invoice.total_amount - invoice.paid_amount
         if amount > pending_amount:
             amount = pending_amount
 
@@ -243,7 +244,8 @@ class InventoryProductView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "Products"
         context["tabs"] = ["Goods", "Services"]
-        context["products"] = []
+        context["products"] = Product.objects.all()
+        context["new_action"] = "openProductModal()"
         return context
 
 
@@ -467,20 +469,57 @@ class ExpensesView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Expenses"
+        context["tabs"] = ["Approved", "Draft"]
         context["expenses"] = Expense.objects.select_related('category').order_by('-date')
         context["new_url"] = "expenses_add"
         return context
 
-class ExpensesAddView(CreateView):
-    model = Expense
-    form_class = ExpenseForm
+class ExpensesAddView(View):
     template_name = "pages/purchase/expenses_add.html"
-    success_url = reverse_lazy("expenses")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = "Add New Expense"
-        return context
+    def get(self, request):
+        suppliers = Contact.objects.filter(contact_type__in=['Supplier', 'Both'])
+        context = {
+            "title": "Add New Expense",
+            "suppliers": suppliers,
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        # 1. Parse date and description
+        expense_date = request.POST.get('invoice_date')
+        description = request.POST.get('expense_notes', '')
+
+        # 2. Get the accounts and amounts
+        account_names = request.POST.getlist('account_name[]')
+        account_amounts = request.POST.getlist('account_amount[]')
+
+        # 3. Calculate total amount and determine category
+        total_amount = Decimal('0.00')
+        category_name = "General Expense"
+        
+        if account_names:
+            category_name = account_names[0]  # Use the first account as the category
+            
+        for amt in account_amounts:
+            try:
+                total_amount += Decimal(amt)
+            except:
+                pass
+
+        # 4. Find or create the ExpenseCategory
+        category, _ = ExpenseCategory.objects.get_or_create(name=category_name)
+
+        # 5. Create the Expense
+        Expense.objects.create(
+            category=category,
+            amount=total_amount,
+            date=expense_date,
+            payment_method='Cash',
+            description=description
+        )
+
+        return redirect('expenses')
 
 
 
@@ -490,6 +529,7 @@ class SupplierPaymentView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Supplier Payments"
+        context["tabs"] = ["Approved", "Draft"]
         context["payments"] = SupplierPayment.objects.select_related('purchase_bill__supplier').order_by('-payment_date')
         context["new_url"] = "supplier_payment_add"
         return context
@@ -517,13 +557,13 @@ class SupplierPaymentAddView(View):
             return redirect('supplier_payment_add')
         
         try:
-            amount = float(amount_str)
+            amount = Decimal(amount_str)
             bill = PurchaseBill.objects.get(id=bill_id, supplier_id=supplier_id)
-        except (ValueError, PurchaseBill.DoesNotExist):
+        except (ValueError, PurchaseBill.DoesNotExist, Exception):
             return redirect('supplier_payment_add')
 
         # Enforce that payment cannot exceed total amount
-        pending_amount = float(bill.total_amount - bill.paid_amount)
+        pending_amount = bill.total_amount - bill.paid_amount
         if amount > pending_amount:
             amount = pending_amount
 

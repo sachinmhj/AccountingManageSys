@@ -8,8 +8,42 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/sales_add.js' %}"></script>
 <script src="{% static 'js/sharedinvoice_add.js' %}"></script>
+<script src="{% static 'js/sales_add.js' %}"></script>
+
+<!-- Product Details Offcanvas (Moved here to escape stacking contexts) -->
+<div id="productDetailsOffcanvas" class="product-details-offcanvas">
+    <div class="offcanvas-header">
+        <h3>Product Details</h3>
+        <button type="button" class="close-offcanvas-btn" onclick="closeProductDetails()">×</button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="offcanvas-product-header">
+            <div class="product-avatar" id="offcanvasProductAvatar">P</div>
+            <div class="product-info">
+                <h4 id="offcanvasProductName">Product Name</h4>
+                <p id="offcanvasProductCategory">Category</p>
+            </div>
+        </div>
+
+        <div class="offcanvas-section">
+            <h5>Item Details</h5>
+            <div class="detail-row">
+                <span class="detail-label">Selling Price</span>
+                <span class="detail-value" id="offcanvasSellingPrice">Rs 0</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Purchase Price</span>
+                <span class="detail-value" id="offcanvasPurchasePrice">Rs 0</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Category</span>
+                <span class="detail-value" id="offcanvasCategoryName">Category Name</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="offcanvas-overlay" id="productDetailsOverlay" onclick="closeProductDetails()"></div>
 {% endblock %}
 
 {% block content %}
@@ -56,7 +90,8 @@
                             {% endfor %}
                         </div>
                         <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
-                            <button type="button" class="btn-add-new" onclick="openContactModal(event)">+ Add New</button>
+                            <button type="button" class="btn-add-new" onclick="openContactModal(event)">+ Add
+                                New</button>
                         </div>
                     </div>
                 </div>
@@ -180,24 +215,89 @@
             </div>
 
             <div class="invoice-items-section">
-                <div class="invoice-items-header">
+                <div class="invoice-items-header" id="invoiceItemsHeader">
                     <div>Product / service</div>
                     <div>Qty</div>
                     <div>Unit Price</div>
                     <div>Amount</div>
+                    <div></div>
+                    <div></div>
                     <div></div>
                 </div>
 
                 <div id="invoiceItemsContainer">
                 </div>
 
-                <button type="button" class="invoice-add-option" onclick="addItemRow()" style="margin-top: 8px;">+ Add Item</button>
+                <div class="invoice-add-product-container" style="position: relative; margin-top: 8px;">
+                    <div class="custom-select-trigger" onclick="toggleProductPickerDropdown(event)">
+                        <input type="text" id="productSearchInput" class="product-input-field" placeholder="Add Product"
+                            oninput="filterProductsPicker()">
+                    </div>
 
-                <!-- Totals -->
-                <div class="invoice-totals" style="margin-top: 16px; text-align: right;">
-                    <div>Subtotal: <strong id="subtotalDisplay">Rs. 0.00</strong></div>
-                    <div>VAT (13%): <strong id="vatDisplay">Rs. 0.00</strong></div>
-                    <div style="font-size: 1.1em; margin-top: 4px;">Total: <strong id="totalDisplay">Rs. 0.00</strong></div>
+                    <div class="custom-dropdown-popup" id="productPickerDropdownPopup">
+                        <div class="dropdown-options-list" id="productPickerOptionsList">
+                            {% for product in products %}
+                            <div class="dropdown-option-item" onclick="selectProductRow('{{ product.id }}', event)">
+                                <span class="product-name">{{ product.name }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
+                            <button type="button" class="btn-add-new" onclick="openProductModal(event)">+ Add
+                                New</button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    const availableProducts = {
+                        {% for product in products %}
+                        '{{ product.id }}': {
+                            name: '{{ product.name|escapejs }}',
+                            selling_price: {{ product.selling_price|default:0 }},
+                            purchase_price: {{ product.purchase_price|default:0 }},
+                            category: '{{ product.category.name|default:""|escapejs }}'
+                        }{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    };
+                </script>
+
+                <!-- Totals Section -->
+                <div class="invoice-summary-section" id="invoiceSummarySection" style="display: none;">
+                    <div class="invoice-summary-row">
+                        <span class="summary-label">Sub Total</span>
+                        <span class="summary-value" id="subTotalDisplay">-</span>
+                    </div>
+                    <div class="invoice-summary-row">
+                        <span class="summary-label">
+                            Discount
+                            <input type="number" id="globalDiscountInput" value="0"
+                                style="width: 50px; text-align:right; margin-left:10px; border:1px solid #ccc; border-radius:4px;"
+                                oninput="calculateTotals()">
+                            <select id="globalDiscountType" onchange="calculateTotals()"
+                                style="width: 50px; margin-left:5px; border:1px solid #ccc; border-radius:4px;">
+                                <option value="%">%</option>
+                                <option value="Flat">Flat</option>
+                            </select>
+                        </span>
+                        <span class="summary-value" id="globalDiscountDisplay">-</span>
+                    </div>
+                    <div class="invoice-summary-row">
+                        <span class="summary-label">Non-Taxable Total</span>
+                        <span class="summary-value" id="nonTaxableTotalDisplay">-</span>
+                    </div>
+                    <div class="invoice-summary-row">
+                        <span class="summary-label">Taxable Total</span>
+                        <span class="summary-value" id="taxableTotalDisplay">-</span>
+                    </div>
+                    <div class="invoice-summary-row">
+                        <span class="summary-label">VAT</span>
+                        <span class="summary-value" id="vatTotalDisplay">-</span>
+                    </div>
+                    <div class="invoice-summary-row grand-total-row">
+                        <span class="summary-label">Grand Total</span>
+                        <span class="summary-value" id="grandTotalDisplay">-</span>
+                    </div>
                 </div>
             </div>
 
@@ -236,5 +336,7 @@
         </form>
     </div>
 </div>
+
+
 
 {% endblock %}
