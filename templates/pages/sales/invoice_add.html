@@ -1,342 +1,1113 @@
 {% extends "layouts/base.html" %}
-
 {% load static %}
 
+{% block title %}New Sales Invoice | Afno360{% endblock %}
+
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/invoice_add.css' %}">
-<link rel="stylesheet" href="{% static 'css/sales_add.css' %}">
-{% endblock %}
+<style>
+    :root {
+        --primary: #2563eb;
+        --success: #16a34a;
+        --danger: #dc2626;
+        --warning: #ca8a04;
+        --border: #e2e8f0;
+        --bg-light: #f8fafc;
+        --bg-white: #ffffff;
+        --text-dark: #1e293b;
+        --text-gray: #64748b;
+    }
 
-{% block extra_js %}
-<script src="{% static 'js/sharedinvoice_add.js' %}"></script>
-<script src="{% static 'js/sales_add.js' %}"></script>
+    body {
+        background-color: #f1f5f9;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        font-size: 13px;
+        color: var(--text-dark);
+    }
 
-<!-- Product Details Offcanvas (Moved here to escape stacking contexts) -->
-<div id="productDetailsOffcanvas" class="product-details-offcanvas">
-    <div class="offcanvas-header">
-        <h3>Product Details</h3>
-        <button type="button" class="close-offcanvas-btn" onclick="closeProductDetails()">×</button>
-    </div>
-    <div class="offcanvas-body">
-        <div class="offcanvas-product-header">
-            <div class="product-avatar" id="offcanvasProductAvatar">P</div>
-            <div class="product-info">
-                <h4 id="offcanvasProductName">Product Name</h4>
-                <p id="offcanvasProductCategory">Category</p>
-            </div>
-        </div>
+    .page-wrapper {
+        display: flex;
+        gap: 20px;
+        padding: 20px;
+        padding-bottom: 80px;
+        align-items: flex-start;
+    }
 
-        <div class="offcanvas-section">
-            <h5>Item Details</h5>
-            <div class="detail-row">
-                <span class="detail-label">Selling Price</span>
-                <span class="detail-value" id="offcanvasSellingPrice">Rs 0</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Purchase Price</span>
-                <span class="detail-value" id="offcanvasPurchasePrice">Rs 0</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Category</span>
-                <span class="detail-value" id="offcanvasCategoryName">Category Name</span>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="offcanvas-overlay" id="productDetailsOverlay" onclick="closeProductDetails()"></div>
+    .sidebar-col {
+        width: 300px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 20px;
+    }
+
+    .main-col {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .panel {
+        background: var(--bg-white);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .panel-header {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    label {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+        display: block;
+    }
+    label span { color: var(--danger); }
+
+    .form-control, .form-select {
+        width: 100%;
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-size: 13px;
+        height: 32px;
+    }
+    .form-control[readonly] { background: var(--bg-light); }
+
+    .btn {
+        padding: 6px 12px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--bg-white);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn:hover { background: var(--bg-light); }
+    .btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-success { background: var(--success); color: white; border-color: var(--success); }
+    
+    .data-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+    .data-table th, .data-table td {
+        padding: 8px;
+        border: 1px solid var(--border);
+        font-size: 12px;
+    }
+    .data-table th { background: var(--bg-light); font-weight: 600; text-align: left; }
+    .data-table td input, .data-table td select {
+        width: 100%; border: 1px solid var(--border); border-radius: 4px; padding: 4px; font-size: 12px;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    
+    .summary-box { padding-right: 20px; }
+    .summary-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dotted var(--border); }
+    .summary-row.total { font-weight: 700; background: #fef3c7; padding: 8px; border: 1px solid #fde68a; border-radius: 4px; font-size: 14px; margin-top: 4px; }
+    
+    .payment-radios { display: flex; gap: 16px; margin-bottom: 16px; }
+    .payment-radios label { display: flex; align-items: center; gap: 6px; font-weight: 400; font-size: 13px; }
+
+    .bottom-panels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .bottom-panel { border: 1px solid var(--border); border-radius: 8px; background: var(--bg-white); padding: 12px; }
+    .bottom-panel-title { font-weight: 600; color: var(--primary); font-size: 12px; margin-bottom: 12px; }
+
+    .sticky-footer {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        background: var(--bg-white);
+        border-top: 1px solid var(--border);
+        padding: 12px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        z-index: 100;
+    }
+    .footer-right { display: flex; gap: 24px; font-size: 14px; font-weight: 600; }
+    .footer-right span { color: var(--text-dark); }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
-{% comment %} Shared Sales/Contact Modal Component {% endcomment %}
-{% include "components/modal_sales/sales_add.html" %}
-{% include "components/modal_sales/invoice_inventory.html" %}
-
-<div class="invoice-add-page">
-
-    <div class="invoice-add-header">
-        <div class="invoice-add-title">
-            <h2>Add New Invoice</h2>
-            <a href="#">HeadOffice (HO)</a>
-        </div>
-
-        <div class="invoice-add-actions">
-            <button type="submit" form="invoiceAddForm" class="invoice-save-btn">Save</button>
-            <button type="button" class="invoice-close-btn" onclick="goBackToInvoices()">×</button>
+<form method="POST" action="{% url 'invoice_add' %}" id="invoiceForm">
+    {% csrf_token %}
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; padding: 20px 20px 0 20px;">
+        <h2 style="margin:0; font-size:22px; font-weight:700;">New Sales Invoice</h2>
+        <div style="display:flex; gap:8px;">
+            <button type="button" class="btn" onclick="toggleSettingsModal()"><i class="fa-solid fa-gear"></i> Settings</button>
+            <button type="submit" class="btn btn-primary">Save</button>
         </div>
     </div>
 
-    <div class="invoice-add-body">
-        <form id="invoiceAddForm" method="POST">
-            {% csrf_token %}
-
-            <div class="invoice-form-grid">
-                <!-- Customer Picker -->
-                <div class="invoice-form-group col-span-8 customer-picker-container" onclick="event.stopPropagation();">
-                    <label>Customer Name <span>*</span></label>
-                    <input type="hidden" name="customer" id="selectedCustomerId" required>
-
-                    <div class="custom-select-trigger" onclick="toggleCustomerDropdown(event)">
-                        <input type="text" id="customerSearchInput" class="customer-input-field"
-                            placeholder="Customer Name" oninput="filterCustomers()">
-                    </div>
-
-                    <div class="custom-dropdown-popup" id="customerDropdownPopup">
-                        <div class="dropdown-options-list" id="customerOptionsList">
-                            {% for customer in customers %}
-                            <div class="dropdown-option-item"
-                                onclick="selectCustomer('{{ customer.name }}', '{{ customer.id }}', event)">
-                                <span class="customer-name">{{ customer.name }}</span>
-                            </div>
+    <!-- 1. Customer & Invoice Information (full width) -->
+    <div id="wrapper_customer" style="padding:20px 20px 0 20px;">
+        <div class="panel" id="panel_customer" style="margin-bottom:0;">
+            <div class="panel-header" id="header_customer">Customer &amp; Invoice Information</div>
+            <div class="grid-4">
+                <!-- Customer + Balance side by side in one cell spanning 2 cols via inline flex -->
+                <div style="grid-column: span 2; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div>
+                        <label>Customer <span>*</span></label>
+                        <select class="form-select" name="customer" id="customer_select" required onchange="onCustomerChange(this)">
+                            <option value="">Select Customer</option>
+                            {% for c in customers %}
+                                <option value="{{ c.id }}">{{ c.name }}</option>
                             {% endfor %}
-                        </div>
-                        <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
-                            <button type="button" class="btn-add-new" onclick="openContactModal(event)">+ Add
-                                New</button>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Customer Balance</label>
+                        <div style="padding:6px 10px; background:#fff1f2; color:#e11d48; border-radius:4px; font-weight:600; font-size:15px; min-height:32px; display:flex; align-items:center; justify-content:space-between;">
+                            <span id="customer_balance">Rs. 0.00</span>
+                            <a id="customer_history_link" href="/sales/customers/" target="_blank" style="font-size:11px; color:#2563eb; text-decoration:none; font-weight:500; display:flex; align-items:center; gap:3px;">
+                                <i class="fa-solid fa-clock-rotate-left" style="font-size:10px;"></i> View History
+                            </a>
                         </div>
                     </div>
                 </div>
-
-                <div class="invoice-form-group col-span-4">
-                    <label>Reference No</label>
-                    <input type="text" name="reference" placeholder="Reference Number">
+                <div>
+                    <label>Invoice No. <span>*</span></label>
+                    <input type="text" class="form-control" name="invoice_no" value="INV-000125" readonly>
                 </div>
-
-                <div class="invoice-form-group col-span-4">
-                    <label>Invoice Code</label>
-                    <input type="text" value="DRAFT" readonly class="input-readonly">
-                </div>
-
-                <div class="invoice-form-group col-span-4">
+                <div>
                     <label>Invoice Date <span>*</span></label>
-                    <input type="date" name="invoice_date" value="{{ today }}" required>
-                </div>
-
-                <div class="invoice-form-group col-span-4">
-                    <label>Due Date <span>*</span></label>
-                    <input type="date" name="due_date" value="{{ today }}" required>
-                </div>
-
-                <div class="invoice-form-group col-span-6">
-                    <label>Currency</label>
-                    <select name="currency">
-                        <option value="NPR" selected>Nepalese Rupee</option>
-                        <option value="JPY">Japanese Yen</option>
-                        <option value="USD">US Dollar</option>
-                        <option value="EUR">Euro</option>
-                        <option value="CNY">Chinese Yuan</option>
-                        <option value="CHF">Swiss Franc</option>
-                        <option value="INR">Indian Rupee</option>
-                    </select>
-                </div>
-
-                <div class="invoice-form-group col-span-6">
-                    <label>Exchange Rate To NPR <span>*</span></label>
-                    <input type="number" name="exchange_rate" value="1" step="0.01" required>
-                </div>
-            </div>
-
-            <div class="invoice-export-section">
-                <label>
-                    <input type="checkbox" id="exportSalesToggle" name="is_export" onchange="toggleExportFields()">
-                    This is export sales
-                </label>
-            </div>
-
-            <div id="exportFieldsGroup" class="invoice-form-grid export-fields-grid" style="display: none;">
-                <div class="invoice-form-group col-span-4">
-                    <label>Country</label>
-                    <select name="export_country" id="exportCountrySelect">
-                        <option value="" disabled selected>Country</option>
-                        <option value="AF">Afghanistan</option>
-                        <option value="AL">Albania</option>
-                        <option value="DZ">Algeria</option>
-                        <option value="AR">Argentina</option>
-                        <option value="AU">Australia</option>
-                        <option value="AT">Austria</option>
-                        <option value="BD">Bangladesh</option>
-                        <option value="BE">Belgium</option>
-                        <option value="BR">Brazil</option>
-                        <option value="CA">Canada</option>
-                        <option value="CL">Chile</option>
-                        <option value="CN">China</option>
-                        <option value="DK">Denmark</option>
-                        <option value="EG">Egypt</option>
-                        <option value="FI">Finland</option>
-                        <option value="FR">France</option>
-                        <option value="DE">Germany</option>
-                        <option value="GR">Greece</option>
-                        <option value="HK">Hong Kong</option>
-                        <option value="IN">India</option>
-                        <option value="ID">Indonesia</option>
-                        <option value="IE">Ireland</option>
-                        <option value="IL">Israel</option>
-                        <option value="IT">Italy</option>
-                        <option value="JP">Japan</option>
-                        <option value="KE">Kenya</option>
-                        <option value="KR">Korea, Republic of</option>
-                        <option value="KW">Kuwait</option>
-                        <option value="MY">Malaysia</option>
-                        <option value="MX">Mexico</option>
-                        <option value="NP">Nepal</option>
-                        <option value="NL">Netherlands</option>
-                        <option value="NZ">New Zealand</option>
-                        <option value="NO">Norway</option>
-                        <option value="PK">Pakistan</option>
-                        <option value="PH">Philippines</option>
-                        <option value="PL">Poland</option>
-                        <option value="PT">Portugal</option>
-                        <option value="QA">Qatar</option>
-                        <option value="RU">Russian Federation</option>
-                        <option value="SA">Saudi Arabia</option>
-                        <option value="SG">Singapore</option>
-                        <option value="ZA">South Africa</option>
-                        <option value="ES">Spain</option>
-                        <option value="LK">Sri Lanka</option>
-                        <option value="SE">Sweden</option>
-                        <option value="CH">Switzerland</option>
-                        <option value="TH">Thailand</option>
-                        <option value="TR">Turkey</option>
-                        <option value="AE">United Arab Emirates</option>
-                        <option value="GB">United Kingdom</option>
-                        <option value="US">United States</option>
-                        <option value="VN">Viet Nam</option>
-                    </select>
-                </div>
-
-                <div class="invoice-form-group col-span-4">
-                    <label>Date</label>
-                    <input type="date" name="export_date">
-                </div>
-
-                <div class="invoice-form-group col-span-4">
-                    <label>Document No</label>
-                    <input type="text" name="export_document_no" placeholder="Document No">
-                </div>
-            </div>
-
-            <div class="invoice-items-section">
-                <div class="invoice-items-header" id="invoiceItemsHeader">
-                    <div>Product / service</div>
-                    <div>Qty</div>
-                    <div>Unit Price</div>
-                    <div>Amount</div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                </div>
-
-                <div id="invoiceItemsContainer">
-                </div>
-
-                <div class="invoice-add-product-container" style="position: relative; margin-top: 8px;">
-                    <div class="custom-select-trigger" onclick="toggleProductPickerDropdown(event)">
-                        <input type="text" id="productSearchInput" class="product-input-field" placeholder="Add Product"
-                            oninput="filterProductsPicker()">
-                    </div>
-
-                    <div class="custom-dropdown-popup" id="productPickerDropdownPopup">
-                        <div class="dropdown-options-list" id="productPickerOptionsList">
-                            {% for product in products %}
-                            <div class="dropdown-option-item" onclick="selectProductRow('{{ product.id }}', event)">
-                                <span class="product-name">{{ product.name }}</span>
-                            </div>
-                            {% endfor %}
+                    <div class="dual-date-stack">
+                        <div class="date-row">
+                            <span class="date-label">AD</span>
+                            <input type="date" class="form-control" name="invoice_date" id="invoice_date_ad" value="{{ today|date:'Y-m-d' }}" required>
                         </div>
-                        <div class="dropdown-add-new-row" onclick="event.stopPropagation();">
-                            <button type="button" class="btn-add-new" onclick="openProductModal(event)">+ Add
-                                New</button>
+                        <div class="date-row" style="position:relative;">
+                            <span class="date-label bs-label">BS</span>
+                            <input type="text" class="form-control" id="invoice_date_bs" placeholder="Pick BS date">
                         </div>
                     </div>
                 </div>
-
-                <script>
-                    const availableProducts = {
-                        {% for product in products %}
-                        '{{ product.id }}': {
-                            name: '{{ product.name|escapejs }}',
-                            selling_price: {{ product.selling_price|default:0 }},
-                            purchase_price: {{ product.purchase_price|default:0 }},
-                            category: '{{ product.category.name|default:""|escapejs }}'
-                        }{% if not forloop.last %},{% endif %}
-                        {% endfor %}
-                    };
-                </script>
-
-                <!-- Totals Section -->
-                <div class="invoice-summary-section" id="invoiceSummarySection" style="display: none;">
-                    <div class="invoice-summary-row">
-                        <span class="summary-label">Sub Total</span>
-                        <span class="summary-value" id="subTotalDisplay">-</span>
-                    </div>
-                    <div class="invoice-summary-row">
-                        <span class="summary-label">
-                            Discount
-                            <input type="number" id="globalDiscountInput" value="0"
-                                style="width: 50px; text-align:right; margin-left:10px; border:1px solid #ccc; border-radius:4px;"
-                                oninput="calculateTotals()">
-                            <select id="globalDiscountType" onchange="calculateTotals()"
-                                style="width: 50px; margin-left:5px; border:1px solid #ccc; border-radius:4px;">
-                                <option value="%">%</option>
-                                <option value="Flat">Flat</option>
-                            </select>
-                        </span>
-                        <span class="summary-value" id="globalDiscountDisplay">-</span>
-                    </div>
-                    <div class="invoice-summary-row">
-                        <span class="summary-label">Non-Taxable Total</span>
-                        <span class="summary-value" id="nonTaxableTotalDisplay">-</span>
-                    </div>
-                    <div class="invoice-summary-row">
-                        <span class="summary-label">Taxable Total</span>
-                        <span class="summary-value" id="taxableTotalDisplay">-</span>
-                    </div>
-                    <div class="invoice-summary-row">
-                        <span class="summary-label">VAT</span>
-                        <span class="summary-value" id="vatTotalDisplay">-</span>
-                    </div>
-                    <div class="invoice-summary-row grand-total-row">
-                        <span class="summary-label">Grand Total</span>
-                        <span class="summary-value" id="grandTotalDisplay">-</span>
-                    </div>
+                <div>
+                    <label>Sales Type <span>*</span></label>
+                    <select class="form-select" name="sales_type"><option>Goods</option><option>Services</option></select>
+                </div>
+                <div>
+                    <label>Sale Category <span>*</span></label>
+                    <select class="form-select" name="sale_category"><option>Local Sales</option><option>Export</option></select>
+                </div>
+                <div>
+                    <label>VAT Treatment <span>*</span></label>
+                    <select class="form-select" name="vat_treatment"><option>With VAT (13%)</option><option>Non VAT</option></select>
+                </div>
+                <div>
+                    <label>Currency <span>*</span></label>
+                    <select class="form-select" name="currency"><option>NPR</option><option>USD</option></select>
+                </div>
+                <div>
+                    <label>Reference (PO / Order No.)</label>
+                    <input type="text" class="form-control" name="reference_po" placeholder="e.g. PO-458796">
+                </div>
+                <div>
+                    <label>Due Date (AD)</label>
+                    <input type="date" class="form-control" name="due_date">
                 </div>
             </div>
-
-            <!-- TDS Switch Section -->
-            <div class="invoice-tds-section">
-                <label class="invoice-switch">
-                    <input type="checkbox" id="tdsApplicableToggle" name="tds_applicable" onchange="toggleTdsFields()">
-                    <span class="invoice-slider"></span>
-                </label>
-                <strong>TDS is applicable</strong>
-            </div>
-
-            <div id="tdsFieldsGroup" class="invoice-form-grid tds-fields-grid" style="display: none;">
-                <div class="invoice-form-group col-span-4">
-                    <label>TDS Account <span>*</span></label>
-                    <select name="tds_account">
-                        <option value="" disabled selected>Select Account</option>
-                    </select>
-                </div>
-
-                <div class="invoice-form-group col-span-4">
-                    <label>TDS Type <span>*</span></label>
-                    <select name="tds_type">
-                        <option value="" disabled selected>TDS Type</option>
-                    </select>
-                </div>
-
-                <div class="invoice-form-group col-span-4">
-                    <label>TDS Amount <span>*</span></label>
-                    <input type="number" name="tds_amount" placeholder="TDS Amount" step="0.01">
-                </div>
-            </div>
-
-            <button type="button" class="invoice-add-option">+ Add Terms and Conditions</button>
-            <button type="button" class="invoice-add-option">+ Add Reporting Tags</button>
-        </form>
+        </div>
     </div>
-</div>
 
+    <!-- FULL WIDTH SECTIONS BELOW -->
+    <div style="padding:20px 20px 80px 20px; display:flex; flex-direction:column; gap:20px;">
 
+        <!-- Items Details -->
+        <div class="panel" id="panel_items" style="margin-bottom:0;">
+            <div class="panel-header" id="header_items">Items Details</div>
+            <table class="data-table" id="itemsTable">
+                <thead>
+                    <tr>
+                        <th style="width:3%">#</th>
+                        <th style="width:15%">Item / Product</th>
+                        <th style="width:14%">Description</th>
+                        <th style="width:6%">Qty</th>
+                        <th style="width:7%">Unit</th>
+                        <th style="width:9%">Rate</th>
+                        <th style="width:8%">Discount</th>
+                        <th style="width:8%">VAT %</th>
+                        <th style="width:10%">Amount</th>
+                        <th style="width:7%">Cost</th>
+                        <th style="width:7%">Profit</th>
+                        <th style="width:6%">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsBody"></tbody>
+            </table>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                <div style="display:flex; gap:8px;">
+                    <button type="button" class="btn" onclick="addRow()"><i class="fa-solid fa-plus"></i> Add Item</button>
+                    <button type="button" class="btn"><i class="fa-solid fa-plus"></i> Add Service</button>
+                </div>
+                <button type="button" class="btn"><i class="fa-solid fa-barcode"></i> Scan Barcode</button>
+            </div>
+        </div>
 
+        <!-- Row A: Summary | Payment & Settlement -->
+        <div id="row_a" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+            <!-- Summary -->
+            <div class="panel" id="panel_summary" style="margin-bottom:0;">
+                <div class="panel-header" id="header_summary">Summary</div>
+                <div class="summary-row"><span>Sub Total</span><span id="lbl_subtotal">0.00</span></div>
+                <div class="summary-row"><span>Discount</span><span id="lbl_discount">0.00</span></div>
+                <div class="summary-row"><span>VAT (13%)</span><span id="lbl_vat">0.00</span></div>
+                <div class="summary-row">
+                    <span>Round Off</span>
+                    <span><input type="number" step="0.01" name="round_off" id="inp_round_off" style="width:60px; text-align:right; border:1px solid var(--border); border-radius:3px; padding:2px 4px;" value="0.00" oninput="calculateTotals()"></span>
+                </div>
+                <div class="summary-row total" style="margin-top:8px; padding:10px 0; background:linear-gradient(135deg,#eff6ff,#dbeafe); border-radius:6px; padding:8px 10px; border:none;">
+                    <span style="font-size:14px;">Grand Total</span><span id="lbl_grand_total" style="font-size:16px;">0.00</span>
+                </div>
+                <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border);"></div>
+                <div class="summary-row" style="border:none; padding:3px 0;"><span style="color:var(--text-gray); font-size:12px;">Total Cost</span><span id="lbl_total_cost" style="font-size:12px; color:var(--text-gray);">0.00</span></div>
+                <div class="summary-row" style="border:none; padding:3px 0;"><span style="color:var(--success); font-weight:600;">Gross Profit</span><span id="lbl_gross_profit" style="color:var(--success); font-weight:600;">0.00</span></div>
+                <div class="summary-row" style="border:none; padding:3px 0;"><span style="color:#7c3aed; font-weight:600;">Profit Margin</span><span id="lbl_profit_margin" style="color:#7c3aed; font-weight:600;">0.00%</span></div>
+            </div>
+
+            <!-- Payment & Settlement -->
+            <div class="panel" id="panel_payment" style="margin-bottom:0;">
+                <div class="panel-header" id="header_payment">Payment &amp; Settlement</div>
+                <div class="payment-radios">
+                    <label><input type="radio" name="pay_type" value="Full" onchange="setFullPayment()"> Full Payment</label>
+                    <label><input type="radio" name="pay_type" value="Partial" checked> Partial Payment</label>
+                    <label><input type="radio" name="pay_type" value="Credit" onchange="setCreditPayment()"> Credit</label>
+                </div>
+
+                <!-- Each field: full row label + input -->
+                <div style="display:flex; flex-direction:column; gap:10px;">
+
+                    <!-- Amount Received -->
+                    <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                        <label style="margin:0; font-weight:600;">Amount Received <span>*</span></label>
+                        <input type="number" step="0.01" class="form-control" name="paid_amount" id="inp_paid_amount" style="text-align:right; font-weight:700; font-size:15px;" value="0.00" oninput="updateBalance(); autoDistribute();">
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                        <label style="margin:0; font-weight:600;">Payment Method <span>*</span></label>
+                        <select class="form-select" name="payment_method" id="payment_method_sel" onchange="onPayMethodChange(this.value)">
+                            <option value="Cash">Cash</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Cheque">Cheque</option>
+                            <option value="Mobile Banking">Mobile Banking</option>
+                        </select>
+                    </div>
+
+                    <!-- === BANK TRANSFER EXTRA FIELDS === -->
+                    <div id="fields_bank" style="display:none; flex-direction:column; gap:10px;">
+                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                            <label style="margin:0; font-weight:600;">Bank Account <span>*</span></label>
+                            <select class="form-select" name="bank_account">
+                                <option value="">Select Bank Account</option>
+                                <option>NMB Bank - 1234567890</option>
+                                <option>Everest Bank - 9876543210</option>
+                                <option>Nabil Bank - 1122334455</option>
+                                <option>Global IME - 5566778899</option>
+                            </select>
+                        </div>
+                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                            <label style="margin:0;">Transaction ID</label>
+                            <input type="text" class="form-control" name="bank_txn_id" placeholder="Bank transaction ID">
+                        </div>
+                    </div>
+
+                    <!-- === CHEQUE EXTRA FIELDS === -->
+                    <div id="fields_cheque" style="display:none; flex-direction:column; gap:10px;">
+                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                            <label style="margin:0; font-weight:600;">Bank Name <span>*</span></label>
+                            <input type="text" class="form-control" name="cheque_bank" placeholder="e.g. Nabil Bank">
+                        </div>
+                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                            <label style="margin:0; font-weight:600;">Cheque No. <span>*</span></label>
+                            <input type="text" class="form-control" name="cheque_no" placeholder="CHQ-458796">
+                        </div>
+                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                            <label style="margin:0;">Cheque Date</label>
+                            <input type="date" class="form-control" name="cheque_date">
+                        </div>
+                    </div>
+
+                    <!-- === MOBILE BANKING EXTRA FIELDS === -->
+                    <div id="fields_mobile" style="display:none; flex-direction:column; gap:10px;">
+                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                            <label style="margin:0; font-weight:600;">App / Wallet <span>*</span></label>
+                            <select class="form-select" name="mobile_app">
+                                <option value="">Select App</option>
+                                <option>eSewa</option>
+                                <option>Khalti</option>
+                                <option>IME Pay</option>
+                                <option>ConnectIPS</option>
+                                <option>FonePay</option>
+                            </select>
+                        </div>
+                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                            <label style="margin:0; font-weight:600;">Mobile No. <span>*</span></label>
+                            <input type="text" class="form-control" name="mobile_no" placeholder="98XXXXXXXX">
+                        </div>
+                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                            <label style="margin:0;">Transaction ID</label>
+                            <input type="text" class="form-control" name="mobile_txn_id" placeholder="TXN ID">
+                        </div>
+                    </div>
+
+                    <!-- Reference No. -->
+                    <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                        <label style="margin:0;">Reference No.</label>
+                        <input type="text" class="form-control" name="reference_no" placeholder="Reference number">
+                    </div>
+
+                    <!-- Payment Date -->
+                    <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                        <label style="margin:0; font-weight:600;">Payment Date <span>*</span></label>
+                        <input type="date" class="form-control" name="payment_date" value="{{ today|date:'Y-m-d' }}">
+                    </div>
+
+                    <!-- Narration -->
+                    <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                        <label style="margin:0;">Narration</label>
+                        <textarea class="form-control" name="narration" rows="2" style="resize:none; font-size:12px;" placeholder="Payment received from customer"></textarea>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Row B: Allocate Payment | Return / Exchange -->
+        <div id="row_b" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+            <!-- Allocate Payment (Pending Invoices) -->
+            <div class="panel" id="panel_allocate" style="margin-bottom:0;">
+                <div class="panel-header" id="header_allocate" style="margin-bottom:0; padding-bottom:8px;">Allocate Payment</div>
+                <div style="display:flex; border-bottom:1px solid var(--border); margin-bottom:12px;">
+                    <button type="button" id="btn_manual_alloc" onclick="setAllocMode('manual')" style="flex:1; background:transparent; border:none; border-bottom:2px solid #2563eb; color:#2563eb; font-weight:600; padding:8px 0; font-size:12px; cursor:pointer;">Manual Allocation</button>
+                    <button type="button" id="btn_auto_alloc" onclick="setAllocMode('auto')" style="flex:1; background:transparent; border:none; border-bottom:2px solid transparent; color:var(--text-gray); font-weight:500; padding:8px 0; font-size:12px; cursor:pointer;">Oldest First (Auto)</button>
+                </div>
+                <div id="alloc_placeholder" style="font-size:11px; color:var(--text-gray); padding:16px; text-align:center; border:1px dashed var(--border); border-radius:6px;">
+                    <i class="fa-solid fa-circle-info" style="margin-bottom:4px; display:block;"></i>
+                    Select a customer to see pending invoices
+                </div>
+                <table id="alloc_table" class="data-table" style="display:none; font-size:11px;">
+                    <thead>
+                        <tr>
+                            <th>Invoice No.</th>
+                            <th>Date</th>
+                            <th style="text-align:right;">Due Amt</th>
+                            <th style="text-align:right; width:110px;">Allocate Amt</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alloc_body"></tbody>
+                </table>
+                <div id="alloc_totals" style="display:none; border-top:2px solid var(--border); padding-top:10px; margin-top:4px;">
+                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:6px; color:var(--text-dark);"><span>Total Due</span><span id="alloc_total_due">0.00</span></div>
+                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px; color:var(--success);"><span>Total Allocated</span><span id="alloc_total_allocated">0.00</span></div>
+                    <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:800; color:var(--danger);"><span>Remaining</span><span id="alloc_remaining">0.00</span></div>
+                    <p style="font-size:10px; color:var(--text-gray); margin-top:6px; margin-bottom:0;">Note: Remaining amount will stay as outstanding.</p>
+                </div>
+                <p id="alloc_no_pending" style="display:none; font-size:11px; color:var(--text-gray); margin-top:8px;">No pending invoices for this customer.</p>
+            </div>
+
+            <!-- Return / Exchange -->
+            <div class="panel" id="panel_return" style="margin-bottom:0;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div class="panel-header" id="header_return" style="margin-bottom:0;">Return / Exchange <span style="font-size:10px; font-weight:400; color:var(--text-gray);">(Optional)</span></div>
+                    <button type="button" class="btn" onclick="toggleReturns()"><i class="fa-solid fa-plus" id="return_toggle_icon"></i> Add Return Item</button>
+                </div>
+                <div id="return_section" style="display:none;">
+                    <table class="data-table" id="returnTable">
+                        <thead>
+                            <tr>
+                                <th style="width:5%">#</th>
+                                <th style="width:30%">Product</th>
+                                <th style="width:15%">Qty</th>
+                                <th style="width:12%">Unit</th>
+                                <th style="width:18%">Rate</th>
+                                <th style="width:15%">Return Amt</th>
+                                <th style="width:5%"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="returnBody"></tbody>
+                    </table>
+                    <button type="button" class="btn" style="margin-top:8px;" onclick="addReturnRow()"><i class="fa-solid fa-plus"></i> Add Row</button>
+                    <div style="margin-top:12px; display:flex; justify-content:flex-end; gap:16px; font-size:13px; font-weight:600;">
+                        <span>Total Return Amount:</span>
+                        <span id="return_total" style="color:var(--danger);">0.00</span>
+                    </div>
+                </div>
+                <p id="return_empty" style="font-size:11px; color:var(--text-gray); margin:0;">No return items added.</p>
+            </div>
+        </div>
+
+        <!-- Row C: Profit Sharing | Terms & Notes -->
+        <div id="row_c" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+            <!-- Allocation (Profit Sharing) -->
+            <div class="panel" id="panel_profit" style="margin-bottom:0;">
+                <div class="panel-header" id="header_profit">Allocation <span style="font-size:10px; font-weight:400; color:var(--text-gray);">(Profit Sharing)</span></div>
+                <table class="data-table" id="profitAllocTable" style="font-size:11px; margin-bottom:8px;">
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>Party Name</th>
+                            <th>Basis</th>
+                            <th>Value</th>
+                            <th>Amount</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="profitAllocBody"></tbody>
+                </table>
+                <button type="button" class="btn" onclick="addAllocRow()" style="width:100%;"><i class="fa-solid fa-plus"></i> Add Allocation</button>
+                <div style="display:flex; justify-content:space-between; font-size:12px; padding-top:8px; border-top:1px solid var(--border); margin-top:8px;">
+                    <span>Total Allocation</span><span style="font-weight:600;" id="alloc_profit_total">0.00</span>
+                </div>
+            </div>
+
+            <!-- Terms & Notes -->
+            <div class="panel" id="panel_terms" style="margin-bottom:0;">
+                <div class="panel-header" id="header_terms">Terms &amp; Conditions</div>
+                <textarea class="form-control" name="terms_conditions" rows="3" style="height:auto; font-size:11px; resize:none; margin-bottom:12px;">Thank you for your business.</textarea>
+                <div class="panel-header" style="margin-bottom:8px;">Notes</div>
+                <input type="text" class="form-control" name="notes" placeholder="Add note..." style="font-size:11px;">
+            </div>
+        </div>
+
+    </div> <!-- End full-width sections -->
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:#fff; width:400px; border-radius:8px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
+                <h3 style="margin:0; font-size:16px;">Page Settings</h3>
+                <button type="button" onclick="toggleSettingsModal()" style="background:transparent; border:none; cursor:pointer; font-size:18px; color:var(--text-gray);"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div style="padding:20px; display:flex; flex-direction:column; gap:12px;">
+                <p style="margin:0 0 8px 0; font-size:12px; color:var(--text-gray);">Select the panels you want to see:</p>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_customer" checked onchange="applySettings()"> Customer & Invoice Information</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_items" checked onchange="applySettings()"> Items Details</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_summary" checked onchange="applySettings()"> Summary</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_payment" checked onchange="applySettings()"> Payment & Settlement</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_allocate" checked onchange="applySettings()"> Allocate Payment</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_return" checked onchange="applySettings()"> Return / Exchange</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_profit" checked onchange="applySettings()"> Allocation (Profit Sharing)</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_terms" checked onchange="applySettings()"> Terms & Conditions / Notes</label>
+            </div>
+            <div style="padding:16px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; background:var(--bg-light);">
+                <button type="button" class="btn btn-primary" onclick="toggleSettingsModal()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sticky Footer -->
+    <div class="sticky-footer">
+        <div class="footer-left">
+            <button type="button" class="btn" onclick="toggleSettingsModal()" style="padding:4px 8px; font-size:12px;"><i class="fa-solid fa-gear"></i> Settings</button>
+            Created By: <strong>{{ request.user.username|default:"Admin" }}</strong>
+        </div>
+        <div class="footer-right">
+            <div>Total: <span id="ftr_total">Rs. 0.00</span></div>
+            <div style="color:var(--success)">Received: <span id="ftr_received">Rs. 0.00</span></div>
+            <div style="color:var(--danger)">Remaining: <span id="ftr_remaining">Rs. 0.00</span></div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 1. Load Products from backend JSON
+    const products = JSON.parse('{{ products_json|safe|escapejs }}');
+    let grandTotal = 0;
+
+    // 2. Add Initial Row + Init Dual Dates
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof initDualDate === 'function') {
+            initDualDate('invoice_date_ad', 'invoice_date_bs');
+        }
+        addRow();
+        loadSettings();
+    });
+
+    // 3. Dynamic Row HTML
+    function addRow() {
+        const tbody = document.getElementById("itemsBody");
+        const tr = document.createElement("tr");
+        
+        let productOptions = '<option value="">Select Product...</option>';
+        products.forEach(p => {
+            productOptions += `<option value="${p.id}">${p.code ? p.code + ' - ' : ''}${p.name}</option>`;
+        });
+
+        tr.innerHTML = `
+            <td style="text-align:center; font-weight:600; color:var(--text-gray);" class="row-num">1</td>
+            <td>
+                <select class="form-select row-product" name="product_id[]" onchange="productSelected(this)" required>
+                    ${productOptions}
+                </select>
+            </td>
+            <td><input type="text" class="form-control" name="description[]" placeholder="Description"></td>
+            <td><input type="number" step="0.01" class="row-qty" name="quantity[]" value="1" oninput="calculateRow(this)" required></td>
+            <td>
+                <select class="form-select row-unit" name="unit[]">
+                    <option>Pcs</option><option>Kg</option><option>Box</option>
+                </select>
+            </td>
+            <td><input type="number" step="0.01" class="row-rate" name="unit_price[]" value="0.00" oninput="calculateRow(this)" required></td>
+            <td><input type="number" step="0.01" class="row-disc" name="discount[]" value="0.00" oninput="calculateRow(this)"></td>
+            <td>
+                <select class="form-select row-tax" name="tax_type[]" onchange="calculateRow(this)">
+                    <option value="Taxable">13%</option>
+                    <option value="Non-Tax">0%</option>
+                </select>
+            </td>
+            <td><input type="text" class="row-amount" value="0.00" readonly style="background:var(--bg-light); text-align:right; font-weight:600;"></td>
+            <td><input type="text" class="row-cost" value="0.00" readonly style="background:var(--bg-light); text-align:right;"></td>
+            <td><input type="text" class="row-profit" value="0.00" readonly style="background:var(--bg-light); text-align:right;"></td>
+            <td style="text-align:center;">
+                <div style="display:flex; gap:6px; justify-content:center;">
+                    <button type="button" title="Edit" style="width:28px;height:28px;border:none;border-radius:6px;background:#eff6ff;color:#2563eb;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;"><i class="fa-solid fa-pencil"></i></button>
+                    <button type="button" title="Delete" onclick="removeRow(this)" style="width:28px;height:28px;border:none;border-radius:6px;background:#fff1f2;color:#e11d48;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+        updateRowNumbers();
+        calculateTotals();
+    }
+
+    function updateRowNumbers() {
+        const rows = document.querySelectorAll("#itemsBody tr");
+        rows.forEach((r, i) => {
+            r.querySelector('.row-num').textContent = i + 1;
+        });
+    }
+
+    function removeRow(btn) {
+        btn.closest("tr").remove();
+        calculateTotals();
+    }
+
+    // 4. Auto-populate from Product Select
+    function productSelected(selectElem) {
+        const tr = selectElem.closest("tr");
+        const productId = selectElem.value;
+        const product = products.find(p => p.id == productId);
+        
+        if (product) {
+            tr.querySelector(".row-rate").value = product.selling_price;
+            tr.querySelector(".row-unit").value = product.unit || 'Pcs';
+            
+            // Auto-fill description if not explicitly entered by user (or always overwrite on change)
+            tr.querySelector("input[name='description[]']").value = product.description || '';
+            
+            // Set raw cost for calculations (stored in dataset)
+            tr.dataset.unitCost = product.purchase_price || 0;
+            
+            calculateRow(selectElem);
+        }
+    }
+
+    // 5. Calculate Single Row
+    function calculateRow(elem) {
+        const tr = elem.closest("tr");
+        const qty = parseFloat(tr.querySelector(".row-qty").value) || 0;
+        const rate = parseFloat(tr.querySelector(".row-rate").value) || 0;
+        const taxType = tr.querySelector(".row-tax").value;
+        const disc = parseFloat(tr.querySelector(".row-disc").value) || 0;
+        
+        const subtotal = (qty * rate) - disc;
+        let amount = subtotal;
+        
+        if (taxType === 'Taxable') {
+            amount += (subtotal * 0.13);
+        }
+        
+        tr.querySelector(".row-amount").value = amount.toFixed(2);
+        
+        // Cost calculation
+        const unitCost = parseFloat(tr.dataset.unitCost) || 0;
+        const totalLineCost = qty * unitCost;
+        tr.querySelector(".row-cost").value = totalLineCost.toFixed(2);
+        
+        // Profit calculation
+        const lineProfit = subtotal - totalLineCost; // Profit is usually excluding VAT
+        tr.querySelector(".row-profit").value = lineProfit.toFixed(2);
+        
+        // Store raw values for global calculations
+        tr.dataset.subtotal = subtotal + disc; // Store raw gross if calculateTotals expects it
+        tr.dataset.cost = totalLineCost;
+        tr.dataset.taxType = taxType;
+        
+        calculateTotals();
+    }
+
+    // 6. Calculate Global Totals
+    function calculateTotals() {
+        let subTotal = 0;
+        let totalDiscount = 0;
+        let vat = 0;
+        let totalCost = 0;
+
+        document.querySelectorAll("#itemsBody tr").forEach(tr => {
+            const qty   = parseFloat(tr.querySelector('.row-qty')?.value) || 0;
+            const rate  = parseFloat(tr.querySelector('.row-rate')?.value) || 0;
+            const disc  = parseFloat(tr.querySelector('.row-disc')?.value) || 0;
+            const taxType = tr.querySelector('.row-tax')?.value || 'Taxable';
+            const lineGross = qty * rate;
+            const lineDisc  = disc; // treat as absolute discount per item for now
+            const lineSub   = lineGross - lineDisc;
+            subTotal      += lineSub;
+            totalDiscount += lineDisc;
+            if (taxType === 'Taxable') vat += lineSub * 0.13;
+            // Cost from dataset
+            totalCost += parseFloat(tr.dataset.cost) || 0;
+        });
+
+        const roundOff = parseFloat(document.getElementById("inp_round_off").value) || 0;
+        grandTotal = subTotal + vat + roundOff;
+        const grossProfit = grandTotal - totalCost;
+        const margin = grandTotal > 0 ? (grossProfit / grandTotal) * 100 : 0;
+
+        // Update Summary UI
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val;
+        };
+
+        setVal("lbl_subtotal", subTotal.toFixed(2));
+        setVal("lbl_discount", totalDiscount.toFixed(2));
+        setVal("lbl_vat", vat.toFixed(2));
+        setVal("lbl_grand_total", grandTotal.toFixed(2));
+        setVal("lbl_total_cost", totalCost.toFixed(2));
+        setVal("lbl_gross_profit", grossProfit.toFixed(2));
+        setVal("lbl_profit_margin", margin.toFixed(2) + '%');
+
+        setVal("pay_total_due", grandTotal.toFixed(2));
+        setVal("ftr_total", `Rs. ${grandTotal.toFixed(2)}`);
+
+        updateBalance();
+    }
+
+    // Payment Method conditional fields
+    function onPayMethodChange(method) {
+        const bank = document.getElementById('fields_bank');
+        const cheque = document.getElementById('fields_cheque');
+        const mobile = document.getElementById('fields_mobile');
+        if (bank) bank.style.display = (method === 'Bank Transfer') ? 'flex' : 'none';
+        if (cheque) cheque.style.display = (method === 'Cheque') ? 'flex' : 'none';
+        if (mobile) mobile.style.display = (method === 'Mobile Banking') ? 'flex' : 'none';
+    }
+
+    // 7. Update Balance based on Paid Amount
+    function updateBalance() {
+        const inpPaid = document.getElementById("inp_paid_amount");
+        const paid = inpPaid ? (parseFloat(inpPaid.value) || 0) : 0;
+        const remaining = grandTotal - paid;
+        
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val;
+        };
+
+        setVal("pay_remaining", remaining.toFixed(2));
+        setVal("ftr_received", `Rs. ${paid.toFixed(2)}`);
+        setVal("ftr_remaining", `Rs. ${remaining.toFixed(2)}`);
+    }
+
+    // 8. Payment Radios
+    function setFullPayment() {
+        document.getElementById("inp_paid_amount").value = grandTotal.toFixed(2);
+        updateBalance();
+        autoDistribute();
+    }
+    function setCreditPayment() {
+        document.getElementById("inp_paid_amount").value = "0.00";
+        updateBalance();
+        clearAllocAmounts();
+    }
+
+    // =============================================
+    // 9. PAYMENT ALLOCATION (Pending Invoices)
+    // =============================================
+    let pendingInvoices = [];
+    let allocMode = 'manual';
+
+    // Load pending invoices when customer changes
+    // Called by onchange on the customer select
+    function onCustomerChange(sel) {
+        const customerId = sel.value;
+
+        // Reset allocation table
+        document.getElementById('alloc_placeholder').style.display = 'block';
+        document.getElementById('alloc_table').style.display = 'none';
+        document.getElementById('alloc_totals').style.display = 'none';
+        document.getElementById('alloc_no_pending').style.display = 'none';
+        pendingInvoices = [];
+
+        if (!customerId) {
+            document.getElementById('customer_balance').textContent = 'Rs. 0.00';
+            document.getElementById('customer_history_link').href = '/sales/customers/';
+            return;
+        }
+
+        // Update View History link to jump to that customer
+        document.getElementById('customer_history_link').href = `/sales/customers/?customer=${customerId}`;
+
+        // Fetch balance + pending invoices together
+        fetch(`/api/customers/${customerId}/`)
+            .then(r => r.json())
+            .then(data => {
+                const balance = parseFloat(data.outstanding || 0);
+                const sign = balance < 0 ? '(CR) ' : '';
+                document.getElementById('customer_balance').textContent =
+                    `${sign}Rs. ${Math.abs(balance).toLocaleString('en-NP', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+            })
+            .catch(() => {});
+
+        fetch(`/api/unpaid-invoices/${customerId}/`)
+            .then(r => r.json())
+            .then(data => {
+                pendingInvoices = data.invoices || [];
+                renderAllocTable();
+            });
+    }
+
+    function renderAllocTable() {
+        const placeholder = document.getElementById('alloc_placeholder');
+        const table = document.getElementById('alloc_table');
+        const noPending = document.getElementById('alloc_no_pending');
+        const tbody = document.getElementById('alloc_body');
+
+        const totalsDiv = document.getElementById('alloc_totals');
+
+        if (pendingInvoices.length === 0) {
+            placeholder.style.display = 'none';
+            table.style.display = 'none';
+            totalsDiv.style.display = 'none';
+            noPending.style.display = 'block';
+            return;
+        }
+
+        placeholder.style.display = 'none';
+        noPending.style.display = 'none';
+        table.style.display = 'table';
+        totalsDiv.style.display = 'block';
+
+        let totalDue = 0;
+        tbody.innerHTML = '';
+        pendingInvoices.forEach(inv => {
+            const due = parseFloat(inv.pending_amount);
+            totalDue += due;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>INV-${inv.invoice_no}</td>
+                <td>${inv.date}</td>
+                <td style="text-align:right;">${due.toFixed(2)}</td>
+                <td>
+                    <input type="number" step="0.01" class="alloc-inp" name="alloc_invoice_id[]"
+                        value="${inv.id}" style="display:none;">
+                    <input type="number" step="0.01" class="alloc-amt form-control" name="alloc_amount[]"
+                        value="0.00" min="0" max="${due.toFixed(2)}"
+                        style="text-align:right; font-size:11px; padding:3px 6px;"
+                        oninput="onManualAllocChange()">
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('alloc_total_due').textContent = totalDue.toLocaleString('en-NP', {minimumFractionDigits:2, maximumFractionDigits:2});
+        updateAllocTotal();
+    }
+
+    function setAllocMode(mode) {
+        allocMode = mode;
+        const btnManual = document.getElementById('btn_manual_alloc');
+        const btnAuto = document.getElementById('btn_auto_alloc');
+        if (mode === 'manual') {
+            btnManual.style.borderBottomColor = '#2563eb';
+            btnManual.style.color = '#2563eb';
+            btnManual.style.fontWeight = '600';
+            
+            btnAuto.style.borderBottomColor = 'transparent';
+            btnAuto.style.color = 'var(--text-gray)';
+            btnAuto.style.fontWeight = '500';
+        } else {
+            btnAuto.style.borderBottomColor = '#2563eb';
+            btnAuto.style.color = '#2563eb';
+            btnAuto.style.fontWeight = '600';
+            
+            btnManual.style.borderBottomColor = 'transparent';
+            btnManual.style.color = 'var(--text-gray)';
+            btnManual.style.fontWeight = '500';
+            autoDistribute();
+        }
+    }
+
+    function autoDistribute() {
+        if (allocMode !== 'auto' || pendingInvoices.length === 0) return;
+        let remaining = parseFloat(document.getElementById('inp_paid_amount').value) || 0;
+        const inputs = document.querySelectorAll('.alloc-amt');
+        const pendingList = pendingInvoices;
+        inputs.forEach((inp, i) => {
+            const due = parseFloat(pendingList[i]?.pending_amount) || 0;
+            const alloc = Math.min(remaining, due);
+            inp.value = alloc.toFixed(2);
+            remaining -= alloc;
+        });
+        updateAllocTotal();
+    }
+
+    function onManualAllocChange() {
+        updateAllocTotal();
+    }
+
+    function updateAllocTotal() {
+        let total = 0;
+        document.querySelectorAll('.alloc-amt').forEach(inp => {
+            total += parseFloat(inp.value) || 0;
+        });
+        
+        let dueTotal = parseFloat(document.getElementById('alloc_total_due').textContent.replace(/,/g, '')) || 0;
+        let remaining = dueTotal - total;
+        
+        document.getElementById('alloc_total_allocated').textContent = total.toLocaleString('en-NP', {minimumFractionDigits:2, maximumFractionDigits:2});
+        document.getElementById('alloc_remaining').textContent = remaining.toLocaleString('en-NP', {minimumFractionDigits:2, maximumFractionDigits:2});
+    }
+
+    function clearAllocAmounts() {
+        document.querySelectorAll('.alloc-amt').forEach(inp => { inp.value = '0.00'; });
+        updateAllocTotal();
+    }
+
+    // =============================================
+    // 10. RETURN / EXCHANGE
+    // =============================================
+    function toggleReturns() {
+        const section = document.getElementById('return_section');
+        const empty = document.getElementById('return_empty');
+        const icon = document.getElementById('return_toggle_icon');
+        if (section.style.display === 'none') {
+            section.style.display = 'block';
+            empty.style.display = 'none';
+            icon.classList.replace('fa-plus', 'fa-minus');
+            if (document.getElementById('returnBody').children.length === 0) addReturnRow();
+        } else {
+            section.style.display = 'none';
+            empty.style.display = 'block';
+            icon.classList.replace('fa-minus', 'fa-plus');
+        }
+    }
+
+    function addReturnRow() {
+        const tbody = document.getElementById('returnBody');
+        let productOptions = '<option value="">Select Product...</option>';
+        products.forEach(p => {
+            productOptions += `<option value="${p.id}" data-rate="${p.selling_price}">${p.code ? p.code + ' - ' : ''}${p.name}</option>`;
+        });
+        const rowNum = tbody.children.length + 1;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="text-align:center; font-weight:600; color:var(--text-gray);">${rowNum}</td>
+            <td>
+                <select class="form-select ret-product" name="return_product_id[]" onchange="returnProductSelected(this)">
+                    ${productOptions}
+                </select>
+            </td>
+            <td><input type="number" class="ret-qty form-control" name="return_qty[]" value="1" min="0" step="0.01" oninput="calcReturnRow(this)"></td>
+            <td><select class="form-select ret-unit" name="return_unit[]"><option>Pcs</option><option>Kg</option><option>Box</option></select></td>
+            <td><input type="number" class="ret-rate form-control" name="return_rate[]" value="0.00" step="0.01" oninput="calcReturnRow(this)"></td>
+            <td><input type="text" class="ret-amount form-control" readonly value="0.00" style="background:var(--bg-light); text-align:right; font-weight:600;"></td>
+            <td style="text-align:center;">
+                <button type="button" class="btn-link text-danger" onclick="removeReturnRow(this)"><i class="fa-solid fa-trash"></i></button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function returnProductSelected(sel) {
+        const opt = sel.options[sel.selectedIndex];
+        const rate = opt.dataset.rate || '0';
+        const tr = sel.closest('tr');
+        tr.querySelector('.ret-rate').value = parseFloat(rate).toFixed(2);
+        calcReturnRow(sel);
+    }
+
+    function calcReturnRow(el) {
+        const tr = el.closest('tr');
+        const qty = parseFloat(tr.querySelector('.ret-qty').value) || 0;
+        const rate = parseFloat(tr.querySelector('.ret-rate').value) || 0;
+        tr.querySelector('.ret-amount').value = (qty * rate).toFixed(2);
+        calcReturnTotal();
+    }
+
+    function calcReturnTotal() {
+        let total = 0;
+        document.querySelectorAll('.ret-amount').forEach(el => { total += parseFloat(el.value) || 0; });
+        document.getElementById('return_total').textContent = total.toFixed(2);
+    }
+
+    function removeReturnRow(btn) {
+        btn.closest('tr').remove();
+        calcReturnTotal();
+        // Re-number
+        const rows = document.querySelectorAll('#returnBody tr');
+        rows.forEach((r, i) => { r.cells[0].textContent = i + 1; });
+    }
+
+    // =============================================
+    // 11. PROFIT SHARING ALLOCATION TABLE
+    // =============================================
+    function addAllocRow() {
+        const tbody = document.getElementById('profitAllocBody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="text" class="form-control" name="alloc_role[]" placeholder="e.g. Sales Rep" style="font-size:11px;"></td>
+            <td><input type="text" class="form-control" name="alloc_party[]" placeholder="Name" style="font-size:11px;"></td>
+            <td>
+                <select class="form-select alloc-basis" name="alloc_basis[]" onchange="calcAllocRow(this)" style="font-size:11px;">
+                    <option value="Fixed">Fixed Amt</option>
+                    <option value="Percentage">% of Total</option>
+                </select>
+            </td>
+            <td><input type="number" class="form-control alloc-val" name="alloc_value[]" value="0" step="0.01" oninput="calcAllocRow(this)" style="font-size:11px;"></td>
+            <td><input type="text" class="form-control alloc-amt-profit" readonly value="0.00" style="background:var(--bg-light); font-size:11px; text-align:right;"></td>
+            <td style="text-align:center;"><button type="button" class="btn-link text-danger" onclick="removeAllocRow(this)"><i class="fa-solid fa-trash"></i></button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function calcAllocRow(el) {
+        const tr = el.closest('tr');
+        const basis = tr.querySelector('.alloc-basis').value;
+        const val = parseFloat(tr.querySelector('.alloc-val').value) || 0;
+        let amt = basis === 'Percentage' ? (grandTotal * val / 100) : val;
+        tr.querySelector('.alloc-amt-profit').value = amt.toFixed(2);
+        calcAllocProfitTotal();
+    }
+
+    function calcAllocProfitTotal() {
+        let total = 0;
+        document.querySelectorAll('.alloc-amt-profit').forEach(el => { total += parseFloat(el.value) || 0; });
+        document.getElementById('alloc_profit_total').textContent = total.toFixed(2);
+    }
+
+    function removeAllocRow(btn) {
+        btn.closest('tr').remove();
+        calcAllocProfitTotal();
+    }
+    
+    // Settings & Sequential Numbering Logic
+    const panelConfig = [
+        { key: 'customer', title: 'Customer & Invoice Information' },
+        { key: 'items', title: 'Items Details' },
+        { key: 'summary', title: 'Summary' },
+        { key: 'payment', title: 'Payment & Settlement' },
+        { key: 'allocate', title: 'Allocate Payment' },
+        { key: 'return', title: 'Return / Exchange', subtitle: '(Optional)' },
+        { key: 'profit', title: 'Allocation', subtitle: '(Profit Sharing)' },
+        { key: 'terms', title: 'Terms & Conditions' }
+    ];
+
+    function toggleSettingsModal() {
+        const modal = document.getElementById('settingsModal');
+        modal.style.display = (modal.style.display === 'none' || modal.style.display === '') ? 'flex' : 'none';
+    }
+
+    function updateRowLayout(rowId, key1, key2) {
+        const row = document.getElementById(rowId);
+        const p1 = document.getElementById(`panel_${key1}`);
+        const p2 = document.getElementById(`panel_${key2}`);
+        if (!row || !p1 || !p2) return;
+        
+        const v1 = p1.style.display !== 'none';
+        const v2 = p2.style.display !== 'none';
+        
+        if (!v1 && !v2) {
+            row.style.display = 'none';
+        } else if (v1 && v2) {
+            row.style.display = 'grid';
+            row.style.gridTemplateColumns = '1fr 1fr';
+        } else {
+            row.style.display = 'grid';
+            row.style.gridTemplateColumns = '1fr';
+        }
+    }
+
+    function updatePanelHeaders() {
+        panelConfig.forEach(cfg => {
+            const panel = document.getElementById(`panel_${cfg.key}`);
+            const header = document.getElementById(`header_${cfg.key}`);
+            if (panel && header) {
+                let html = `${cfg.title}`;
+                if (cfg.subtitle) {
+                    html += ` <span style="font-size:10px; font-weight:400; color:var(--text-gray);">${cfg.subtitle}</span>`;
+                }
+                header.innerHTML = html;
+            }
+        });
+    }
+
+    function applySettings() {
+        const settings = {};
+        panelConfig.forEach(cfg => {
+            const chk = document.getElementById(`chk_${cfg.key}`);
+            const panel = document.getElementById(`panel_${cfg.key}`);
+            if (chk && panel) {
+                settings[cfg.key] = chk.checked;
+                panel.style.display = chk.checked ? 'block' : 'none';
+            }
+        });
+        
+        // Handle customer outer wrapper padding
+        const wrapperCust = document.getElementById('wrapper_customer');
+        if (wrapperCust && settings['customer'] !== undefined) {
+            wrapperCust.style.display = settings['customer'] ? 'block' : 'none';
+        }
+
+        // Update 2-column row layouts dynamically
+        updateRowLayout('row_a', 'summary', 'payment');
+        updateRowLayout('row_b', 'allocate', 'return');
+        updateRowLayout('row_c', 'profit', 'terms');
+
+        // Update panel titles
+        updatePanelHeaders();
+
+        localStorage.setItem('sales_invoice_settings', JSON.stringify(settings));
+    }
+
+    function loadSettings() {
+        const saved = localStorage.getItem('sales_invoice_settings');
+        if (saved) {
+            try {
+                const settings = JSON.parse(saved);
+                panelConfig.forEach(cfg => {
+                    const chk = document.getElementById(`chk_${cfg.key}`);
+                    if (chk && settings[cfg.key] !== undefined) {
+                        chk.checked = settings[cfg.key];
+                    }
+                });
+            } catch(e){}
+        }
+        applySettings(); // Always apply and update numbering on load
+    }
+</script>
 {% endblock %}

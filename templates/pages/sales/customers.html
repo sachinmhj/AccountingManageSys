@@ -1,112 +1,1078 @@
 {% extends "layouts/base.html" %}
 {% load static %}
 
+{% block title %}Customers Dashboard | Afno360{% endblock %}
+
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/sales_add.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --primary: #2563eb;
+        --success: #16a34a;
+        --danger: #dc2626;
+        --warning: #f59e0b;
+        --border: #e2e8f0;
+        --bg-light: #f8fafc;
+        --text-gray: #64748b;
+    }
+
+    body {
+        background-color: #f1f5f9;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* ─── KPI HEADER ─── */
+    .dash-header {
+        display: flex;
+        gap: 16px;
+        padding: 16px 20px 0;
+    }
+
+    .kpi-card {
+        background: #fff;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        padding: 14px 18px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .kpi-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .kpi-info h4 {
+        margin: 0 0 2px 0;
+        font-size: 12px;
+        color: var(--text-gray);
+        font-weight: 500;
+    }
+
+    .kpi-info .val {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    /* ─── MAIN LAYOUT ─── */
+    .cust-page {
+        display: flex;
+        height: calc(100vh - 170px);
+        margin: 14px 20px 0;
+        gap: 16px;
+    }
+
+    /* ─── LEFT PANEL ─── */
+    .cust-list-panel {
+        width: 280px;
+        min-width: 240px;
+        background: #fff;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .cust-list-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cust-list-header h2 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .btn-new {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .btn-new:hover {
+        background: #1d4ed8;
+    }
+
+    .cust-search {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .cust-search input {
+        width: 100%;
+        padding: 7px 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 5px;
+        font-size: 13px;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+    .cust-search input:focus {
+        border-color: var(--primary);
+    }
+
+    .cust-list-items {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .cust-item {
+        display: flex;
+        align-items: center;
+        padding: 11px 14px;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+    .cust-item:hover {
+        background: var(--bg-light);
+    }
+
+    .cust-item.active {
+        background: #eff6ff;
+        border-left: 3px solid var(--primary);
+    }
+
+    .cust-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #475569;
+        margin-right: 10px;
+        font-size: 11px;
+        flex-shrink: 0;
+    }
+
+    .cust-item.active .cust-avatar {
+        background: #bfdbfe;
+        color: var(--primary);
+    }
+
+    .cust-item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .cust-item-name {
+        font-weight: 600;
+        font-size: 13px;
+        color: #1e293b;
+        margin-bottom: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .cust-item-pan {
+        font-size: 11px;
+        color: var(--text-gray);
+    }
+
+    /* ─── RIGHT PANEL ─── */
+    .cust-detail-panel {
+        flex: 1;
+        background: #fff;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-width: 0;
+        min-height: 0;
+    }
+
+    /* Detail Header */
+    .cd-header {
+        padding: 18px 22px 14px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .cd-name-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 4px;
+    }
+
+    .cd-name-row h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .vat-badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 20px;
+        background: #dcfce7;
+        color: #15803d;
+        letter-spacing: 0.03em;
+    }
+
+    .cd-meta {
+        font-size: 12px;
+        color: var(--text-gray);
+        margin-bottom: 10px;
+        line-height: 1.8;
+    }
+
+    .cd-meta span {
+        color: #334155;
+        font-weight: 500;
+    }
+
+    .cd-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .cd-actions a,
+    .cd-actions button {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        font-size: 12px;
+        text-decoration: none;
+        color: #334155;
+        font-weight: 500;
+        background: #fff;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .cd-actions a:hover,
+    .cd-actions button:hover {
+        background: var(--bg-light);
+    }
+
+    .cd-contact-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .cct-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 11px;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        font-size: 11px;
+        text-decoration: none;
+        color: #334155;
+        font-weight: 500;
+        background: #fff;
+    }
+
+    .cct-btn:hover {
+        background: var(--bg-light);
+    }
+
+    .cd-contact-list {
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f8fafc;
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        font-size: 12px;
+    }
+
+    .contact-item i {
+        color: var(--primary);
+        opacity: 0.7;
+    }
+
+    .contact-item strong {
+        color: #1e293b;
+        font-weight: 600;
+    }
+
+    .contact-item span {
+        color: var(--text-gray);
+    }
+
+    .contact-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 6px;
+    }
+
+    .contact-actions a {
+        color: var(--text-gray);
+        text-decoration: none;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #fff;
+        border: 1px solid var(--border);
+        font-size: 11px;
+    }
+
+    .contact-actions a:hover {
+        color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    /* Stat cards */
+    .cd-stats {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        padding: 14px 22px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-light);
+    }
+
+    .cd-stat {
+        background: #fff;
+        border-radius: 7px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cd-stat::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 3px;
+        height: 100%;
+    }
+
+    .cd-stat.blue::before {
+        background: var(--primary);
+    }
+
+    .cd-stat.green::before {
+        background: var(--success);
+    }
+
+    .cd-stat.orange::before {
+        background: var(--warning);
+    }
+
+    .cd-stat.red::before {
+        background: var(--danger);
+    }
+
+    .cd-stat.purple::before {
+        background: #8b5cf6;
+    }
+
+    .cd-stat-label {
+        font-size: 11px;
+        color: var(--text-gray);
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .cd-stat-value {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .cd-stat.red .cd-stat-value {
+        color: var(--danger);
+    }
+
+    .cd-stat.orange .cd-stat-value {
+        color: var(--warning);
+    }
+
+    .cd-stat.green .cd-stat-value {
+        color: var(--success);
+    }
+
+    .cd-stat.blue .cd-stat-value {
+        color: var(--primary);
+    }
+
+    .cd-stat.purple .cd-stat-value {
+        color: #8b5cf6;
+    }
+
+    /* History */
+    .cd-history {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        min-height: 0;
+    }
+
+    .cd-hist-toolbar {
+        padding: 10px 22px;
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        background: #fff;
+    }
+
+    .hist-tabs {
+        display: flex;
+        gap: 2px;
+        background: var(--bg-light);
+        border-radius: 5px;
+        padding: 3px;
+    }
+
+    .hist-tab {
+        padding: 4px 12px;
+        border-radius: 4px;
+        border: none;
+        background: transparent;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-gray);
+        cursor: pointer;
+    }
+
+    .hist-tab.active {
+        background: #fff;
+        color: var(--primary);
+        font-weight: 600;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .hist-date-input {
+        padding: 5px 9px;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        font-size: 12px;
+        outline: none;
+        color: #334155;
+    }
+
+    .hist-date-input:focus {
+        border-color: var(--primary);
+    }
+
+    .hist-search {
+        flex: 1;
+        min-width: 120px;
+        padding: 5px 10px;
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        font-size: 12px;
+        outline: none;
+    }
+
+    .hist-search:focus {
+        border-color: var(--primary);
+    }
+
+    .cd-table-wrap {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0;
+    }
+
+    .hist-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .hist-table th {
+        background: var(--bg-light);
+        padding: 8px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-gray);
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .hist-table td {
+        padding: 8px 12px;
+        font-size: 12px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .hist-table tr:hover td {
+        background: var(--bg-light);
+    }
+
+    .type-sale {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .type-payment {
+        color: var(--success);
+        font-weight: 600;
+    }
+
+    .type-return {
+        color: var(--warning);
+        font-weight: 600;
+    }
+
+    .type-refund {
+        color: var(--danger);
+        font-weight: 600;
+    }
+
+
+    /* Modal */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: #fff;
+        border-radius: 8px;
+        width: 560px;
+        max-width: 95vw;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 24px;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-
-{% comment %} Shared Sales/Contact Modal Component {% endcomment %}
-{% include "components/modal_sales/sales_add.html" %}
-
-<div class="erp-page">
-
-    {% include "components/erp_list_header.html" %}
-
-    <div class="invoice-table-container">
-        <table class="invoice-table" id="customersTable">
-            <thead>
-                <tr>
-                    <th>
-                        <input type="checkbox" class="select-checkbox" id="selectAllCheckbox">
-                        FULL NAME
-                    </th>
-                    <th>GROUP <span class="filter-icon">▼</span></th>
-                    <th>PHONE NUMBER</th>
-                    <th>EMAIL</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for customer in customers %}
-                <tr class="customer-row">
-                    <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <input type="checkbox" class="select-checkbox row-checkbox">
-                            <span class="customer-avatar">{{ customer.avatar_initials|default:"CC" }}</span>
-                            <span class="fw-medium">{{ customer.full_name }}</span>
-                        </div>
-                    </td>
-                    <td>{{ customer.group|default:"--" }}</td>
-                    <td>{{ customer.phone_number|default:"--" }}</td>
-                    <td>{{ customer.email|default:"--" }}</td>
-                </tr>
-                {% empty %}
-                <!-- Fallback Mock Row matching UI screenshot -->
-                <tr class="customer-row">
-                    <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <input type="checkbox" class="select-checkbox row-checkbox">
-                            <span class="customer-avatar">CC</span>
-                            <span class="fw-medium">Cash Customer</span>
-                        </div>
-                    </td>
-                    <td>--</td>
-                    <td>--</td>
-                    <td>--</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Bottom Pagination and Row Count Footer -->
-    <div class="table-footer-pagination d-flex justify-content-end align-items-center gap-3 p-3">
-        <div class="d-flex align-items-center gap-2">
-            <span>Rows Count</span>
-            <select class="form-select form-select-sm" style="width: auto;">
-                <option value="20" selected>20</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
+<!-- KPI Header -->
+<div class="dash-header">
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-users"></i></div>
+        <div class="kpi-info">
+            <h4>Total Customers</h4>
+            <p class="val">{{ total_customers }}</p>
         </div>
-        <div class="pagination-controls d-flex align-items-center gap-1">
-            <button type="button" class="btn btn-light btn-sm" disabled>&lt;</button>
-            <span class="px-2">1 - 1 / 1</span>
-            <button type="button" class="btn btn-light btn-sm" disabled>&gt;</button>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background:#f3e8ff; color:#8b5cf6;"><i class="fa-solid fa-file-invoice"></i></div>
+        <div class="kpi-info">
+            <h4>Total Bills</h4>
+            <p class="val">{{ total_bills }}</p>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background:#f0fdf4; color:#16a34a;"><i class="fa-solid fa-user-check"></i></div>
+        <div class="kpi-info">
+            <h4>Active this Month</h4>
+            <p class="val">{{ active_this_month }}</p>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background:#fef2f2; color:#dc2626;"><i class="fa-solid fa-file-invoice-dollar"></i>
+        </div>
+        <div class="kpi-info">
+            <h4>Total Receivables</h4>
+            <p class="val">Rs. {{ total_receivables|floatformat:2 }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="cust-page">
+    <!-- LEFT: Customer List -->
+    <div class="cust-list-panel">
+        <div class="cust-list-header">
+            <h2>Customers</h2>
+            <button class="btn-new" onclick="openModal()"><i class="fa-solid fa-plus"></i> New Customer</button>
+        </div>
+        <div class="cust-search">
+            <input type="text" id="customerSearch" placeholder="&#128269; Search Customer..."
+                oninput="searchCustomers(this.value)">
+        </div>
+        <div class="cust-list-items" id="customerList">
+            {% for c in customers %}
+            <div class="cust-item {% if forloop.first %}active{% endif %}" onclick="selectCustomer(this, {{ c.id }})"
+                id="cust-{{ c.id }}">
+                <div class="cust-avatar">{{ c.name|slice:":2"|upper }}</div>
+                <div class="cust-item-info">
+                    <div class="cust-item-name">{{ c.name }}</div>
+                    <div class="cust-item-pan">PAN: {{ c.pan_vat_number|default:"N/A" }}</div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="color:#cbd5e1; font-size:11px; flex-shrink:0;"></i>
+            </div>
+            {% empty %}
+            <div style="text-align:center; padding:40px; color:var(--text-gray);">
+                <i class="fa-solid fa-users"
+                    style="font-size:28px; display:block; margin-bottom:8px; opacity:0.25;"></i>
+                <p style="font-size:13px;">No customers yet.</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
 
+    <!-- RIGHT: Customer Detail Dashboard -->
+    <div class="cust-detail-panel" id="customerDetailPanel">
+        {% if customers %}
+        <div id="loader" style="display:none; text-align:center; padding:50px;"><i
+                class="fa-solid fa-spinner fa-spin fa-2x" style="color:var(--primary);"></i></div>
+
+        <div id="detailContent" style="display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden;">
+            <!-- Header -->
+            <div class="cd-header">
+                <div style="flex:1; min-width:0;">
+                    <div class="cd-name-row">
+                        <h2 id="lbl_name">Loading...</h2>
+                        <span class="vat-badge" id="lbl_vat_badge" style="display:none;">VAT Registered</span>
+                    </div>
+                    <div class="cd-meta">
+                        PAN: <span id="lbl_pan">—</span> &nbsp;|&nbsp;
+                        Address: <span id="lbl_address">—</span>
+                    </div>
+                    <div id="cd-contact-list" class="cd-contact-list"></div>
+                </div>
+                <div class="cd-actions">
+                    <button onclick="openEditModal()" title="Edit customer"><i class="fa-solid fa-pen-to-square"></i>
+                        Edit</button>
+                </div>
+            </div>
+
+            <!-- Stat Cards -->
+            <div class="cd-stats">
+                <div class="cd-stat purple">
+                    <div class="cd-stat-label">Total Bills</div>
+                    <div class="cd-stat-value" id="lbl_total_bills">0</div>
+                </div>
+                <div class="cd-stat blue">
+                    <div class="cd-stat-label">Total Sales</div>
+                    <div class="cd-stat-value" id="lbl_total_sales">Rs. 0.00</div>
+                </div>
+                <div class="cd-stat orange">
+                    <div class="cd-stat-label">Total Returns</div>
+                    <div class="cd-stat-value" id="lbl_total_returns">Rs. 0.00</div>
+                </div>
+                <div class="cd-stat green">
+                    <div class="cd-stat-label">Received</div>
+                    <div class="cd-stat-value" id="lbl_received">Rs. 0.00</div>
+                </div>
+                <div class="cd-stat red">
+                    <div class="cd-stat-label">Outstanding Due</div>
+                    <div class="cd-stat-value" id="lbl_due">Rs. 0.00</div>
+                </div>
+            </div>
+
+            <!-- Customer History -->
+            <div class="cd-history">
+                <div class="cd-hist-toolbar">
+                    <!-- Tabs -->
+                    <div class="hist-tabs">
+                        <button class="hist-tab active" onclick="setTab('all', this)">All</button>
+                        <button class="hist-tab" onclick="setTab('Sales Invoice', this)">Sales</button>
+                        <button class="hist-tab" onclick="setTab('Payment Received', this)">Payments</button>
+                        <button class="hist-tab" onclick="setTab('Sales Return', this)">Returns</button>
+                    </div>
+                    <!-- Date Range -->
+                    <input type="date" class="hist-date-input" id="hist_from" placeholder="From"
+                        oninput="filterHistory()">
+                    <input type="date" class="hist-date-input" id="hist_to" placeholder="To" oninput="filterHistory()">
+                    <!-- Search -->
+                    <input type="text" class="hist-search" id="hist_search" placeholder="&#128269; Search..."
+                        oninput="filterHistory()">
+                </div>
+                <div class="cd-table-wrap">
+                    <table class="hist-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Reference</th>
+                                <th style="text-align:right">Total Amount</th>
+                                <th style="text-align:right">Paid Amount</th>
+                                <th style="text-align:right">Due Amount</th>
+                                <th style="text-align:right">Due Days</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hist_tbody">
+                            <tr>
+                                <td colspan="8" style="text-align:center; color:var(--text-gray); padding:30px;">Select
+                                    a customer to view history.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:80px; color:var(--text-gray);">
+            <i class="fa-solid fa-users" style="font-size:48px; margin-bottom:16px; display:block; opacity:0.2;"></i>
+            <p>No customers exist. Create one to view dashboard.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Customer Modal -->
+<div class="modal-overlay" id="addCustomerModal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 id="modalTitle" style="margin:0; font-size:16px; font-weight:700;"><i class="fa-solid fa-user-plus"
+                    style="color:var(--primary);"></i> Add New Customer</h3>
+            <button type="button" onclick="closeModal()"
+                style="border:none; background:none; cursor:pointer; font-size:20px;">&times;</button>
+        </div>
+        <form id="newCustomerForm" onsubmit="submitCustomer(event)">
+            {% csrf_token %}
+            <input type="hidden" name="customer_id" id="modal_customer_id" value="">
+            <div
+                style="font-size:11px; font-weight:700; color:var(--text-gray); letter-spacing:0.05em; margin-bottom:8px;">
+                COMPANY INFO</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+                <div style="grid-column:span 2;">
+                    <label>Company / Full Name <span style="color:var(--danger)">*</span></label>
+                    <input type="text" name="name" class="form-control" required
+                        placeholder="e.g. ABC Traders Pvt. Ltd.">
+                </div>
+                <div>
+                    <label>Phone</label>
+                    <input type="text" name="phone" class="form-control" placeholder="Main phone">
+                </div>
+                <div>
+                    <label>PAN / VAT Number</label>
+                    <input type="text" name="pan_vat" class="form-control" placeholder="e.g. 600123456">
+                </div>
+                <div style="grid-column:span 2;">
+                    <label>Address</label>
+                    <input type="text" name="address" class="form-control" placeholder="City, District">
+                </div>
+            </div>
+            <div
+                style="font-size:11px; font-weight:700; color:var(--text-gray); letter-spacing:0.05em; margin-bottom:8px;">
+                CONTACT PERSONS</div>
+            <div id="contactPersonsList">
+                <div class="cp-row"
+                    style="display:grid; grid-template-columns:1.5fr 1fr 1fr 1.5fr 28px; gap:8px; margin-bottom:10px; align-items:center;">
+                    <input type="text" name="cp_name[]" class="form-control" placeholder="Name (e.g. Ram Sharma)">
+                    <input type="text" name="cp_designation[]" class="form-control" placeholder="Role (Owner)">
+                    <input type="text" name="cp_phone[]" class="form-control" placeholder="Phone">
+                    <input type="email" name="cp_email[]" class="form-control" placeholder="Email">
+                    <span></span>
+                </div>
+            </div>
+            <button type="button" onclick="addContactRow()"
+                style="font-size:12px; border:1px dashed var(--primary); background:#eff6ff; color:var(--primary); border-radius:4px; padding:5px 12px; cursor:pointer; margin-bottom:20px;">
+                <i class="fa-solid fa-plus"></i> Add Another Contact Person
+            </button>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="btnSaveCust"><i class="fa-solid fa-save"></i> Save
+                    Customer</button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
 
+
 {% block extra_js %}
-<script src="{% static 'js/sales_add.js' %}"></script>
 <script>
-    function openCustomerModal() {
-        // Calls the correct function from sales_add.js
-        if (typeof openContactModal === 'function') {
-            openContactModal('customer');
-        } else {
-            // Direct DOM fallback with the correct overlay ID: contactModalOverlay
-            const modal = document.getElementById("contactModalOverlay");
-            if (modal) {
-                modal.style.display = "flex";
-            }
-        }
+    // ─── State ───
+    let allTransactions = [];
+    let activeTab = 'all';
+
+    function fmt(n) { return 'Rs. ' + parseFloat(n || 0).toFixed(2); }
+
+    // ─── Customer search (left panel) ───
+    function searchCustomers(query) {
+        document.querySelectorAll('.cust-item').forEach(item => {
+            const name = item.querySelector('.cust-item-name').textContent.toLowerCase();
+            item.style.display = name.includes(query.toLowerCase()) ? '' : 'none';
+        });
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        // Targets all common button selectors for "+ ADD NEW"
-        const newBtn = document.querySelector(".new-btn, .btn-add-new, button[onclick*='openCustomerModal']");
-        
-        if (newBtn) {
-            newBtn.addEventListener("click", function (e) {
-                e.preventDefault();
-                openCustomerModal();
+    // ─── Select customer ───
+    let selectedCustomerId = null;
+    let currentCustomerData = null;
+
+    function selectCustomer(el, id) {
+        selectedCustomerId = id;
+        document.querySelectorAll('.cust-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+
+        const loader = document.getElementById('loader');
+        const content = document.getElementById('detailContent');
+        loader.style.display = 'block';
+        content.style.opacity = '0.3';
+
+        fetch(`/api/customers/${id}/`)
+            .then(r => r.json())
+            .then(data => {
+                currentCustomerData = data;
+                // Header
+                document.getElementById('lbl_name').textContent = data.name;
+                document.getElementById('lbl_pan').textContent = data.pan_vat;
+                document.getElementById('lbl_address').textContent = data.address;
+
+                const vatBadge = document.getElementById('lbl_vat_badge');
+                vatBadge.style.display = data.vat_registered ? '' : 'none';
+
+                // Contact Persons List
+                let cListHtml = '';
+                if (data.contact_persons && data.contact_persons.length > 0) {
+                    data.contact_persons.forEach(cp => {
+                        let actions = '';
+                        if (cp.phone && cp.phone !== 'N/A') actions += `<a href="tel:${cp.phone}" title="Call"><i class="fa-solid fa-phone"></i></a> <a href="https://wa.me/${cp.phone.replace(/\D/g, '')}" target="_blank" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>`;
+                        if (cp.email && cp.email !== 'N/A') actions += `<a href="mailto:${cp.email}" title="Email"><i class="fa-solid fa-envelope"></i></a>`;
+
+                        cListHtml += `
+                        <div class="contact-item">
+                            <i class="fa-solid fa-user-circle"></i>
+                            <strong>${cp.name}</strong> 
+                            ${cp.designation && cp.designation !== 'Contact' ? `<span>(${cp.designation})</span>` : ''}
+                            ${cp.phone && cp.phone !== 'N/A' ? `<span style="margin-left:10px;"><i class="fa-solid fa-phone" style="font-size:10px;margin-right:3px;"></i>${cp.phone}</span>` : ''}
+                            ${cp.email && cp.email !== 'N/A' ? `<span style="margin-left:10px;"><i class="fa-solid fa-envelope" style="font-size:10px;margin-right:3px;"></i>${cp.email}</span>` : ''}
+                            <div class="contact-actions">${actions}</div>
+                        </div>
+                    `;
+                    });
+                } else {
+                    cListHtml = `<div class="cd-meta">No contact persons found.</div>`;
+                }
+                document.getElementById('cd-contact-list').innerHTML = cListHtml;
+
+                // Stats
+                document.getElementById('lbl_total_bills').textContent = data.total_bills;
+                document.getElementById('lbl_total_sales').textContent = fmt(data.total_sales);
+                document.getElementById('lbl_total_returns').textContent = fmt(data.total_returns);
+                document.getElementById('lbl_received').textContent = fmt(data.total_received);
+                document.getElementById('lbl_due').textContent = fmt(data.outstanding);
+
+                // Save & filter transactions
+                allTransactions = data.transactions || [];
+                activeTab = 'all';
+                document.querySelectorAll('.hist-tab').forEach(t => t.classList.remove('active'));
+                document.querySelector('.hist-tab').classList.add('active');
+                document.getElementById('hist_from').value = '';
+                document.getElementById('hist_to').value = '';
+                document.getElementById('hist_search').value = '';
+                renderHistory(allTransactions);
+
+                loader.style.display = 'none';
+                content.style.opacity = '1';
+            })
+            .catch(err => {
+                console.error(err);
+                loader.style.display = 'none';
+                content.style.opacity = '1';
             });
+    }
+
+    // ─── Tab switching ───
+    function setTab(tab, btn) {
+        activeTab = tab;
+        document.querySelectorAll('.hist-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        filterHistory();
+    }
+
+    // ─── Filter history ───
+    function filterHistory() {
+        const from = document.getElementById('hist_from').value;
+        const to = document.getElementById('hist_to').value;
+        const search = document.getElementById('hist_search').value.toLowerCase();
+
+        const filtered = allTransactions.filter(t => {
+            const matchTab = activeTab === 'all' || t.type.toLowerCase().includes(activeTab.toLowerCase());
+            const matchFrom = !from || t.date >= from;
+            const matchTo = !to || t.date <= to;
+            const matchSrch = !search || t.ref.toLowerCase().includes(search) || t.type.toLowerCase().includes(search);
+            return matchTab && matchFrom && matchTo && matchSrch;
+        });
+        renderHistory(filtered);
+    }
+
+    // ─── Render transaction table ───
+    function renderHistory(rows) {
+        if (!rows || rows.length === 0) {
+            document.getElementById('hist_tbody').innerHTML =
+                '<tr><td colspan="8" style="text-align:center; color:var(--text-gray); padding:24px;">No transactions found.</td></tr>';
+            return;
         }
+        let html = '';
+        rows.forEach(t => {
+            const due = parseFloat(t.due_amount || 0);
+            const dueCell = due > 0
+                ? `<span style="color:var(--danger); font-weight:600;">Rs. ${due.toFixed(2)}</span>`
+                : `<span style="color:var(--text-gray);">—</span>`;
+            html += `
+        <tr>
+            <td>${t.date}</td>
+            <td><span class="${t.css_class}">${t.type}</span></td>
+            <td style="color:var(--primary); font-weight:500;">${t.ref}</td>
+            <td style="text-align:right;">Rs. ${parseFloat(t.total_amount || 0).toFixed(2)}</td>
+            <td style="text-align:right; color:var(--success);">Rs. ${parseFloat(t.paid_amount || 0).toFixed(2)}</td>
+            <td style="text-align:right;">${dueCell}</td>
+            <td style="text-align:right; color:var(--text-gray);">${t.due_days || '—'}</td>
+            <td>
+                ${t.detail_url && t.detail_url !== '#' ? `<a href="${t.detail_url}" style="color:var(--primary); font-size:12px; background:#eff6ff; padding:4px 8px; border-radius:4px; text-decoration:none;"><i class="fa-solid fa-eye"></i> View</a>` : `<span style="color:var(--text-gray); font-size:11px;">—</span>`}
+            </td>
+        </tr>`;
+        });
+        document.getElementById('hist_tbody').innerHTML = html;
+    }
+
+    // ─── Modal ───
+    function openModal() {
+        document.getElementById('addCustomerModal').style.display = 'flex';
+        document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-user-plus" style="color:var(--primary);"></i> Add New Customer';
+    }
+
+    function openEditModal() {
+        if (!currentCustomerData) return;
+
+        document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square" style="color:var(--primary);"></i> Edit Customer';
+
+        const form = document.getElementById('newCustomerForm');
+        form.querySelector('#modal_customer_id').value = currentCustomerData.id;
+        form.querySelector('input[name="name"]').value = currentCustomerData.name;
+        form.querySelector('input[name="phone"]').value = currentCustomerData.phone !== 'N/A' ? currentCustomerData.phone : '';
+        form.querySelector('input[name="pan_vat"]').value = currentCustomerData.pan_vat !== 'N/A' ? currentCustomerData.pan_vat : '';
+        form.querySelector('input[name="address"]').value = currentCustomerData.address !== 'N/A' ? currentCustomerData.address : '';
+
+        // Contact persons
+        const list = document.getElementById('contactPersonsList');
+        list.innerHTML = ''; // clear default
+        if (currentCustomerData.contact_persons && currentCustomerData.contact_persons.length > 0) {
+            currentCustomerData.contact_persons.forEach((cp, idx) => {
+                const row = document.createElement('div');
+                row.className = 'cp-row';
+                row.style = 'display:grid; grid-template-columns:1.5fr 1fr 1fr 1.5fr 28px; gap:8px; margin-bottom:10px; align-items:center;';
+                row.innerHTML = `
+                <input type="text" name="cp_name[]" class="form-control" placeholder="Name" value="${cp.name}">
+                <input type="text" name="cp_designation[]" class="form-control" placeholder="Role" value="${cp.designation !== 'Contact' ? cp.designation : ''}">
+                <input type="text" name="cp_phone[]" class="form-control" placeholder="Phone" value="${cp.phone}">
+                <input type="email" name="cp_email[]" class="form-control" placeholder="Email" value="${cp.email}">
+                <button type="button" onclick="this.closest('.cp-row').remove()" style="border:none; background:none; color:#dc2626; cursor:pointer; font-size:16px;">&times;</button>`;
+                list.appendChild(row);
+            });
+        } else {
+            // Add one empty row if none
+            list.innerHTML = `
+        <div class="cp-row" style="display:grid; grid-template-columns:1.5fr 1fr 1fr 1.5fr 28px; gap:8px; margin-bottom:10px; align-items:center;">
+            <input type="text" name="cp_name[]" class="form-control" placeholder="Name (e.g. Ram Sharma)">
+            <input type="text" name="cp_designation[]" class="form-control" placeholder="Role (Owner)">
+            <input type="text" name="cp_phone[]" class="form-control" placeholder="Phone">
+            <input type="email" name="cp_email[]" class="form-control" placeholder="Email">
+            <span></span>
+        </div>`;
+        }
+
+        document.getElementById('addCustomerModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('addCustomerModal').style.display = 'none';
+        document.getElementById('newCustomerForm').reset();
+        document.getElementById('modal_customer_id').value = '';
+        document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-user-plus" style="color:var(--primary);"></i> Add New Customer';
+        document.getElementById('contactPersonsList').innerHTML = `
+        <div class="cp-row" style="display:grid; grid-template-columns:1.5fr 1fr 1fr 1.5fr 28px; gap:8px; margin-bottom:10px; align-items:center;">
+            <input type="text" name="cp_name[]" class="form-control" placeholder="Name (e.g. Ram Sharma)">
+            <input type="text" name="cp_designation[]" class="form-control" placeholder="Role (Owner)">
+            <input type="text" name="cp_phone[]" class="form-control" placeholder="Phone">
+            <input type="email" name="cp_email[]" class="form-control" placeholder="Email">
+            <span></span>
+        </div>`;
+    }
+    document.getElementById('addCustomerModal').addEventListener('click', function (e) { if (e.target === this) closeModal(); });
+
+    function addContactRow() {
+        const row = document.createElement('div');
+        row.className = 'cp-row';
+        row.style = 'display:grid; grid-template-columns:1.5fr 1fr 1fr 1.5fr 28px; gap:8px; margin-bottom:10px; align-items:center;';
+        row.innerHTML = `
+        <input type="text" name="cp_name[]" class="form-control" placeholder="Name">
+        <input type="text" name="cp_designation[]" class="form-control" placeholder="Role">
+        <input type="text" name="cp_phone[]" class="form-control" placeholder="Phone">
+        <input type="email" name="cp_email[]" class="form-control" placeholder="Email">
+        <button type="button" onclick="this.closest('.cp-row').remove()" style="border:none; background:none; color:#dc2626; cursor:pointer; font-size:16px;">&times;</button>`;
+        document.getElementById('contactPersonsList').appendChild(row);
+    }
+
+    function submitCustomer(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnSaveCust');
+        const form = e.target;
+        btn.textContent = 'Saving...';
+        btn.disabled = true;
+        fetch("{% url 'api_customer_add' %}", {
+            method: 'POST', body: new FormData(form),
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') { window.location.reload(); }
+                else { alert('Error: ' + data.message); btn.textContent = 'Save Customer'; btn.disabled = false; }
+            })
+            .catch(() => { alert('An error occurred'); btn.textContent = 'Save Customer'; btn.disabled = false; });
+    }
+
+    // ─── Auto-load first customer ───
+    document.addEventListener('DOMContentLoaded', () => {
+        const first = document.querySelector('.cust-item');
+        if (first) first.click();
     });
 </script>
 {% endblock %}

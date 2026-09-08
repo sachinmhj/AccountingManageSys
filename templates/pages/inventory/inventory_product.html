@@ -1,75 +1,269 @@
 {% extends "layouts/base.html" %}
 {% load static %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/invoiceadd.css' %}">
-{% endblock %}
+{% block title %}Products | Afno360{% endblock %}
 
-{% block extra_js %}
-<script src="{% static 'js/sharedinvoice_add.js' %}"></script>
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #2563eb; --success: #16a34a; --danger: #dc2626;
+        --border: #e2e8f0; --bg-light: #f8fafc; --text-gray: #64748b;
+    }
+    body { background: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+    .prod-page { margin: 20px; }
+
+    /* Header */
+    .prod-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .prod-header h1 { margin:0; font-size:22px; font-weight:700; }
+    .header-actions { display:flex; gap:8px; }
+
+    /* KPI Strip */
+    .kpi-strip { display:flex; gap:16px; margin-bottom:20px; }
+    .kpi-card { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px 20px; flex:1;
+        display:flex; align-items:center; gap:14px; box-shadow:0 1px 2px rgba(0,0,0,0.04); }
+    .kpi-icon { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .kpi-info h4 { margin:0 0 3px 0; font-size:12px; color:var(--text-gray); font-weight:500; }
+    .kpi-info p { margin:0; font-size:20px; font-weight:700; color:#1e293b; }
+
+    /* Search & Filter Bar */
+    .filter-bar { display:flex; gap:10px; margin-bottom:16px; align-items:center; }
+    .filter-bar input, .filter-bar select {
+        padding:7px 12px; border:1px solid var(--border); border-radius:6px;
+        font-size:13px; background:#fff; height:36px;
+    }
+    .filter-bar input { flex:1; }
+
+    /* Table */
+    .prod-table-wrap { background:#fff; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+    .prod-table { width:100%; border-collapse:collapse; }
+    .prod-table th { background:var(--bg-light); padding:10px 14px; font-size:12px; font-weight:600; color:var(--text-gray); border-bottom:1px solid var(--border); text-align:left; }
+    .prod-table td { padding:12px 14px; font-size:13px; border-bottom:1px solid var(--border); }
+    .prod-table tr:last-child td { border-bottom:none; }
+    .prod-table tr:hover { background:#fafafa; }
+
+    .badge { display:inline-block; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; }
+    .badge-goods { background:#eff6ff; color:var(--primary); }
+    .badge-service { background:#f0fdf4; color:var(--success); }
+
+    .action-btn { width:28px; height:28px; border-radius:4px; border:1px solid var(--border); background:#fff;
+        display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px; color:var(--text-gray); text-decoration:none; }
+    .action-btn:hover { background:var(--bg-light); }
+
+    /* Buttons */
+    .btn { padding:7px 14px; border:1px solid var(--border); border-radius:6px; background:#fff;
+        font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+    .btn-primary { background:var(--primary); color:#fff; border-color:var(--primary); }
+    .btn-primary:hover { background:#1d4ed8; }
+
+    /* Modal */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; align-items:center; justify-content:center; }
+    .modal-box { background:#fff; border-radius:10px; width:540px; padding:28px; max-height:90vh; overflow-y:auto; }
+    .modal-title { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .modal-title h3 { margin:0; font-size:17px; font-weight:700; }
+    .modal-close { border:none; background:none; font-size:22px; cursor:pointer; color:var(--text-gray); line-height:1; }
+    .form-grid { display:grid; gap:14px; }
+    .form-grid-2 { grid-template-columns:1fr 1fr; }
+    label { font-size:12px; font-weight:500; display:block; margin-bottom:4px; color:#334155; }
+    label span { color:var(--danger); }
+    .form-control, .form-select { width:100%; padding:6px 10px; border:1px solid var(--border); border-radius:5px; font-size:13px; height:34px; }
+    .form-group { display:flex; flex-direction:column; }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
+<div class="prod-page">
 
-{% include "components/modal_sales/sales_add.html" %}
-{% include "components/modal_sales/invoice_inventory.html" %}
+    <!-- Header -->
+    <div class="prod-header">
+        <h1><i class="fa-solid fa-boxes-stacked" style="color:var(--primary); margin-right:8px;"></i>Products</h1>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="openModal()"><i class="fa-solid fa-plus"></i> New Product</button>
+        </div>
+    </div>
 
-<div class="invoice-page">
+    <!-- KPI Strip -->
+    <div class="kpi-strip">
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background:#eff6ff; color:#2563eb;"><i class="fa-solid fa-box"></i></div>
+            <div class="kpi-info"><h4>Total Products</h4><p>{{ total }}</p></div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background:#f0fdf4; color:#16a34a;"><i class="fa-solid fa-boxes-stacked"></i></div>
+            <div class="kpi-info"><h4>Goods</h4><p>{{ products|length }}</p></div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background:#faf5ff; color:#7c3aed;"><i class="fa-solid fa-tag"></i></div>
+            <div class="kpi-info"><h4>Categories</h4><p>{{ categories.count }}</p></div>
+        </div>
+    </div>
 
-    {% include "components/erp_list_header.html" %}
-    <div class="invoice-table-container">
-        <table class="invoice-table">
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="&#128269; Search product name or code..." oninput="filterProducts(this.value)">
+        <select id="filterType" onchange="filterProducts(document.getElementById('searchInput').value)">
+            <option value="">All Types</option>
+            <option value="Goods">Goods</option>
+            <option value="Service">Service</option>
+        </select>
+        <select id="filterCategory" onchange="filterProducts(document.getElementById('searchInput').value)">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+                <option value="{{ cat.name }}">{{ cat.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
 
+    <!-- Product Table -->
+    <div class="prod-table-wrap">
+        <table class="prod-table" id="productTable">
             <thead>
                 <tr>
-                    <th>
-                        <input
-                            type="checkbox"
-                            class="select-checkbox"
-                            onclick="event.stopPropagation();">
-                        Code/SKU
-                    </th>
-
-                    <th>Name</th>
+                    <th><input type="checkbox"></th>
+                    <th>Code / SKU</th>
+                    <th>Product Name</th>
+                    <th>Type</th>
                     <th>Category</th>
-                    <th>Tax</th>
+                    <th>Unit</th>
+                    <th style="text-align:right">Cost Price</th>
+                    <th style="text-align:right">Selling Price</th>
+                    <th>Action</th>
                 </tr>
             </thead>
-
             <tbody>
-
-                {% for product in products %}
-
-                <tr>
+                {% for p in products %}
+                <tr data-name="{{ p.name|lower }}" data-code="{{ p.code|default:''|lower }}" data-type="{{ p.product_type }}" data-category="{{ p.category.name|default:'' }}">
+                    <td><input type="checkbox"></td>
+                    <td style="color:var(--text-gray); font-weight:500;">{{ p.code|default:"—" }}</td>
+                    <td style="font-weight:600; color:#1e293b;">{{ p.name }}</td>
                     <td>
-                        <input
-                            type="checkbox"
-                            class="row-checkbox"
-                            onclick="event.stopPropagation();">
-
-                        {{ product.code }}
+                        {% if p.product_type == 'Goods' %}
+                            <span class="badge badge-goods">Goods</span>
+                        {% else %}
+                            <span class="badge badge-service">Service</span>
+                        {% endif %}
                     </td>
-
-                    <td>{{ product.name }}</td>
-                    <td>{{ product.category }}</td>
-                    <td>{{ product.tax }}</td>
+                    <td>{{ p.category.name|default:"—" }}</td>
+                    <td>{{ p.unit }}</td>
+                    <td style="text-align:right;">Rs. {{ p.purchase_price|floatformat:2 }}</td>
+                    <td style="text-align:right; font-weight:600; color:var(--primary);">Rs. {{ p.selling_price|floatformat:2 }}</td>
+                    <td>
+                        <a href="#" class="action-btn" title="View"><i class="fa-regular fa-eye"></i></a>
+                        <a href="#" class="action-btn" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                    </td>
                 </tr>
-
                 {% empty %}
-
-                <tr>
-                    <td colspan="4" class="empty">
-                        No products found
+                <tr id="emptyRow">
+                    <td colspan="9" style="text-align:center; padding:50px; color:var(--text-gray);">
+                        <i class="fa-solid fa-box-open" style="font-size:36px; display:block; margin-bottom:10px; opacity:0.3;"></i>
+                        No products yet. <a href="#" onclick="openModal()" style="color:var(--primary);">Create your first product</a>
                     </td>
                 </tr>
-
                 {% endfor %}
-
             </tbody>
-
         </table>
     </div>
 
 </div>
 
+<!-- Add Product Modal -->
+<div class="modal-overlay" id="addProductModal">
+    <div class="modal-box">
+        <div class="modal-title">
+            <h3><i class="fa-solid fa-plus" style="color:var(--primary);"></i> New Product</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'inventory_product' %}">
+            {% csrf_token %}
+            <div class="form-grid form-grid-2">
+                <div class="form-group" style="grid-column:span 2;">
+                    <label>Product Name <span>*</span></label>
+                    <input type="text" name="name" class="form-control" placeholder="e.g. Laptop HP ProBook" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label>Item Code / SKU</label>
+                    <input type="text" name="code" class="form-control" placeholder="e.g. HP-001">
+                </div>
+                <div class="form-group">
+                    <label>Product Type <span>*</span></label>
+                    <select name="product_type" class="form-select">
+                        <option value="Goods">Goods</option>
+                        <option value="Service">Service</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category" class="form-select">
+                        <option value="">— None —</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Unit</label>
+                    <select name="unit" class="form-select">
+                        <option value="Pcs">Pcs</option>
+                        <option value="Kg">Kg</option>
+                        <option value="Ltr">Ltr</option>
+                        <option value="Box">Box</option>
+                        <option value="Doz">Dozen</option>
+                        <option value="Mtr">Meter</option>
+                        <option value="Set">Set</option>
+                        <option value="Pair">Pair</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cost / Purchase Price (Rs.)</label>
+                    <input type="number" step="0.01" name="purchase_price" class="form-control" placeholder="0.00" value="0.00">
+                </div>
+                <div class="form-group">
+                    <label>Selling Price (Rs.) <span>*</span></label>
+                    <input type="number" step="0.01" name="selling_price" class="form-control" placeholder="0.00" value="0.00" required>
+                </div>
+                <div class="form-group" style="grid-column:span 2;">
+                    <label>Description</label>
+                    <input type="text" name="description" class="form-control" placeholder="Optional product description...">
+                </div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px;">
+                <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openModal() { document.getElementById("addProductModal").style.display = "flex"; }
+function closeModal() { document.getElementById("addProductModal").style.display = "none"; }
+
+// Close modal on backdrop click
+document.getElementById("addProductModal").addEventListener("click", function(e) {
+    if (e.target === this) closeModal();
+});
+
+// Live search & filter
+function filterProducts(query) {
+    const filterType = document.getElementById("filterType").value.toLowerCase();
+    const filterCat  = document.getElementById("filterCategory").value.toLowerCase();
+    query = query.toLowerCase();
+
+    document.querySelectorAll("#productTable tbody tr[data-name]").forEach(row => {
+        const name    = row.dataset.name || '';
+        const code    = row.dataset.code || '';
+        const type    = row.dataset.type.toLowerCase();
+        const cat     = row.dataset.category.toLowerCase();
+
+        const matchSearch = name.includes(query) || code.includes(query);
+        const matchType   = !filterType || type === filterType;
+        const matchCat    = !filterCat  || cat === filterCat;
+
+        row.style.display = (matchSearch && matchType && matchCat) ? '' : 'none';
+    });
+}
+</script>
 {% endblock %}

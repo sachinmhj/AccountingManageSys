@@ -110,3 +110,65 @@
     color: #94a3b8;
 }
 
+
+/* Dual Date Compact Stack */
+.dual-date-stack {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: #fff;
+    position: relative;
+}
+
+.dual-date-stack:focus-within {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+}
+
+.dual-date-stack .date-row {
+    display: flex;
+    align-items: center;
+    background: #fff;
+}
+
+.dual-date-stack .date-row:first-child {
+    border-bottom: 1px solid #eee;
+}
+
+.dual-date-stack .date-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #6c757d;
+    padding: 0 6px;
+    width: 34px;
+    text-align: center;
+    background: #f8f9fa;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #eee;
+    text-transform: uppercase;
+}
+
+.dual-date-stack .bs-label {
+    color: #b45309;
+    background: #fffbf0;
+    border-right-color: #fde68a;
+}
+
+.dual-date-stack .form-control {
+    border: none;
+    border-radius: 0;
+    height: 28px;
+    padding: 2px 8px;
+    font-size: 13px;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+.dual-date-stack .form-control:focus {
+    box-shadow: none;
+    outline: none;
+}

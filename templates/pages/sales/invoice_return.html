@@ -1,0 +1,406 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Sales Return | Afno360{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary: #2563eb; --success: #16a34a; --danger: #dc2626;
+        --warning: #f59e0b; --border: #e2e8f0; --bg-light: #f8fafc;
+        --text-gray: #64748b; --text-dark: #1e293b;
+    }
+    body { background: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size:13px; }
+
+    .sr-page { margin: 20px; padding-bottom: 40px; }
+
+    .sr-topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .sr-topbar h1 { margin:0; font-size:22px; font-weight:700; }
+
+    .panel { background:#fff; border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:20px; box-shadow:0 1px 2px rgba(0,0,0,0.05); }
+    .panel-header { font-size:13px; font-weight:600; color:var(--primary); margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+
+    label { font-size:12px; font-weight:500; color:var(--text-dark); margin-bottom:4px; display:block; }
+    label span { color:var(--danger); }
+    .form-control, .form-select { width:100%; padding:6px 10px; border:1px solid var(--border); border-radius:4px; font-size:13px; height:32px; }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+
+    .btn { padding:6px 14px; border:1px solid var(--border); border-radius:4px; background:#fff; font-size:12px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+    .btn:hover { background:var(--bg-light); }
+    .btn-primary { background:var(--primary); color:#fff; border-color:var(--primary); }
+    .btn-primary:hover { background:#1d4ed8; }
+    .btn-success { background:var(--success); color:#fff; border-color:var(--success); }
+
+    .data-table { width:100%; border-collapse:collapse; margin-bottom:12px; }
+    .data-table th, .data-table td { padding:8px; border:1px solid var(--border); font-size:12px; }
+    .data-table th { background:var(--bg-light); font-weight:600; }
+    .data-table td input, .data-table td select { width:100%; border:1px solid var(--border); border-radius:4px; padding:4px 6px; font-size:12px; }
+
+    .summary-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dotted var(--border); font-size:13px; }
+    .summary-row.total { font-weight:700; background:#fef3c7; padding:8px; border:1px solid #fde68a; border-radius:4px; margin-top:4px; font-size:14px; }
+
+    /* Recent Returns Table */
+    .hist-table { width:100%; border-collapse:collapse; }
+    .hist-table th { background:var(--bg-light); padding:9px 12px; font-size:11px; font-weight:600; color:var(--text-gray); border-bottom:1px solid var(--border); text-align:left; }
+    .hist-table td { padding:9px 12px; font-size:12px; border-bottom:1px solid var(--border); }
+    .hist-table tr:last-child td { border-bottom:none; }
+    .status-badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; }
+    .status-pending { background:#fff7ed; color:var(--warning); }
+    .status-adjusted { background:#f0fdf4; color:var(--success); }
+    .status-refunded { background:#eff6ff; color:var(--primary); }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="sr-page">
+
+    <!-- Top Bar -->
+    <div class="sr-topbar">
+        <h1><i class="fa-solid fa-rotate-left" style="color:var(--danger); margin-right:8px;"></i>Sales Return</h1>
+        <div style="display:flex; gap:8px;">
+            <button type="button" class="btn" onclick="document.getElementById('returnForm').reset(); window.location.reload();"><i class="fa-solid fa-rotate-right"></i> Clear</button>
+            <button type="submit" form="returnForm" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save Return</button>
+            <button type="button" class="btn" onclick="toggleSettingsModal()"><i class="fa-solid fa-gear"></i> Settings</button>
+        </div>
+    </div>
+
+    <!-- Return Form -->
+    <form method="POST" action="{% url 'invoice_return' %}" id="returnForm">
+        {% csrf_token %}
+
+        <!-- Section 1: Header -->
+        <div class="panel" id="panel_return_info">
+            <div class="panel-header"><i class="fa-solid fa-circle-info"></i> Return Information</div>
+            <div class="grid-4">
+                <div>
+                    <label>Customer <span>*</span></label>
+                    <select class="form-select" name="customer" required>
+                        <option value="">Select Customer</option>
+                        {% for c in customers %}
+                            <option value="{{ c.id }}">{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Return Date <span>*</span></label>
+                    <div class="dual-date-stack">
+                        <div class="date-row">
+                            <span class="date-label">AD</span>
+                            <input type="date" class="form-control" name="return_date" id="return_date_ad" value="{{ today|date:'Y-m-d' }}" required>
+                        </div>
+                        <div class="date-row" style="position:relative;">
+                            <span class="date-label bs-label">BS</span>
+                            <input type="text" class="form-control" id="return_date_bs" placeholder="Pick BS date">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label>Contact Person</label>
+                    <input type="text" class="form-control" name="contact_person" placeholder="Name of person returning">
+                </div>
+                <div>
+                    <label>Mobile</label>
+                    <input type="text" class="form-control" name="mobile" placeholder="Phone number">
+                </div>
+
+                <div>
+                    <label>Original Invoice (Optional)</label>
+                    <select class="form-select" name="original_invoice">
+                        <option value="">Select Invoice (if applicable)</option>
+                        {% for inv in invoices %}
+                            <option value="{{ inv.id }}">{{ inv.invoice_number }} — {{ inv.customer.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Refund Method <span>*</span></label>
+                    <select class="form-select" name="refund_method">
+                        <option value="Adjust in Next Invoice">Adjust in Next Invoice</option>
+                        <option value="Refund to Customer">Refund to Customer</option>
+                    </select>
+                </div>
+                <div style="grid-column:span 2;">
+                    <label>Reason for Return</label>
+                    <input type="text" class="form-control" name="notes" placeholder="e.g. Defective item, Wrong product delivered...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Returned Items -->
+        <div class="panel" id="panel_return_items">
+            <div class="panel-header"><i class="fa-solid fa-boxes-stacked"></i> Items Being Returned</div>
+            <table class="data-table" id="returnItemsTable">
+                <thead>
+                    <tr>
+                        <th style="width:22%">Product</th>
+                        <th style="width:8%">Qty</th>
+                        <th style="width:8%">Unit</th>
+                        <th style="width:12%">Rate</th>
+                        <th style="width:12%">Tax Type</th>
+                        <th style="width:12%">Condition</th>
+                        <th style="width:12%">Amount</th>
+                        <th style="width:5%"></th>
+                    </tr>
+                </thead>
+                <tbody id="returnItemsBody">
+                    <!-- Added dynamically -->
+                </tbody>
+            </table>
+            <button type="button" class="btn" onclick="addReturnRow()">
+                <i class="fa-solid fa-plus" style="color:var(--danger);"></i> Add Return Item
+            </button>
+        </div>
+
+        <!-- Section 3: Summary -->
+        <div id="row_summary_actions" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <!-- Summary -->
+            <div class="panel" id="panel_return_summary" style="grid-column: span 2;">
+                <div class="panel-header"><i class="fa-solid fa-calculator"></i> Return Summary</div>
+                <div class="summary-row"><span>Sub Total</span><span id="lbl_subtotal">0.00</span></div>
+                <div class="summary-row"><span>VAT (13%)</span><span id="lbl_vat">0.00</span></div>
+                <div class="summary-row total"><span>Total Return Amount</span><span id="lbl_total">0.00</span></div>
+            </div>
+        </div>
+
+    </form>
+
+    <!-- Recent Returns History -->
+    <div class="panel" id="panel_return_history">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <div class="panel-header" style="margin:0;"><i class="fa-solid fa-clock-rotate-left"></i> Recent Returns</div>
+            {% if recent_returns %}
+            <button type="button" id="btn_see_all_returns" onclick="toggleAllReturns()" style="background:transparent; border:none; color:var(--primary); font-size:12px; font-weight:600; cursor:pointer;">See All</button>
+            {% endif %}
+        </div>
+        {% if recent_returns %}
+        <table class="hist-table">
+            <thead>
+                <tr>
+                    <th>Return No.</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Original Invoice</th>
+                    <th>Refund Method</th>
+                    <th style="text-align:right">Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in recent_returns %}
+                <tr class="return-history-row" {% if forloop.counter > 5 %}style="display:none;"{% endif %} data-index="{{ forloop.counter }}">
+                    <td style="color:var(--danger); font-weight:500;">{{ r.return_number }}</td>
+                    <td>{{ r.return_date }}</td>
+                    <td>{{ r.customer.name }}</td>
+                    <td style="color:var(--primary);">{{ r.original_invoice.invoice_number|default:"—" }}</td>
+                    <td style="color:var(--text-gray);">{{ r.refund_method }}</td>
+                    <td style="text-align:right; font-weight:600;">Rs. {{ r.total_amount|floatformat:2 }}</td>
+                    <td>
+                        {% if r.status == 'Pending' %}
+                            <span class="status-badge status-pending">Pending</span>
+                        {% elif r.status == 'Adjusted' %}
+                            <span class="status-badge status-adjusted">Adjusted</span>
+                        {% else %}
+                            <span class="status-badge status-refunded">Refunded</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="text-align:center; padding:40px; color:var(--text-gray);">
+            <i class="fa-solid fa-rotate-left" style="font-size:32px; display:block; margin-bottom:8px; opacity:0.25;"></i>
+            No sales returns processed yet.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:#fff; width:380px; border-radius:8px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
+                <h3 style="margin:0; font-size:16px; font-weight:700;">Sales Return Settings</h3>
+                <button type="button" onclick="toggleSettingsModal()" style="background:transparent; border:none; cursor:pointer; font-size:18px; color:var(--text-gray);"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div style="padding:20px; display:flex; flex-direction:column; gap:12px;">
+                <p style="margin:0 0 8px 0; font-size:12px; color:var(--text-gray);">Select panels to display:</p>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input type="checkbox" id="chk_return_info" checked onchange="applySettings()"> Return Information</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input type="checkbox" id="chk_return_items" checked onchange="applySettings()"> Items Being Returned</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input type="checkbox" id="chk_return_summary" checked onchange="applySettings()"> Return Summary</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input type="checkbox" id="chk_return_history" checked onchange="applySettings()"> Recent Returns History</label>
+            </div>
+            <div style="padding:14px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; background:var(--bg-light);">
+                <button type="button" onclick="toggleSettingsModal()" style="padding:6px 16px; background:var(--primary); color:#fff; border:none; border-radius:4px; font-size:13px; font-weight:600; cursor:pointer;">Done</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const returnProducts = JSON.parse('{{ products_json|safe|escapejs }}');
+    let returnGrandTotal = 0;
+
+    // Add first row on load
+    document.addEventListener("DOMContentLoaded", function() {
+        addReturnRow();
+        if (typeof initDualDate === 'function') {
+            initDualDate('return_date_ad', 'return_date_bs');
+        }
+        loadSettings();
+    });
+
+    function addReturnRow() {
+        const tbody = document.getElementById("returnItemsBody");
+        const tr = document.createElement("tr");
+
+        let productOptions = '<option value="">Select Product...</option>';
+        returnProducts.forEach(p => {
+            productOptions += `<option value="${p.id}">${p.code ? p.code + ' - ' : ''}${p.name}</option>`;
+        });
+
+        tr.innerHTML = `
+            <td>
+                <select class="form-select row-product" name="product_id[]" onchange="returnProductSelected(this)" required>
+                    ${productOptions}
+                </select>
+            </td>
+            <td><input type="number" step="0.01" class="row-qty" name="returned_qty[]" value="1" oninput="calcReturnRow(this)" min="0.01" required></td>
+            <td>
+                <select class="form-select row-unit" name="unit[]">
+                    <option>Pcs</option><option>Kg</option><option>Box</option><option>Ltr</option>
+                </select>
+            </td>
+            <td><input type="number" step="0.01" class="row-rate" name="unit_price[]" value="0.00" oninput="calcReturnRow(this)" required></td>
+            <td>
+                <select class="form-select row-tax" name="tax_type[]" onchange="calcReturnRow(this)">
+                    <option value="Taxable">Taxable (13%)</option>
+                    <option value="Non-Tax">Non-Tax</option>
+                </select>
+            </td>
+            <td>
+                <select class="form-select" name="disposition[]" style="background:#f0fdf4;">
+                    <option value="Saleable" style="color:#16a34a;">✔ Saleable</option>
+                    <option value="Damaged" style="color:#dc2626;">✘ Damaged</option>
+                </select>
+            </td>
+            <td><input type="text" class="row-amount" value="0.00" readonly style="background:var(--bg-light); text-align:right; font-weight:600;"></td>
+            <td style="text-align:center;">
+                <button type="button" onclick="removeReturnRow(this)" style="border:none; background:none; color:var(--danger); cursor:pointer;">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+        calcReturnTotals();
+    }
+
+    function removeReturnRow(btn) {
+        btn.closest("tr").remove();
+        calcReturnTotals();
+    }
+
+    function returnProductSelected(sel) {
+        const tr = sel.closest("tr");
+        const product = returnProducts.find(p => p.id == sel.value);
+        if (product) {
+            tr.querySelector(".row-rate").value = product.selling_price;
+            tr.querySelector(".row-unit").value = product.unit || 'Pcs';
+            calcReturnRow(sel);
+        }
+    }
+
+    function calcReturnRow(elem) {
+        const tr = elem.closest("tr");
+        const qty  = parseFloat(tr.querySelector(".row-qty").value)  || 0;
+        const rate = parseFloat(tr.querySelector(".row-rate").value) || 0;
+        const taxType = tr.querySelector(".row-tax").value;
+
+        const lineAmt = qty * rate;
+        const vatAmt  = taxType === 'Taxable' ? lineAmt * 0.13 : 0;
+        const total   = lineAmt + vatAmt;
+
+        tr.querySelector(".row-amount").value = total.toFixed(2);
+        tr.dataset.lineAmt = lineAmt;
+        tr.dataset.vatAmt  = vatAmt;
+
+        calcReturnTotals();
+    }
+
+    function calcReturnTotals() {
+        let subtotal = 0, vat = 0;
+        document.querySelectorAll("#returnItemsBody tr").forEach(tr => {
+            subtotal += parseFloat(tr.dataset.lineAmt) || 0;
+            vat      += parseFloat(tr.dataset.vatAmt)  || 0;
+        });
+        returnGrandTotal = subtotal + vat;
+
+        document.getElementById("lbl_subtotal").textContent = subtotal.toFixed(2);
+        document.getElementById("lbl_vat").textContent      = vat.toFixed(2);
+        document.getElementById("lbl_total").textContent    = returnGrandTotal.toFixed(2);
+    }
+
+    // Settings Modal Logic
+    const returnPanels = ['return_info', 'return_items', 'return_summary', 'return_history'];
+
+    function toggleSettingsModal() {
+        const modal = document.getElementById('settingsModal');
+        modal.style.display = (modal.style.display === 'none' || modal.style.display === '') ? 'flex' : 'none';
+    }
+
+    function applySettings() {
+        const settings = {};
+        returnPanels.forEach(k => {
+            const chk = document.getElementById(`chk_${k}`);
+            const panel = document.getElementById(`panel_${k}`);
+            if (chk && panel) {
+                settings[k] = chk.checked;
+                panel.style.display = chk.checked ? '' : 'none';
+            }
+        });
+
+        // Summary row — show/hide the wrapper
+        const row = document.getElementById('row_summary_actions');
+        const pSummary = document.getElementById('panel_return_summary');
+        if (row && pSummary) {
+            row.style.display = (pSummary.style.display === 'none') ? 'none' : 'grid';
+        }
+
+        localStorage.setItem('sales_return_settings', JSON.stringify(settings));
+    }
+
+    // Toggle See All / See Less for Recent Returns
+    let allReturnsVisible = false;
+    function toggleAllReturns() {
+        allReturnsVisible = !allReturnsVisible;
+        document.querySelectorAll('.return-history-row').forEach(row => {
+            const idx = parseInt(row.dataset.index);
+            if (idx > 5) {
+                row.style.display = allReturnsVisible ? '' : 'none';
+            }
+        });
+        const btn = document.getElementById('btn_see_all_returns');
+        if (btn) btn.textContent = allReturnsVisible ? 'See Less' : 'See All';
+    }
+
+    function loadSettings() {
+        const saved = localStorage.getItem('sales_return_settings');
+        if (saved) {
+            try {
+                const settings = JSON.parse(saved);
+                returnPanels.forEach(k => {
+                    const chk = document.getElementById(`chk_${k}`);
+                    if (chk && settings[k] !== undefined) {
+                        chk.checked = settings[k];
+                    }
+                });
+            } catch(e){}
+        }
+        applySettings();
+    }
+</script>
+{% endblock %}

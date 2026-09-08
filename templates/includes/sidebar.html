@@ -16,7 +16,7 @@
 
         <!-- ================= Sales ================= -->
 
-        {% with sales_urls="invoice invoice_add customers customer_payment customer_payment_add" %}
+        {% with sales_urls="invoice_add invoice quotation quotation_add invoice_return customers" %}
         <li class="menu-item has-submenu {% if request.resolver_match.url_name in sales_urls.split %}open{% endif %}">
         {% endwith %}
 
@@ -32,12 +32,25 @@
 
                 <li>
                     <div class="submenu-item-wrapper">
+                        <a href="{% url 'invoice_add' %}"
+                           class="{% if request.resolver_match.url_name == 'invoice_add' %}submenu-active{% endif %}">
+                            New Sales
+                        </a>
+                    </div>
+                </li>
+                <li>
+                    <div class="submenu-item-wrapper">
                         <a href="{% url 'invoice' %}"
                            class="{% if request.resolver_match.url_name == 'invoice' %}submenu-active{% endif %}">
-                            Invoices
+                            Sales History
                         </a>
-                        <a href="{% url 'invoice_add' %}" class="add-icon" title="Add New Invoice">
-                            <i class='bx bx-plus'></i>
+                    </div>
+                </li>
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="{% url 'invoice_return' %}"
+                           class="{% if request.resolver_match.url_name == 'invoice_return' %}submenu-active{% endif %}">
+                            Sales Return
                         </a>
                     </div>
                 </li>
@@ -45,28 +58,15 @@
                     <div class="submenu-item-wrapper">
                         <a href="{% url 'customers' %}"
                            class="{% if request.resolver_match.url_name == 'customers' %}submenu-active{% endif %}">
-                            Customers
+                           Customers
                         </a>
-                        {% if request.resolver_match.url_name == 'customers' %}
-                            <a href="javascript:void(0);" onclick="openCustomerModal()" class="add-icon" title="Add Customer">
-                                <i class='bx bx-plus'></i>
-                            </a>
-                        {% else %}
-                            <a href="{% url 'customers' %}" class="add-icon" title="Add Customer">
-                                <i class='bx bx-plus'></i>
-                            </a>
-                        {% endif %}
                     </div>
                 </li>
-
                 <li>
                     <div class="submenu-item-wrapper">
-                        <a href="{% url 'customer_payment' %}"
-                           class="{% if request.resolver_match.url_name == 'customer_payment' %}submenu-active{% endif %}">
-                            Customer Payments
-                        </a>
-                        <a href="{% url 'customer_payment_add' %}" class="add-icon" title="Add Customer Payment">
-                            <i class='bx bx-plus'></i>
+                        <a href="{% url 'quotation' %}"
+                           class="{% if request.resolver_match.url_name == 'quotation' or request.resolver_match.url_name == 'quotation_add' %}submenu-active{% endif %}">
+                            Quotations
                         </a>
                     </div>
                 </li>
