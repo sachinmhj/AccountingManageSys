@@ -94,8 +94,16 @@
 
                     <div class="form-group col-span-4">
                         <label>Received Date <span class="required">*</span></label>
-                        <!-- Changed name to payment_date for backend compatibility -->
-                        <input type="date" name="payment_date" value="{{ today|date:'Y-m-d' }}" required>
+                        <div class="dual-date-stack">
+                            <div class="date-row">
+                                <span class="date-label">AD</span>
+                                <input type="date" name="payment_date" id="pay_date_ad" value="{{ today|date:'Y-m-d' }}" required>
+                            </div>
+                            <div class="date-row" style="position:relative;">
+                                <span class="date-label bs-label">BS</span>
+                                <input type="text" id="pay_date_bs" placeholder="Pick BS date">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group col-span-4">
@@ -238,7 +246,16 @@
 
                     <div class="form-group col-span-4">
                         <label>Date <span class="required">*</span></label>
-                        <input type="date" name="receipt_date" value="2026-08-10" required>
+                        <div class="dual-date-stack">
+                            <div class="date-row">
+                                <span class="date-label">AD</span>
+                                <input type="date" name="receipt_date" id="rcpt_date_ad" value="{{ today|date:'Y-m-d' }}" required>
+                            </div>
+                            <div class="date-row" style="position:relative;">
+                                <span class="date-label bs-label">BS</span>
+                                <input type="text" id="rcpt_date_bs" placeholder="Pick BS date">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group col-span-4">
@@ -549,5 +566,11 @@ function saveNewAccount() {
         alert("Please enter Account Name.");
     }
 }
+document.addEventListener("DOMContentLoaded", function() {
+    if (typeof initDualDate === 'function') {
+        initDualDate('pay_date_ad', 'pay_date_bs');
+        initDualDate('rcpt_date_ad', 'rcpt_date_bs');
+    }
+});
 </script>
 {% endblock %}

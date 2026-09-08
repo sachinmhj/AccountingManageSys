@@ -360,8 +360,17 @@
                     <input type="text" class="form-control" name="reference_po" placeholder="e.g. PO-458796">
                 </div>
                 <div>
-                    <label>Due Date (AD)</label>
-                    <input type="date" class="form-control" name="due_date">
+                    <label>Due Date</label>
+                    <div class="dual-date-stack">
+                        <div class="date-row">
+                            <span class="date-label">AD</span>
+                            <input type="date" class="form-control" name="due_date" id="due_date_ad">
+                        </div>
+                        <div class="date-row" style="position:relative;">
+                            <span class="date-label bs-label">BS</span>
+                            <input type="text" class="form-control" id="due_date_bs" placeholder="Pick BS date">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -482,7 +491,16 @@
                         </div>
                         <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
                             <label style="margin:0;">Cheque Date</label>
-                            <input type="date" class="form-control" name="cheque_date">
+                            <div class="dual-date-stack">
+                                <div class="date-row">
+                                    <span class="date-label">AD</span>
+                                    <input type="date" class="form-control" name="cheque_date" id="cheque_date_ad">
+                                </div>
+                                <div class="date-row" style="position:relative;">
+                                    <span class="date-label bs-label">BS</span>
+                                    <input type="text" class="form-control" id="cheque_date_bs" placeholder="Pick BS date">
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -518,7 +536,16 @@
                     <!-- Payment Date -->
                     <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
                         <label style="margin:0; font-weight:600;">Payment Date <span>*</span></label>
-                        <input type="date" class="form-control" name="payment_date" value="{{ today|date:'Y-m-d' }}">
+                        <div class="dual-date-stack">
+                            <div class="date-row">
+                                <span class="date-label">AD</span>
+                                <input type="date" class="form-control" name="payment_date" id="payment_date_ad" value="{{ today|date:'Y-m-d' }}">
+                            </div>
+                            <div class="date-row" style="position:relative;">
+                                <span class="date-label bs-label">BS</span>
+                                <input type="text" class="form-control" id="payment_date_bs" placeholder="Pick BS date">
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Narration -->
@@ -692,6 +719,9 @@
     document.addEventListener("DOMContentLoaded", function() {
         if (typeof initDualDate === 'function') {
             initDualDate('invoice_date_ad', 'invoice_date_bs');
+            initDualDate('due_date_ad', 'due_date_bs');
+            initDualDate('cheque_date_ad', 'cheque_date_bs');
+            initDualDate('payment_date_ad', 'payment_date_bs');
         }
         addRow();
         loadSettings();

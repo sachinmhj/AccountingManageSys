@@ -74,7 +74,16 @@
                 </div>
                 <div>
                     <label>Valid Until</label>
-                    <input type="date" class="form-control" name="valid_until">
+                    <div class="dual-date-stack">
+                        <div class="date-row">
+                            <span class="date-label">AD</span>
+                            <input type="date" class="form-control" name="valid_until" id="valid_until_ad">
+                        </div>
+                        <div class="date-row" style="position:relative;">
+                            <span class="date-label bs-label">BS</span>
+                            <input type="text" class="form-control" id="valid_until_bs" placeholder="Pick BS date">
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label>Status</label>
@@ -149,6 +158,7 @@
         addRow();
         if (typeof initDualDate === 'function') {
             initDualDate('quote_date_ad', 'quote_date_bs');
+            initDualDate('valid_until_ad', 'valid_until_bs');
         }
     });
 
