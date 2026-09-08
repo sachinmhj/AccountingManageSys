@@ -1,4 +1,5 @@
 from django.urls import path
+from . import views
 from .views import (
     HomeView,
     SalesView,
@@ -87,4 +88,12 @@ urlpatterns = [
     path("inventory/production-order/add/",ProductionOrderAddView.as_view(),name="production_order_add"),
     path("inventory/production-journal/",ProductionJournalView.as_view(),name="production_journal"),
     path("inventory/production-journal/add/",ProductionJournalAddView.as_view(),name="production_journal_add"),
+
+    # Document / Receipt Manager Routes
+    path("documents/", views.DocumentManagerView.as_view(), name="document_manager"),
+    path("documents/upload/", views.DocumentUploadView.as_view(), name="document_upload"),
+    path("documents/bulk-delete/", views.DocumentBulkDeleteView.as_view(), name="document_bulk_delete"),
+    path("documents/<int:pk>/delete/", views.DocumentDeleteView.as_view(), name="document_delete"),
+    path("documents/<int:pk>/unlink/", views.DocumentUnlinkView.as_view(), name="document_unlink"),
+    path("documents/<int:pk>/update-label/", views.DocumentUpdateLabelView.as_view(), name="document_update_label"),
 ]

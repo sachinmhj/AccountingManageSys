@@ -212,6 +212,7 @@
                     <th style="text-align:right">Paid</th>
                     <th style="text-align:right">Due</th>
                     <th>Status</th>
+                    <th style="text-align:center;">Attachment</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -244,6 +245,16 @@
                             <span class="status-badge status-partial">Partial</span>
                         {% else %}
                             <span class="status-badge status-draft">Draft</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align:center;">
+                        {% if invoice.bill_attachment %}
+                            <a href="{{ invoice.bill_attachment.url }}" target="_blank" title="View Attachment"
+                               style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; background:#eff6ff; border-radius:6px; color:#2563eb; text-decoration:none; font-size:13px; transition:background 0.15s;">
+                                <i class="fa-solid fa-paperclip"></i>
+                            </a>
+                        {% else %}
+                            <span style="color:#94a3b8; font-size:12px;">N/A</span>
                         {% endif %}
                     </td>
                     <td>

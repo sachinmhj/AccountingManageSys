@@ -13,7 +13,7 @@ from .models import (
     InvoiceAllocation, PaymentAllocation, CustomerPayment,
     PurchaseBill, PurchaseBillItem, Expense, ExpenseCategory,
     SupplierPayment, SalesReturn, SalesReturnItem, UserProfile,
-    ContactPerson, Quotation, QuotationItem
+    ContactPerson, Quotation, QuotationItem, ReceiptDocument
 )
 from .forms import ProductForm, ProductCategoryForm, ContactForm, ExpenseForm, ExpenseCategoryForm
 
@@ -302,6 +302,15 @@ class InvoiceAddView(View):
         products = Product.objects.all()
         today = timezone.now().date()
         
+        # Check for preloaded receipt document from Document Manager URL query parameter
+        doc_id = request.GET.get('doc_id') or request.GET.get('__ref_receipt_id')
+        preloaded_doc = None
+        if doc_id:
+            try:
+                preloaded_doc = ReceiptDocument.objects.get(id=doc_id)
+            except (ReceiptDocument.DoesNotExist, ValueError):
+                preloaded_doc = None
+
         # Serialize products for JavaScript to auto-populate Rate, Unit, Tax Type, Cost, Description
         product_list = list(products.values('id', 'name', 'code', 'selling_price', 'unit', 'purchase_price', 'description'))
         
@@ -310,6 +319,7 @@ class InvoiceAddView(View):
             'products': products,
             'products_json': json.dumps(product_list, cls=DjangoJSONEncoder),
             'today': today,
+            'preloaded_doc': preloaded_doc,
         }
         return render(request, self.template_name, context)
 
@@ -336,6 +346,7 @@ class InvoiceAddView(View):
             currency=request.POST.get('currency', 'NPR'),
             notes=request.POST.get('notes', ''),
             terms_conditions=request.POST.get('terms_conditions', ''),
+            bill_attachment=request.FILES.get('bill_attachment'),
             status='Draft',
             created_by=request.user if request.user.is_authenticated else None
         )
@@ -541,7 +552,27 @@ class InvoiceAddView(View):
         else:
             invoice.status = 'Unpaid'
 
+        # Save bill attachment if uploaded
+        bill_file = request.FILES.get('bill_attachment')
+        if bill_file:
+            invoice.bill_attachment = bill_file
+
         invoice.save()
+
+        # Link ReceiptDocument if doc_id was passed from Document Manager
+        linked_doc_id = request.POST.get('linked_doc_id')
+        if linked_doc_id:
+            try:
+                rec_doc = ReceiptDocument.objects.get(id=linked_doc_id)
+                rec_doc.status = 'DONE'
+                rec_doc.linked_invoice = invoice
+                rec_doc.label = 'INVOICE'
+                if not invoice.bill_attachment and rec_doc.file:
+                    invoice.bill_attachment = rec_doc.file
+                    invoice.save(update_fields=['bill_attachment'])
+                rec_doc.save()
+            except (ReceiptDocument.DoesNotExist, ValueError):
+                pass
 
         return redirect('invoice')
 
@@ -1311,3 +1342,97 @@ class SupplierAddView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "New Supplier"
         return context
+
+
+# ============================================================
+# Document / Receipt Manager Views (Tigg-style)
+# ============================================================
+
+class DocumentManagerView(View):
+    template_name = "pages/documents/receipt_manager.html"
+
+    def get(self, request):
+        pending_docs = ReceiptDocument.objects.filter(status='PENDING').order_by('-uploaded_at')
+        done_docs = ReceiptDocument.objects.filter(status='DONE').order_by('-uploaded_at')
+        
+        context = {
+            'pending_docs': pending_docs,
+            'done_docs': done_docs,
+            'pending_count': pending_docs.count(),
+            'done_count': done_docs.count(),
+        }
+        return render(request, self.template_name, context)
+
+class DocumentUploadView(View):
+    def post(self, request):
+        files = request.FILES.getlist('documents')
+        if not files and request.FILES.get('document'):
+            files = [request.FILES.get('document')]
+
+        uploaded_objs = []
+        for f in files:
+            if not f: continue
+            size_mb = round(f.size / (1024 * 1024), 2)
+            doc = ReceiptDocument.objects.create(
+                file=f,
+                original_name=f.name,
+                file_size=size_mb,
+                label='UNLABELED',
+                status='PENDING',
+                uploaded_by=request.user if request.user.is_authenticated else None
+            )
+            uploaded_objs.append({
+                'id': doc.id,
+                'name': doc.original_name,
+                'url': doc.file.url,
+                'size': doc.file_size,
+            })
+            
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or 'json' in request.content_type:
+            return JsonResponse({'status': 'success', 'documents': uploaded_objs})
+            
+        return redirect('document_manager')
+
+class DocumentDeleteView(View):
+    def post(self, request, pk):
+        doc = get_object_or_404(ReceiptDocument, pk=pk)
+        doc.delete()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'success'})
+        return redirect('document_manager')
+
+class DocumentUpdateLabelView(View):
+    def post(self, request, pk):
+        doc = get_object_or_404(ReceiptDocument, pk=pk)
+        label = request.POST.get('label')
+        if label and label in dict(ReceiptDocument.LABEL_CHOICES):
+            doc.label = label
+            doc.save(update_fields=['label'])
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'success', 'label': doc.label, 'label_display': doc.get_label_display()})
+        return redirect('document_manager')
+
+class DocumentBulkDeleteView(View):
+    def post(self, request):
+        doc_ids = request.POST.getlist('doc_ids')
+        if not doc_ids and request.POST.get('doc_ids_str'):
+            doc_ids = [i.strip() for i in request.POST.get('doc_ids_str').split(',') if i.strip()]
+        if doc_ids:
+            ReceiptDocument.objects.filter(id__in=doc_ids).delete()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'success'})
+        return redirect('document_manager')
+
+class DocumentUnlinkView(View):
+    def post(self, request, pk):
+        doc = get_object_or_404(ReceiptDocument, pk=pk)
+        if doc.linked_invoice:
+            invoice = doc.linked_invoice
+            invoice.bill_attachment = None
+            invoice.save(update_fields=['bill_attachment'])
+        doc.status = 'PENDING'
+        doc.linked_invoice = None
+        doc.save(update_fields=['status', 'linked_invoice'])
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'success'})
+        return redirect('document_manager')

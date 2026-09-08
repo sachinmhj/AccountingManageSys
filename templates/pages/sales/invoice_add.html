@@ -53,7 +53,7 @@
         border-radius: 8px;
         padding: 16px;
         margin-bottom: 20px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
 
     .panel-header {
@@ -73,9 +73,13 @@
         margin-bottom: 4px;
         display: block;
     }
-    label span { color: var(--danger); }
 
-    .form-control, .form-select {
+    label span {
+        color: var(--danger);
+    }
+
+    .form-control,
+    .form-select {
         width: 100%;
         padding: 6px 12px;
         border: 1.5px solid #cbd5e1;
@@ -88,6 +92,7 @@
         transition: border-color 0.15s ease, box-shadow 0.15s ease;
         outline: none;
     }
+
     .form-select {
         appearance: none;
         -webkit-appearance: none;
@@ -99,11 +104,16 @@
         padding-right: 34px;
         cursor: pointer;
     }
-    .form-control:focus, .form-select:focus {
+
+    .form-control:focus,
+    .form-select:focus {
         border-color: #2563eb;
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
-    .form-control[readonly] { background: var(--bg-light); }
+
+    .form-control[readonly] {
+        background: var(--bg-light);
+    }
 
     /* Custom Searchable Customer Combobox */
     .cust-combo-btn {
@@ -124,8 +134,16 @@
         transition: border-color 0.15s ease, box-shadow 0.15s ease;
         outline: none;
     }
-    .cust-combo-btn:hover { border-color: #94a3b8; }
-    .cust-combo-btn.open { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+
+    .cust-combo-btn:hover {
+        border-color: #94a3b8;
+    }
+
+    .cust-combo-btn.open {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
     .cust-combo-menu {
         display: none;
         position: absolute;
@@ -140,10 +158,19 @@
         overflow: hidden;
         animation: custSlideDown 0.18s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
     @keyframes custSlideDown {
-        from { opacity: 0; transform: translateY(-8px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
+
     .cust-combo-add-btn {
         display: flex;
         align-items: center;
@@ -157,7 +184,11 @@
         border-bottom: 1px solid #dbeafe;
         transition: background 0.15s;
     }
-    .cust-combo-add-btn:hover { background: #dbeafe; }
+
+    .cust-combo-add-btn:hover {
+        background: #dbeafe;
+    }
+
     .cust-option-item {
         display: flex;
         align-items: center;
@@ -169,8 +200,17 @@
         color: #334155;
         transition: background 0.12s, color 0.12s;
     }
-    .cust-option-item:hover { background: #f1f5f9; color: #1e293b; }
-    .cust-option-item.selected { background: #eff6ff; color: #2563eb; font-weight: 600; }
+
+    .cust-option-item:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .cust-option-item.selected {
+        background: #eff6ff;
+        color: #2563eb;
+        font-weight: 600;
+    }
 
     /* Custom Sales Type Combobox */
     .st-combo-btn {
@@ -191,8 +231,16 @@
         transition: border-color 0.15s ease, box-shadow 0.15s ease;
         outline: none;
     }
-    .st-combo-btn:hover { border-color: #94a3b8; }
-    .st-combo-btn.open { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+
+    .st-combo-btn:hover {
+        border-color: #94a3b8;
+    }
+
+    .st-combo-btn.open {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
     .st-combo-menu {
         display: none;
         position: absolute;
@@ -207,10 +255,19 @@
         overflow: hidden;
         animation: stSlideDown 0.18s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
     @keyframes stSlideDown {
-        from { opacity: 0; transform: translateY(-8px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
+
     .st-option-item {
         display: flex;
         align-items: center;
@@ -220,9 +277,18 @@
         cursor: pointer;
         transition: background 0.12s;
     }
-    .st-option-item:last-child { border-bottom: none; }
-    .st-option-item:hover { background: #f8fafc; }
-    .st-option-item.selected { background: #eff6ff; }
+
+    .st-option-item:last-child {
+        border-bottom: none;
+    }
+
+    .st-option-item:hover {
+        background: #f8fafc;
+    }
+
+    .st-option-item.selected {
+        background: #eff6ff;
+    }
 
     .btn {
         padding: 6px 12px;
@@ -236,596 +302,1242 @@
         align-items: center;
         gap: 6px;
     }
-    .btn:hover { background: var(--bg-light); }
-    .btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
-    .btn-primary:hover { background: #1d4ed8; }
-    .btn-success { background: var(--success); color: white; border-color: var(--success); }
-    
-    .data-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
-    .data-table th, .data-table td {
+
+    .btn:hover {
+        background: var(--bg-light);
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+        background: #1d4ed8;
+    }
+
+    .btn-success {
+        background: var(--success);
+        color: white;
+        border-color: var(--success);
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 12px;
+    }
+
+    .data-table th,
+    .data-table td {
         padding: 8px;
         border: 1px solid var(--border);
         font-size: 12px;
     }
-    .data-table th { background: var(--bg-light); font-weight: 600; text-align: left; }
-    .data-table td input, .data-table td select {
-        width: 100%; border: 1px solid var(--border); border-radius: 4px; padding: 4px; font-size: 12px;
+
+    .data-table th {
+        background: var(--bg-light);
+        font-weight: 600;
+        text-align: left;
     }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-    
-    .summary-box { padding-right: 20px; }
-    .summary-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dotted var(--border); }
-    .summary-row.total { font-weight: 700; background: #fef3c7; padding: 8px; border: 1px solid #fde68a; border-radius: 4px; font-size: 14px; margin-top: 4px; }
-    
-    .payment-radios { display: flex; gap: 16px; margin-bottom: 16px; }
-    .payment-radios label { display: flex; align-items: center; gap: 6px; font-weight: 400; font-size: 13px; }
+    .data-table td input,
+    .data-table td select {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 4px;
+        font-size: 12px;
+    }
 
-    .bottom-panels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-    .bottom-panel { border: 1px solid var(--border); border-radius: 8px; background: var(--bg-white); padding: 12px; }
-    .bottom-panel-title { font-weight: 600; color: var(--primary); font-size: 12px; margin-bottom: 12px; }
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+    }
+
+    .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+    .panel-responsive-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .panel-responsive-scroll .grid-4 {
+        min-width: 780px;
+    }
+
+    .summary-box {
+        padding-right: 20px;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px dotted var(--border);
+    }
+
+    .summary-row.total {
+        font-weight: 700;
+        background: #fef3c7;
+        padding: 8px;
+        border: 1px solid #fde68a;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-top: 4px;
+    }
+
+    .payment-radios {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .payment-radios label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 400;
+        font-size: 13px;
+    }
+
+    .bottom-panels {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+    .bottom-panel {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--bg-white);
+        padding: 12px;
+    }
+
+    .bottom-panel-title {
+        font-weight: 600;
+        color: var(--primary);
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
 
     .sticky-footer {
         position: fixed;
-        bottom: 0; left: 0; right: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
         background: var(--bg-white);
         border-top: 1px solid var(--border);
         padding: 12px 24px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
         z-index: 100;
     }
-    .footer-right { display: flex; gap: 24px; font-size: 14px; font-weight: 600; }
-    .footer-right span { color: var(--text-dark); }
+
+    .footer-right {
+        display: flex;
+        gap: 24px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .footer-right span {
+        color: var(--text-dark);
+    }
+
+    /* ── Dynamic Split-Screen Bill Attachment Viewer ────────────────────────── */
+    .invoice-workspace {
+        display: flex;
+        gap: 16px;
+        align-items: stretch;
+        width: 100%;
+        height: calc(100vh - 120px);
+        box-sizing: border-box;
+        padding: 0 16px;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .invoice-form-col {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        overflow-y: auto;
+        padding-right: 6px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .invoice-form-col::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .invoice-form-col::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+
+    .invoice-form-col::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .invoice-form-col::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    .invoice-viewer-col {
+        width: 44%;
+        max-width: 650px;
+        flex-shrink: 0;
+        height: calc(100vh - 120px);
+        position: relative;
+        top: 0;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 90;
+        animation: viewerSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .invoice-workspace.split-view-active .invoice-viewer-col {
+        height: 100%;
+    }
+
+    @keyframes viewerSlideIn {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* ── Split-Screen Form System ────────────────────────── */
+    .invoice-workspace.split-view-active #row_a,
+    .invoice-workspace.split-view-active #row_b,
+    .invoice-workspace.split-view-active #row_c {
+        grid-template-columns: 1fr !important;
+    }
+
+    .table-responsive-wrap {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        margin-bottom: 12px;
+    }
+
+    .table-responsive-wrap .data-table {
+        margin-bottom: 0;
+        min-width: 920px;
+    }
+
+    .table-responsive-wrap.alloc-table-wrap .data-table {
+        min-width: 450px;
+    }
+
+    .table-responsive-wrap.return-table-wrap .data-table {
+        min-width: 540px;
+    }
+
+    .table-responsive-wrap.profit-table-wrap .data-table {
+        min-width: 480px;
+    }
+
+    .table-responsive-wrap::-webkit-scrollbar {
+        height: 7px;
+    }
+
+    .table-responsive-wrap::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+
+    .table-responsive-wrap::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .table-responsive-wrap::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    .viewer-header {
+        padding: 10px 14px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .viewer-hdr-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 12px;
+        text-decoration: none;
+        transition: all 0.15s;
+    }
+
+    .viewer-hdr-btn:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .viewer-hdr-btn.close-btn:hover {
+        background: #fee2e2;
+        color: #dc2626;
+        border-color: #fca5a5;
+    }
+
+    .viewer-details-bar {
+        padding: 7px 14px;
+        background: #ffffff;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+    }
+
+    .viewer-toolbar {
+        padding: 8px 14px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .viewer-tool-btn {
+        padding: 4px 9px;
+        border-radius: 5px;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        font-size: 11.5px;
+        font-weight: 500;
+        color: #334155;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s;
+    }
+
+    .viewer-tool-btn:hover {
+        background: #e2e8f0;
+    }
+
+    .viewer-tool-btn.danger {
+        background: #fff1f2;
+        color: #e11d48;
+        border-color: #fecdd3;
+    }
+
+    .viewer-tool-btn.danger:hover {
+        background: #ffe4e6;
+    }
+
+    .viewer-body {
+        flex: 1;
+        background: #0f172a;
+        overflow: auto;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        user-select: none;
+    }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
-<form method="POST" action="{% url 'invoice_add' %}" id="invoiceForm">
+<form method="POST" action="{% url 'invoice_add' %}" id="invoiceForm" enctype="multipart/form-data">
     {% csrf_token %}
-    
-    <div style="display:flex; justify-content:space-between; align-items:center; padding: 20px 20px 0 20px;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 16px 8px 16px;">
         <h2 style="margin:0; font-size:22px; font-weight:700;">New Sales Invoice</h2>
         <div style="display:flex; gap:8px;">
-            <button type="button" class="btn" onclick="toggleSettingsModal()"><i class="fa-solid fa-gear"></i> Settings</button>
+            <button type="button" class="btn" onclick="toggleSettingsModal()"><i class="fa-solid fa-gear"></i>
+                Settings</button>
             <button type="submit" class="btn btn-primary">Save</button>
         </div>
     </div>
 
-    <!-- 1. Customer & Invoice Information (full width) -->
-    <div id="wrapper_customer" style="padding:20px 20px 0 20px;">
-        <div class="panel" id="panel_customer" style="margin-bottom:0;">
-            <div class="panel-header" id="header_customer">Customer &amp; Invoice Information</div>
-            <div class="grid-4">
-                <!-- Customer + Balance side by side in one cell spanning 2 cols via inline flex -->
-                <div style="grid-column: span 2; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                    <div>
-                        <label>Customer <span>*</span></label>
-                        <div style="display:flex; gap:8px; align-items:center;">
-                            <!-- Custom Combobox Component Wrapper -->
-                            <div class="cust-combo-wrapper" style="position:relative; flex:1;">
-                                <!-- Hidden Native Select for Form Submit & Validation -->
-                                <select name="customer" id="customer_select" required onchange="onCustomerChange(this)" style="display:none;">
-                                    <option value="">Select Customer...</option>
-                                    {% for c in customers %}
-                                        <option value="{{ c.id }}" data-phone="{{ c.phone|default:'' }}" data-pan="{{ c.pan_vat|default:'' }}">{{ c.name }}</option>
-                                    {% endfor %}
-                                </select>
+    <!-- Dynamic Workspace Container for Split-Screen View -->
+    <div class="invoice-workspace" id="invoiceWorkspace">
+        <!-- Left Form Column -->
+        <div class="invoice-form-col" id="invoiceFormCol">
 
-                                <!-- Trigger Control Box -->
-                                <button type="button" id="cust_combo_btn" class="cust-combo-btn" onclick="toggleCustDropdown(event)">
-                                    <div style="display:flex; align-items:center; gap:8px; min-width:0;">
-                                        <i class="fa-solid fa-building-user" style="color:#64748b; font-size:14px; flex-shrink:0;"></i>
-                                        <span id="cust_combo_label" style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap; color:#64748b;">Select Customer...</span>
+            <!-- 1. Customer & Invoice Information (full width) -->
+            <div id="wrapper_customer" style="padding: 8px 0 0 0;">
+                <div class="panel" id="panel_customer" style="margin-bottom:0;">
+                    <div class="panel-header" id="header_customer">Customer &amp; Invoice Information</div>
+                    <div class="panel-responsive-scroll">
+                        <div class="grid-4">
+                            <div>
+                                <label>Customer <span>*</span></label>
+                                <div style="display:flex; gap:8px; align-items:center;">
+                                    <!-- Custom Combobox Component Wrapper -->
+                                    <div class="cust-combo-wrapper" style="position:relative; flex:1;">
+                                        <!-- Hidden Native Select for Form Submit & Validation -->
+                                        <select name="customer" id="customer_select" required
+                                            onchange="onCustomerChange(this)" style="display:none;">
+                                            <option value="">Select Customer...</option>
+                                            {% for c in customers %}
+                                            <option value="{{ c.id }}" data-phone="{{ c.phone|default:'' }}"
+                                                data-pan="{{ c.pan_vat|default:'' }}">{{ c.name }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                        <!-- Trigger Control Box -->
+                                        <button type="button" id="cust_combo_btn" class="cust-combo-btn"
+                                            onclick="toggleCustDropdown(event)">
+                                            <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                                                <i class="fa-solid fa-building-user"
+                                                    style="color:#64748b; font-size:14px; flex-shrink:0;"></i>
+                                                <span id="cust_combo_label"
+                                                    style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap; color:#64748b;">Select
+                                                    Customer...</span>
+                                            </div>
+                                            <i class="fa-solid fa-chevron-down" id="cust_combo_arrow"
+                                                style="color:#94a3b8; font-size:12px; transition:transform 0.2s; flex-shrink:0;"></i>
+                                        </button>
+
+                                        <!-- Custom Floating Dropdown Menu -->
+                                        <div id="cust_combo_menu" class="cust-combo-menu">
+                                            <!-- Real-time Search Box Header -->
+                                            <div
+                                                style="padding:8px 10px; border-bottom:1px solid #f1f5f9; background:#f8fafc; display:flex; align-items:center; gap:8px;">
+                                                <i class="fa-solid fa-magnifying-glass"
+                                                    style="color:#94a3b8; font-size:13px;"></i>
+                                                <input type="text" id="cust_search_input"
+                                                    placeholder="Search customer by name, phone..."
+                                                    oninput="filterCustOptions(this.value)" autocomplete="off"
+                                                    style="border:none; background:transparent; outline:none; width:100%; font-size:12.5px; color:#1e293b;">
+                                            </div>
+
+                                            <!-- "+ Add New Customer" Action Button -->
+                                            <div class="cust-combo-add-btn" onclick="triggerAddNewCustFromDropdown()">
+                                                <div
+                                                    style="width:22px; height:22px; background:linear-gradient(135deg,#2563eb,#1d4ed8); color:white; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;">
+                                                    <i class="fa-solid fa-plus"></i>
+                                                </div>
+                                                <span>Add New Customer</span>
+                                            </div>
+
+                                            <!-- Scrollable Customer Options List -->
+                                            <div id="cust_combo_list" style="max-height:220px; overflow-y:auto;">
+                                                <!-- Dynamically Populated -->
+                                            </div>
+
+                                            <!-- Empty Search State -->
+                                            <div id="cust_combo_empty"
+                                                style="display:none; padding:16px; text-align:center; color:#94a3b8; font-size:12px;">
+                                                <i class="fa-solid fa-user-slash"
+                                                    style="font-size:18px; margin-bottom:4px; display:block; opacity:0.5;"></i>
+                                                No matching customers found.
+                                            </div>
+                                        </div>
                                     </div>
-                                    <i class="fa-solid fa-chevron-down" id="cust_combo_arrow" style="color:#94a3b8; font-size:12px; transition:transform 0.2s; flex-shrink:0;"></i>
+
+                                    <!-- Quick Add Icon Button -->
+                                    <button type="button" id="btn_quick_add_cust" onclick="openAddCustomerModal()"
+                                        title="Add New Customer"
+                                        style="flex-shrink:0; width:36px; height:36px; border:none; border-radius:7px; background:linear-gradient(135deg, #2563eb, #1d4ed8); color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:0 2px 6px rgba(37,99,235,0.3); transition:transform .1s, opacity .15s;">
+                                        <i class="fa-solid fa-user-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <label>Customer Balance</label>
+                                <div
+                                    style="padding:6px 10px; background:#fff1f2; color:#e11d48; border-radius:4px; font-weight:600; font-size:15px; min-height:32px; display:flex; align-items:center; justify-content:space-between;">
+                                    <span id="customer_balance">Rs. 0.00</span>
+                                    <a id="customer_history_link" href="/sales/customers/" target="_blank"
+                                        style="font-size:11px; color:#2563eb; text-decoration:none; font-weight:500; display:flex; align-items:center; gap:3px;">
+                                        <i class="fa-solid fa-clock-rotate-left" style="font-size:10px;"></i> View
+                                        History
+                                    </a>
+                                </div>
+                            </div>
+                            <div>
+                                <label>Invoice No. <span>*</span></label>
+                                <input type="text" class="form-control" name="invoice_no" value="INV-000125" readonly>
+                            </div>
+                            <div>
+                                <label>Invoice Date <span>*</span></label>
+                                <div class="dual-date-stack">
+                                    <div class="date-row">
+                                        <span class="date-label">AD</span>
+                                        <input type="date" class="form-control" name="invoice_date" id="invoice_date_ad"
+                                            value="{{ today|date:'Y-m-d' }}" required>
+                                    </div>
+                                    <div class="date-row" style="position:relative;">
+                                        <span class="date-label bs-label">BS</span>
+                                        <input type="text" class="form-control" id="invoice_date_bs"
+                                            placeholder="Pick BS date">
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label>Sales Type <span>*</span></label>
+                                <div class="st-combo-wrapper" style="position:relative;">
+                                    <select name="sales_type" id="sales_type_select" style="display:none;">
+                                        <option value="Goods" selected>Goods</option>
+                                        <option value="Services">Services</option>
+                                        <option value="Mixed">Mixed / Both</option>
+                                    </select>
+                                    <button type="button" id="st_combo_btn" class="st-combo-btn"
+                                        onclick="toggleStDropdown(event)">
+                                        <div style="display:flex; align-items:center; gap:8px;" id="st_combo_selected">
+                                            <i class="fa-solid fa-box" style="color:#2563eb;"></i>
+                                            <span style="font-weight:600; color:#1e293b;">Goods</span>
+                                        </div>
+                                        <i class="fa-solid fa-chevron-down" id="st_combo_arrow"
+                                            style="color:#94a3b8; font-size:12px; transition:transform 0.2s;"></i>
+                                    </button>
+                                    <div id="st_combo_menu" class="st-combo-menu">
+                                        <div class="st-option-item selected"
+                                            onclick="selectSalesType('Goods', 'fa-solid fa-box', '#2563eb', event)">
+                                            <div style="display:flex; align-items:center; gap:10px;">
+                                                <div
+                                                    style="width:28px; height:28px; background:#eff6ff; color:#2563eb; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
+                                                    <i class="fa-solid fa-box"></i>
+                                                </div>
+                                                <div>
+                                                    <div style="font-weight:600; color:#1e293b; font-size:13px;">Goods
+                                                    </div>
+                                                    <div style="font-size:11px; color:#64748b;">Physical inventory &
+                                                        items</div>
+                                                </div>
+                                            </div>
+                                            <i class="fa-solid fa-check st-check"
+                                                style="color:#2563eb; font-size:13px;"></i>
+                                        </div>
+                                        <div class="st-option-item"
+                                            onclick="selectSalesType('Services', 'fa-solid fa-wrench', '#0891b2', event)">
+                                            <div style="display:flex; align-items:center; gap:10px;">
+                                                <div
+                                                    style="width:28px; height:28px; background:#ecfeff; color:#0891b2; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
+                                                    <i class="fa-solid fa-wrench"></i>
+                                                </div>
+                                                <div>
+                                                    <div style="font-weight:600; color:#1e293b; font-size:13px;">
+                                                        Services</div>
+                                                    <div style="font-size:11px; color:#64748b;">Consulting, labor & work
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <i class="fa-solid fa-check st-check"
+                                                style="color:#2563eb; font-size:13px; display:none;"></i>
+                                        </div>
+                                        <div class="st-option-item"
+                                            onclick="selectSalesType('Mixed', 'fa-solid fa-layer-group', '#8b5cf6', event)">
+                                            <div style="display:flex; align-items:center; gap:10px;">
+                                                <div
+                                                    style="width:28px; height:28px; background:#f5f3ff; color:#8b5cf6; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
+                                                    <i class="fa-solid fa-layer-group"></i>
+                                                </div>
+                                                <div>
+                                                    <div style="font-weight:600; color:#1e293b; font-size:13px;">Mixed /
+                                                        Both</div>
+                                                    <div style="font-size:11px; color:#64748b;">Goods & Services
+                                                        combined</div>
+                                                </div>
+                                            </div>
+                                            <i class="fa-solid fa-check st-check"
+                                                style="color:#2563eb; font-size:13px; display:none;"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label>Sale Category <span>*</span></label>
+                                <select class="form-select" name="sale_category">
+                                    <option>Local Sales</option>
+                                    <option>Export</option>
+                                </select>
+                            </div>
+                            <div class="vt-combo-wrapper" style="position:relative; width: 100%;">
+                                <label>VAT Treatment <span>*</span></label>
+                                <input type="hidden" name="vat_treatment" id="vt_hidden_input" value="Standard">
+                                <button type="button" class="st-combo-btn" id="vt_combo_btn"
+                                    onclick="toggleVtDropdown(event)" style="height: 38px;">
+                                    <span class="st-combo-selected" id="vt_combo_selected"
+                                        style="display:flex; align-items:center; gap:8px;">
+                                        <i class="fa-solid fa-percent" style="color:#2563eb;"></i>
+                                        <span style="font-weight:600; color:#1e293b;">Standard (13%)</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down text-muted" id="vt_combo_arrow"
+                                        style="font-size:12px; transition: transform 0.2s;"></i>
                                 </button>
 
-                                <!-- Custom Floating Dropdown Menu -->
-                                <div id="cust_combo_menu" class="cust-combo-menu">
-                                    <!-- Real-time Search Box Header -->
-                                    <div style="padding:8px 10px; border-bottom:1px solid #f1f5f9; background:#f8fafc; display:flex; align-items:center; gap:8px;">
-                                        <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8; font-size:13px;"></i>
-                                        <input type="text" id="cust_search_input" placeholder="Search customer by name, phone..." 
-                                               oninput="filterCustOptions(this.value)" autocomplete="off"
-                                               style="border:none; background:transparent; outline:none; width:100%; font-size:12.5px; color:#1e293b;">
-                                    </div>
-
-                                    <!-- "+ Add New Customer" Action Button -->
-                                    <div class="cust-combo-add-btn" onclick="triggerAddNewCustFromDropdown()">
-                                        <div style="width:22px; height:22px; background:linear-gradient(135deg,#2563eb,#1d4ed8); color:white; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;">
-                                            <i class="fa-solid fa-plus"></i>
+                                <div class="st-combo-menu" id="vt_combo_menu" style="width: 250px;">
+                                    <div class="st-options-container">
+                                        <div class="st-option-item selected"
+                                            onclick="selectVatTreatment('Standard', 'Standard (13%)', 'fa-solid fa-percent', '#2563eb', event)">
+                                            <div style="display:flex; align-items:center; gap:10px;">
+                                                <div
+                                                    style="width:28px; height:28px; background:#eff6ff; color:#2563eb; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
+                                                    <i class="fa-solid fa-percent"></i>
+                                                </div>
+                                                <div>
+                                                    <div style="font-weight:600; color:#1e293b; font-size:13px;">
+                                                        Standard (13%)</div>
+                                                </div>
+                                            </div>
+                                            <i class="fa-solid fa-check vt-check"
+                                                style="color:#2563eb; font-size:13px;"></i>
                                         </div>
-                                        <span>Add New Customer</span>
+                                        <div class="st-option-item"
+                                            onclick="selectVatTreatment('Exempt', 'Exempt (No VAT)', 'fa-solid fa-ban', '#0891b2', event)">
+                                            <div style="display:flex; align-items:center; gap:10px;">
+                                                <div
+                                                    style="width:28px; height:28px; background:#ecfeff; color:#0891b2; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
+                                                    <i class="fa-solid fa-ban"></i>
+                                                </div>
+                                                <div>
+                                                    <div style="font-weight:600; color:#1e293b; font-size:13px;">Exempt
+                                                        (No VAT)</div>
+                                                </div>
+                                            </div>
+                                            <i class="fa-solid fa-check vt-check"
+                                                style="color:#2563eb; font-size:13px; display:none;"></i>
+                                        </div>
+                                        <div class="st-option-item"
+                                            onclick="selectVatTreatment('Zero Rated', 'Zero Rated (0%)', 'fa-solid fa-0', '#10b981', event)">
+                                            <div style="display:flex; align-items:center; gap:10px;">
+                                                <div
+                                                    style="width:28px; height:28px; background:#d1fae5; color:#10b981; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
+                                                    <i class="fa-solid fa-0"></i>
+                                                </div>
+                                                <div>
+                                                    <div style="font-weight:600; color:#1e293b; font-size:13px;">Zero
+                                                        Rated (0%)</div>
+                                                </div>
+                                            </div>
+                                            <i class="fa-solid fa-check vt-check"
+                                                style="color:#2563eb; font-size:13px; display:none;"></i>
+                                        </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label>Currency <span>*</span></label>
+                                <select class="form-select" name="currency">
+                                    <option>NPR</option>
+                                    <option>USD</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Reference (PO / Order No.)</label>
+                                <input type="text" class="form-control" name="reference_po"
+                                    placeholder="e.g. PO-458796">
+                            </div>
+                            <div>
+                                <label>Due Date</label>
+                                <div class="dual-date-stack">
+                                    <div class="date-row">
+                                        <span class="date-label">AD</span>
+                                        <input type="date" class="form-control" name="due_date" id="due_date_ad">
+                                    </div>
+                                    <div class="date-row" style="position:relative;">
+                                        <span class="date-label bs-label">BS</span>
+                                        <input type="text" class="form-control" id="due_date_bs"
+                                            placeholder="Pick BS date">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Bill Attachment inside Customer & Invoice Info (Single Grid Cell beside Due Date) -->
+                            <div>
+                                <label style="display:flex; align-items:center; gap:6px;">
+                                    <i class="fa-solid fa-paperclip" style="color:#2563eb; font-size:13px;"></i>
+                                    Bill Attachment
+                                    <span style="font-size:11px; font-weight:400; color:#94a3b8;">(Optional)</span>
+                                </label>
 
-                                    <!-- Scrollable Customer Options List -->
-                                    <div id="cust_combo_list" style="max-height:220px; overflow-y:auto;">
-                                        <!-- Dynamically Populated -->
+                                <!-- Drop Zone -->
+                                <div id="attachDropZone"
+                                    style="border:2px dashed #cbd5e1; border-radius:8px; padding:6px 10px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition:all 0.2s; background:#f8fafc; min-height:48px;"
+                                    ondragover="event.preventDefault(); this.style.borderColor='#2563eb'; this.style.background='#eff6ff';"
+                                    ondragleave="this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc';"
+                                    ondrop="handleAttachDrop(event);"
+                                    onclick="document.getElementById('bill_attachment_input').click();">
+                                    <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                                        <div
+                                            style="width:30px; height:30px; background:#eff6ff; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                            <i class="fa-solid fa-cloud-arrow-up"
+                                                style="font-size:14px; color:#2563eb;"></i>
+                                        </div>
+                                        <div style="min-width:0; overflow:hidden;">
+                                            <div style="font-size:11.5px; font-weight:600; color:#475569; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">Upload Bill</div>
+                                            <div style="font-size:10px; color:#94a3b8; white-space:nowrap;">PDF, JPG, PNG</div>
+                                        </div>
                                     </div>
+                                    <span
+                                        style="font-size:10.5px; font-weight:600; color:#2563eb; background:#dbeafe; padding:3px 8px; border-radius:5px; flex-shrink:0;">Browse</span>
+                                </div>
 
-                                    <!-- Empty Search State -->
-                                    <div id="cust_combo_empty" style="display:none; padding:16px; text-align:center; color:#94a3b8; font-size:12px;">
-                                        <i class="fa-solid fa-user-slash" style="font-size:18px; margin-bottom:4px; display:block; opacity:0.5;"></i>
-                                        No matching customers found.
+                                <!-- Hidden file input -->
+                                <input type="file" name="bill_attachment" id="bill_attachment_input"
+                                    accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx" style="display:none;"
+                                    onchange="previewAttachment(this.files[0]);">
+                                <input type="hidden" name="linked_doc_id" id="linked_doc_id_input" value="{% if preloaded_doc %}{{ preloaded_doc.id }}{% endif %}">
+
+                                <!-- Attached File Summary Pill (shown when file is selected) -->
+                                <div id="attachPreview"
+                                    style="display:none; padding:6px 10px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; align-items:center; justify-content:space-between; gap:8px; min-height:48px;">
+                                    <div style="display:flex; align-items:center; gap:8px; min-width:0; flex:1;">
+                                        <div
+                                            style="width:30px; height:30px; background:#2563eb; color:#ffffff; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0;">
+                                            <i id="previewDocIcon" class="fa-solid fa-file-invoice"></i>
+                                        </div>
+                                        <div style="min-width:0;">
+                                            <div id="previewFileName"
+                                                style="font-size:11.5px; font-weight:600; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:110px;">
+                                            </div>
+                                            <div
+                                                style="font-size:10px; color:#16a34a; font-weight:600;">
+                                                <i class="fa-solid fa-circle-check"></i> Attached
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+                                        <button type="button" onclick="toggleViewerPanel()"
+                                            style="background:#2563eb; color:#ffffff; border:none; border-radius:5px; padding:4px 7px; font-size:10.5px; font-weight:600; cursor:pointer;"
+                                            title="View Split Panel">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button type="button"
+                                            onclick="document.getElementById('bill_attachment_input').click()"
+                                            style="background:#ffffff; color:#475569; border:1px solid #cbd5e1; border-radius:5px; padding:4px 7px; font-size:10.5px; cursor:pointer;"
+                                            title="Change File">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button type="button" onclick="clearAttachment()"
+                                            style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; border-radius:5px; padding:4px 7px; font-size:10.5px; cursor:pointer;"
+                                            title="Remove Attachment">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End Bill Attachment -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FULL WIDTH SECTIONS BELOW -->
+            <div style="padding: 12px 0 80px 0; display:flex; flex-direction:column; gap:20px;">
+
+                <!-- Items Details -->
+                <div class="panel" id="panel_items" style="margin-bottom:0;">
+                    <div class="panel-header" id="header_items">Items Details</div>
+                    <div class="table-responsive-wrap">
+                        <table class="data-table" id="itemsTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:3%">#</th>
+                                    <th style="width:15%">Item / Product</th>
+                                    <th style="width:14%">Description</th>
+                                    <th style="width:6%">Qty</th>
+                                    <th style="width:7%">Unit</th>
+                                    <th style="width:9%">Rate</th>
+                                    <th style="width:8%">Discount</th>
+                                    <th style="width:8%">VAT %</th>
+                                    <th style="width:10%">Amount</th>
+                                    <th style="width:7%">Cost</th>
+                                    <th style="width:7%">Profit</th>
+                                    <th style="width:6%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsBody"></tbody>
+                        </table>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                        <div style="display:flex; gap:8px;">
+                            <button type="button" class="btn" onclick="addRow()"><i class="fa-solid fa-plus"></i> Add
+                                Item</button>
+                            <button type="button" class="btn"><i class="fa-solid fa-plus"></i> Add Service</button>
+                        </div>
+                        <button type="button" class="btn"><i class="fa-solid fa-barcode"></i> Scan Barcode</button>
+                    </div>
+                </div>
+
+                <!-- Row A: Summary | Payment & Settlement -->
+                <div id="row_a" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+                    <!-- Summary -->
+                    <div class="panel" id="panel_summary" style="margin-bottom:0;">
+                        <div class="panel-header" id="header_summary">Summary</div>
+                        <div class="summary-row"><span>Sub Total</span><span id="lbl_subtotal">0.00</span></div>
+                        <div class="summary-row"><span>Discount</span><span id="lbl_discount">0.00</span></div>
+                        <div class="summary-row"><span>VAT (13%)</span><span id="lbl_vat">0.00</span></div>
+                        <div class="summary-row">
+                            <span>Round Off</span>
+                            <span><input type="number" step="0.01" name="round_off" id="inp_round_off"
+                                    style="width:60px; text-align:right; border:1px solid var(--border); border-radius:3px; padding:2px 4px;"
+                                    value="0.00" oninput="calculateTotals()"></span>
+                        </div>
+                        <div class="summary-row total"
+                            style="margin-top:8px; padding:10px 0; background:linear-gradient(135deg,#eff6ff,#dbeafe); border-radius:6px; padding:8px 10px; border:none;">
+                            <span style="font-size:14px;">Grand Total</span><span id="lbl_grand_total"
+                                style="font-size:16px;">0.00</span>
+                        </div>
+                        <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border);"></div>
+                        <div class="summary-row" style="border:none; padding:3px 0;"><span
+                                style="color:var(--text-gray); font-size:12px;">Total Cost</span><span
+                                id="lbl_total_cost" style="font-size:12px; color:var(--text-gray);">0.00</span></div>
+                        <div class="summary-row" style="border:none; padding:3px 0;"><span
+                                style="color:var(--success); font-weight:600;">Gross Profit</span><span
+                                id="lbl_gross_profit" style="color:var(--success); font-weight:600;">0.00</span></div>
+                        <div class="summary-row" style="border:none; padding:3px 0;"><span
+                                style="color:#7c3aed; font-weight:600;">Profit Margin</span><span id="lbl_profit_margin"
+                                style="color:#7c3aed; font-weight:600;">0.00%</span></div>
+                    </div>
+
+                    <!-- Payment & Settlement -->
+                    <div class="panel" id="panel_payment" style="margin-bottom:0;">
+                        <div class="panel-header" id="header_payment">Payment &amp; Settlement</div>
+                        <div class="payment-radios">
+                            <label><input type="radio" name="pay_type" value="Full" onchange="setFullPayment()"> Full
+                                Payment</label>
+                            <label><input type="radio" name="pay_type" value="Partial" checked> Partial Payment</label>
+                            <label><input type="radio" name="pay_type" value="Credit" onchange="setCreditPayment()">
+                                Credit</label>
+                        </div>
+
+                        <!-- Each field: full row label + input -->
+                        <div style="display:flex; flex-direction:column; gap:10px;">
+
+                            <!-- Amount Received -->
+                            <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                                <label style="margin:0; font-weight:600;">Amount Received <span>*</span></label>
+                                <input type="number" step="0.01" class="form-control" name="paid_amount"
+                                    id="inp_paid_amount" style="text-align:right; font-weight:700; font-size:15px;"
+                                    value="0.00" oninput="updateBalance(); autoDistribute();">
+                            </div>
+
+                            <!-- Payment Method -->
+                            <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                                <label style="margin:0; font-weight:600;">Payment Method <span>*</span></label>
+                                <select class="form-select" name="payment_method" id="payment_method_sel"
+                                    onchange="onPayMethodChange(this.value)">
+                                    <option value="Cash">Cash</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Cheque">Cheque</option>
+                                    <option value="Mobile Banking">Mobile Banking</option>
+                                </select>
+                            </div>
+
+                            <!-- === BANK TRANSFER EXTRA FIELDS === -->
+                            <div id="fields_bank" style="display:none; flex-direction:column; gap:10px;">
+                                <div
+                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; font-weight:600;">Bank Account <span>*</span></label>
+                                    <select class="form-select" name="bank_account">
+                                        <option value="">Select Bank Account</option>
+                                        <option>NMB Bank - 1234567890</option>
+                                        <option>Everest Bank - 9876543210</option>
+                                        <option>Nabil Bank - 1122334455</option>
+                                        <option>Global IME - 5566778899</option>
+                                    </select>
+                                </div>
+                                <div
+                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0;">Transaction ID</label>
+                                    <input type="text" class="form-control" name="bank_txn_id"
+                                        placeholder="Bank transaction ID">
+                                </div>
+                            </div>
+
+                            <!-- === CHEQUE EXTRA FIELDS === -->
+                            <div id="fields_cheque" style="display:none; flex-direction:column; gap:10px;">
+                                <div
+                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; font-weight:600;">Bank Name <span>*</span></label>
+                                    <input type="text" class="form-control" name="cheque_bank"
+                                        placeholder="e.g. Nabil Bank">
+                                </div>
+                                <div
+                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; font-weight:600;">Cheque No. <span>*</span></label>
+                                    <input type="text" class="form-control" name="cheque_no" placeholder="CHQ-458796">
+                                </div>
+                                <div
+                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0;">Cheque Date</label>
+                                    <div class="dual-date-stack">
+                                        <div class="date-row">
+                                            <span class="date-label">AD</span>
+                                            <input type="date" class="form-control" name="cheque_date"
+                                                id="cheque_date_ad">
+                                        </div>
+                                        <div class="date-row" style="position:relative;">
+                                            <span class="date-label bs-label">BS</span>
+                                            <input type="text" class="form-control" id="cheque_date_bs"
+                                                placeholder="Pick BS date">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Quick Add Icon Button -->
-                            <button type="button" id="btn_quick_add_cust" onclick="openAddCustomerModal()" title="Add New Customer"
-                                style="flex-shrink:0; width:36px; height:36px; border:none; border-radius:7px; background:linear-gradient(135deg, #2563eb, #1d4ed8); color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:0 2px 6px rgba(37,99,235,0.3); transition:transform .1s, opacity .15s;">
-                                <i class="fa-solid fa-user-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div>
-                        <label>Customer Balance</label>
-                        <div style="padding:6px 10px; background:#fff1f2; color:#e11d48; border-radius:4px; font-weight:600; font-size:15px; min-height:32px; display:flex; align-items:center; justify-content:space-between;">
-                            <span id="customer_balance">Rs. 0.00</span>
-                            <a id="customer_history_link" href="/sales/customers/" target="_blank" style="font-size:11px; color:#2563eb; text-decoration:none; font-weight:500; display:flex; align-items:center; gap:3px;">
-                                <i class="fa-solid fa-clock-rotate-left" style="font-size:10px;"></i> View History
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <label>Invoice No. <span>*</span></label>
-                    <input type="text" class="form-control" name="invoice_no" value="INV-000125" readonly>
-                </div>
-                <div>
-                    <label>Invoice Date <span>*</span></label>
-                    <div class="dual-date-stack">
-                        <div class="date-row">
-                            <span class="date-label">AD</span>
-                            <input type="date" class="form-control" name="invoice_date" id="invoice_date_ad" value="{{ today|date:'Y-m-d' }}" required>
-                        </div>
-                        <div class="date-row" style="position:relative;">
-                            <span class="date-label bs-label">BS</span>
-                            <input type="text" class="form-control" id="invoice_date_bs" placeholder="Pick BS date">
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <label>Sales Type <span>*</span></label>
-                    <div class="st-combo-wrapper" style="position:relative;">
-                        <select name="sales_type" id="sales_type_select" style="display:none;">
-                            <option value="Goods" selected>Goods</option>
-                            <option value="Services">Services</option>
-                            <option value="Mixed">Mixed / Both</option>
-                        </select>
-                        <button type="button" id="st_combo_btn" class="st-combo-btn" onclick="toggleStDropdown(event)">
-                            <div style="display:flex; align-items:center; gap:8px;" id="st_combo_selected">
-                                <i class="fa-solid fa-box" style="color:#2563eb;"></i>
-                                <span style="font-weight:600; color:#1e293b;">Goods</span>
+                            <!-- === MOBILE BANKING EXTRA FIELDS === -->
+                            <div id="fields_mobile" style="display:none; flex-direction:column; gap:10px;">
+                                <div
+                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; font-weight:600;">App / Wallet <span>*</span></label>
+                                    <select class="form-select" name="mobile_app">
+                                        <option value="">Select App</option>
+                                        <option>eSewa</option>
+                                        <option>Khalti</option>
+                                        <option>IME Pay</option>
+                                        <option>ConnectIPS</option>
+                                        <option>FonePay</option>
+                                    </select>
+                                </div>
+                                <div
+                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; font-weight:600;">Mobile No. <span>*</span></label>
+                                    <input type="text" class="form-control" name="mobile_no" placeholder="98XXXXXXXX">
+                                </div>
+                                <div
+                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0;">Transaction ID</label>
+                                    <input type="text" class="form-control" name="mobile_txn_id" placeholder="TXN ID">
+                                </div>
                             </div>
-                            <i class="fa-solid fa-chevron-down" id="st_combo_arrow" style="color:#94a3b8; font-size:12px; transition:transform 0.2s;"></i>
-                        </button>
-                        <div id="st_combo_menu" class="st-combo-menu">
-                            <div class="st-option-item selected" onclick="selectSalesType('Goods', 'fa-solid fa-box', '#2563eb', event)">
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <div style="width:28px; height:28px; background:#eff6ff; color:#2563eb; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
-                                        <i class="fa-solid fa-box"></i>
+
+                            <!-- Reference No. -->
+                            <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                                <label style="margin:0;">Reference No.</label>
+                                <input type="text" class="form-control" name="reference_no"
+                                    placeholder="Reference number">
+                            </div>
+
+                            <!-- Payment Date -->
+                            <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                                <label style="margin:0; font-weight:600;">Payment Date <span>*</span></label>
+                                <div class="dual-date-stack">
+                                    <div class="date-row">
+                                        <span class="date-label">AD</span>
+                                        <input type="date" class="form-control" name="payment_date" id="payment_date_ad"
+                                            value="{{ today|date:'Y-m-d' }}">
                                     </div>
-                                    <div>
-                                        <div style="font-weight:600; color:#1e293b; font-size:13px;">Goods</div>
-                                        <div style="font-size:11px; color:#64748b;">Physical inventory & items</div>
+                                    <div class="date-row" style="position:relative;">
+                                        <span class="date-label bs-label">BS</span>
+                                        <input type="text" class="form-control" id="payment_date_bs"
+                                            placeholder="Pick BS date">
                                     </div>
                                 </div>
-                                <i class="fa-solid fa-check st-check" style="color:#2563eb; font-size:13px;"></i>
                             </div>
-                            <div class="st-option-item" onclick="selectSalesType('Services', 'fa-solid fa-wrench', '#0891b2', event)">
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <div style="width:28px; height:28px; background:#ecfeff; color:#0891b2; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
-                                        <i class="fa-solid fa-wrench"></i>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight:600; color:#1e293b; font-size:13px;">Services</div>
-                                        <div style="font-size:11px; color:#64748b;">Consulting, labor & work</div>
-                                    </div>
-                                </div>
-                                <i class="fa-solid fa-check st-check" style="color:#2563eb; font-size:13px; display:none;"></i>
+
+                            <!-- Narration -->
+                            <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
+                                <label style="margin:0;">Narration</label>
+                                <textarea class="form-control" name="narration" rows="2"
+                                    style="resize:none; font-size:12px;"
+                                    placeholder="Payment received from customer"></textarea>
                             </div>
-                            <div class="st-option-item" onclick="selectSalesType('Mixed', 'fa-solid fa-layer-group', '#8b5cf6', event)">
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <div style="width:28px; height:28px; background:#f5f3ff; color:#8b5cf6; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
-                                        <i class="fa-solid fa-layer-group"></i>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight:600; color:#1e293b; font-size:13px;">Mixed / Both</div>
-                                        <div style="font-size:11px; color:#64748b;">Goods & Services combined</div>
-                                    </div>
-                                </div>
-                                <i class="fa-solid fa-check st-check" style="color:#2563eb; font-size:13px; display:none;"></i>
-                            </div>
+
                         </div>
                     </div>
                 </div>
-                <div>
-                    <label>Sale Category <span>*</span></label>
-                    <select class="form-select" name="sale_category"><option>Local Sales</option><option>Export</option></select>
+
+                <!-- Row B: Allocate Payment | Return / Exchange -->
+                <div id="row_b" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+
+                    <!-- Allocate Payment (Pending Invoices) -->
+                    <div class="panel" id="panel_allocate" style="margin-bottom:0;">
+                        <div class="panel-header" id="header_allocate" style="margin-bottom:0; padding-bottom:8px;">
+                            Allocate Payment</div>
+                        <div style="display:flex; border-bottom:1px solid var(--border); margin-bottom:12px;">
+                            <button type="button" id="btn_manual_alloc" onclick="setAllocMode('manual')"
+                                style="flex:1; background:transparent; border:none; border-bottom:2px solid #2563eb; color:#2563eb; font-weight:600; padding:8px 0; font-size:12px; cursor:pointer;">Manual
+                                Allocation</button>
+                            <button type="button" id="btn_auto_alloc" onclick="setAllocMode('auto')"
+                                style="flex:1; background:transparent; border:none; border-bottom:2px solid transparent; color:var(--text-gray); font-weight:500; padding:8px 0; font-size:12px; cursor:pointer;">Oldest
+                                First (Auto)</button>
+                        </div>
+                        <div id="alloc_placeholder"
+                            style="font-size:11px; color:var(--text-gray); padding:16px; text-align:center; border:1px dashed var(--border); border-radius:6px;">
+                            <i class="fa-solid fa-circle-info" style="margin-bottom:4px; display:block;"></i>
+                            Select a customer to see pending invoices
+                        </div>
+                        <div class="table-responsive-wrap alloc-table-wrap">
+                            <table id="alloc_table" class="data-table" style="display:none; font-size:11px;">
+                                <thead>
+                                    <tr>
+                                        <th>Invoice No.</th>
+                                        <th>Date</th>
+                                        <th style="text-align:right;">Due Amt</th>
+                                        <th style="text-align:right; width:110px;">Allocate Amt</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="alloc_body"></tbody>
+                            </table>
+                        </div>
+                        <div id="alloc_totals"
+                            style="display:none; border-top:2px solid var(--border); padding-top:10px; margin-top:4px;">
+                            <div
+                                style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:6px; color:var(--text-dark);">
+                                <span>Total Due</span><span id="alloc_total_due">0.00</span></div>
+                            <div
+                                style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px; color:var(--success);">
+                                <span>Total Allocated</span><span id="alloc_total_allocated">0.00</span></div>
+                            <div
+                                style="display:flex; justify-content:space-between; font-size:15px; font-weight:800; color:var(--danger);">
+                                <span>Remaining</span><span id="alloc_remaining">0.00</span></div>
+                            <p style="font-size:10px; color:var(--text-gray); margin-top:6px; margin-bottom:0;">Note:
+                                Remaining amount will stay as outstanding.</p>
+                        </div>
+                        <p id="alloc_no_pending"
+                            style="display:none; font-size:11px; color:var(--text-gray); margin-top:8px;">No pending
+                            invoices for this customer.</p>
+                    </div>
+
+                    <!-- Return / Exchange -->
+                    <div class="panel" id="panel_return" style="margin-bottom:0;">
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                            <div class="panel-header" id="header_return" style="margin-bottom:0;">Return / Exchange
+                                <span style="font-size:10px; font-weight:400; color:var(--text-gray);">(Optional)</span>
+                            </div>
+                            <button type="button" class="btn" onclick="toggleReturns()"><i class="fa-solid fa-plus"
+                                    id="return_toggle_icon"></i> Add Return Item</button>
+                        </div>
+                        <div id="return_section" style="display:none;">
+                            <div class="table-responsive-wrap return-table-wrap">
+                                <table class="data-table" id="returnTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:5%">#</th>
+                                            <th style="width:30%">Product</th>
+                                            <th style="width:15%">Qty</th>
+                                            <th style="width:12%">Unit</th>
+                                            <th style="width:18%">Rate</th>
+                                            <th style="width:15%">Return Amt</th>
+                                            <th style="width:5%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="returnBody"></tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="btn" style="margin-top:8px;" onclick="addReturnRow()"><i
+                                    class="fa-solid fa-plus"></i> Add Row</button>
+                            <div
+                                style="margin-top:12px; display:flex; justify-content:flex-end; gap:16px; font-size:13px; font-weight:600;">
+                                <span>Total Return Amount:</span>
+                                <span id="return_total" style="color:var(--danger);">0.00</span>
+                            </div>
+                        </div>
+                        <p id="return_empty" style="font-size:11px; color:var(--text-gray); margin:0;">No return items
+                            added.</p>
+                    </div>
                 </div>
-                <div class="vt-combo-wrapper" style="position:relative; width: 100%;">
-                    <label>VAT Treatment <span>*</span></label>
-                    <input type="hidden" name="vat_treatment" id="vt_hidden_input" value="Standard">
-                    <button type="button" class="st-combo-btn" id="vt_combo_btn" onclick="toggleVtDropdown(event)" style="height: 38px;">
-                        <span class="st-combo-selected" id="vt_combo_selected" style="display:flex; align-items:center; gap:8px;">
-                            <i class="fa-solid fa-percent" style="color:#2563eb;"></i> 
-                            <span style="font-weight:600; color:#1e293b;">Standard (13%)</span>
-                        </span>
-                        <i class="fa-solid fa-chevron-down text-muted" id="vt_combo_arrow" style="font-size:12px; transition: transform 0.2s;"></i>
+
+                <!-- Row C: Profit Sharing | Terms & Notes -->
+                <div id="row_c" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
+
+                    <!-- Allocation (Profit Sharing) -->
+                    <div class="panel" id="panel_profit" style="margin-bottom:0;">
+                        <div class="panel-header" id="header_profit">Allocation <span
+                                style="font-size:10px; font-weight:400; color:var(--text-gray);">(Profit Sharing)</span>
+                        </div>
+                        <div class="table-responsive-wrap profit-table-wrap">
+                            <table class="data-table" id="profitAllocTable" style="font-size:11px; margin-bottom:8px;">
+                                <thead>
+                                    <tr>
+                                        <th>Role</th>
+                                        <th>Party Name</th>
+                                        <th>Basis</th>
+                                        <th>Value</th>
+                                        <th>Amount</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="profitAllocBody"></tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn" onclick="addAllocRow()" style="width:100%;"><i
+                                class="fa-solid fa-plus"></i> Add Allocation</button>
+                        <div
+                            style="display:flex; justify-content:space-between; font-size:12px; padding-top:8px; border-top:1px solid var(--border); margin-top:8px;">
+                            <span>Total Allocation</span><span style="font-weight:600;"
+                                id="alloc_profit_total">0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Terms & Notes -->
+                    <div class="panel" id="panel_terms" style="margin-bottom:0;">
+                        <div class="panel-header" id="header_terms">Terms &amp; Conditions</div>
+                        <textarea class="form-control" name="terms_conditions" rows="3"
+                            style="height:auto; font-size:11px; resize:none; margin-bottom:12px;">Thank you for your business.</textarea>
+                        <div class="panel-header" style="margin-bottom:8px;">Notes</div>
+                        <input type="text" class="form-control" name="notes" placeholder="Add note..."
+                            style="font-size:11px;">
+                    </div>
+                </div>
+
+
+
+            </div> <!-- End full-width sections -->
+        </div> <!-- End Left Form Column (invoiceFormCol) -->
+
+        <!-- Dynamic Split-Screen Bill Attachment Viewer Panel (Right Side) -->
+        <div class="invoice-viewer-col" id="invoiceViewerCol" style="display:none;">
+            <!-- Header Bar -->
+            <div class="viewer-header">
+                <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                    <div
+                        style="width:28px; height:28px; background:#eff6ff; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#2563eb; font-size:13px; flex-shrink:0;">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                    <div style="min-width:0;">
+                        <div style="font-weight:700; color:#1e293b; font-size:13.5px; line-height:1.2;">Bill Preview
+                        </div>
+                        <div style="font-size:11px; color:#64748b;">Split View Mode</div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <a id="viewerOpenTabBtn" href="#" target="_blank" class="viewer-hdr-btn"
+                        title="Open attachment in new tab">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                    <button type="button" onclick="toggleViewerPanel()" class="viewer-hdr-btn close-btn"
+                        title="Close split view">
+                        <i class="fa-solid fa-xmark"></i>
                     </button>
-                    
-                    <div class="st-combo-menu" id="vt_combo_menu" style="width: 250px;">
-                        <div class="st-options-container">
-                            <div class="st-option-item selected" onclick="selectVatTreatment('Standard', 'Standard (13%)', 'fa-solid fa-percent', '#2563eb', event)">
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <div style="width:28px; height:28px; background:#eff6ff; color:#2563eb; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
-                                        <i class="fa-solid fa-percent"></i>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight:600; color:#1e293b; font-size:13px;">Standard (13%)</div>
-                                    </div>
-                                </div>
-                                <i class="fa-solid fa-check vt-check" style="color:#2563eb; font-size:13px;"></i>
-                            </div>
-                            <div class="st-option-item" onclick="selectVatTreatment('Exempt', 'Exempt (No VAT)', 'fa-solid fa-ban', '#0891b2', event)">
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <div style="width:28px; height:28px; background:#ecfeff; color:#0891b2; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
-                                        <i class="fa-solid fa-ban"></i>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight:600; color:#1e293b; font-size:13px;">Exempt (No VAT)</div>
-                                    </div>
-                                </div>
-                                <i class="fa-solid fa-check vt-check" style="color:#2563eb; font-size:13px; display:none;"></i>
-                            </div>
-                            <div class="st-option-item" onclick="selectVatTreatment('Zero Rated', 'Zero Rated (0%)', 'fa-solid fa-0', '#10b981', event)">
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <div style="width:28px; height:28px; background:#d1fae5; color:#10b981; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
-                                        <i class="fa-solid fa-0"></i>
-                                    </div>
-                                    <div>
-                                        <div style="font-weight:600; color:#1e293b; font-size:13px;">Zero Rated (0%)</div>
-                                    </div>
-                                </div>
-                                <i class="fa-solid fa-check vt-check" style="color:#2563eb; font-size:13px; display:none;"></i>
-                            </div>
-                        </div>
+                </div>
+            </div>
+
+            <!-- Details Bar -->
+            <div class="viewer-details-bar">
+                <span id="viewerFileName"
+                    style="font-weight:600; color:#1e293b; max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">document.pdf</span>
+                <span id="viewerFileSize"
+                    style="color:#64748b; font-size:11px; background:#f1f5f9; padding:2px 8px; border-radius:4px; font-weight:500;">0
+                    MB</span>
+            </div>
+
+            <!-- Controls Toolbar -->
+            <div class="viewer-toolbar">
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <button type="button" class="viewer-tool-btn" onclick="zoomBillViewer(-0.15)" title="Zoom Out"><i
+                            class="fa-solid fa-magnifying-glass-minus"></i></button>
+                    <span id="viewerZoomVal"
+                        style="font-size:11.5px; font-weight:700; color:#475569; width:44px; text-align:center;">100%</span>
+                    <button type="button" class="viewer-tool-btn" onclick="zoomBillViewer(0.15)" title="Zoom In"><i
+                            class="fa-solid fa-magnifying-glass-plus"></i></button>
+                    <button type="button" class="viewer-tool-btn" onclick="resetBillViewer()"
+                        title="Reset Zoom & Rotation"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+                    <button type="button" class="viewer-tool-btn" onclick="rotateBillViewer()"
+                        title="Rotate 90° Clockwise"><i class="fa-solid fa-rotate"></i> Rotate</button>
+                </div>
+                <button type="button" class="viewer-tool-btn danger" onclick="clearAttachment()" title="Remove File"><i
+                        class="fa-solid fa-trash-can"></i> Remove</button>
+            </div>
+
+            <!-- Scrollable / Zoomable Body Viewport -->
+            <div class="viewer-body" id="viewerBody" onwheel="handleViewerWheel(event)">
+                <!-- Image View -->
+                <div id="viewerImgContainer"
+                    style="display:none; transform-origin: center center; transition: transform 0.15s ease-out;">
+                    <img id="viewerImg" src="" alt="Bill Attachment"
+                        style="max-width:100%; height:auto; border-radius:6px; box-shadow:0 8px 30px rgba(0,0,0,0.45);">
+                </div>
+                <!-- PDF View -->
+                <iframe id="viewerPdf" src=""
+                    style="width:100%; height:100%; border:none; display:none; background:#ffffff; border-radius:6px;"></iframe>
+                <!-- Generic Document Fallback -->
+                <div id="viewerDocFallback"
+                    style="display:none; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#cbd5e1; gap:12px; padding:20px; text-align:center;">
+                    <div
+                        style="width:60px; height:60px; background:#1e293b; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:28px; color:#38bdf8;">
+                        <i id="viewerFallbackIcon" class="fa-solid fa-file-lines"></i>
                     </div>
-                </div>
-                <div>
-                    <label>Currency <span>*</span></label>
-                    <select class="form-select" name="currency"><option>NPR</option><option>USD</option></select>
-                </div>
-                <div>
-                    <label>Reference (PO / Order No.)</label>
-                    <input type="text" class="form-control" name="reference_po" placeholder="e.g. PO-458796">
-                </div>
-                <div>
-                    <label>Due Date</label>
-                    <div class="dual-date-stack">
-                        <div class="date-row">
-                            <span class="date-label">AD</span>
-                            <input type="date" class="form-control" name="due_date" id="due_date_ad">
-                        </div>
-                        <div class="date-row" style="position:relative;">
-                            <span class="date-label bs-label">BS</span>
-                            <input type="text" class="form-control" id="due_date_bs" placeholder="Pick BS date">
-                        </div>
+                    <div id="viewerFallbackName"
+                        style="font-size:14px; font-weight:600; color:#f8fafc; word-break:break-all; max-width:280px;">
                     </div>
+                    <div style="font-size:12px; color:#94a3b8;">Document attached. Click below to view in browser.</div>
+                    <a id="viewerFallbackDownloadBtn" href="#" target="_blank"
+                        style="padding:8px 18px; background:#2563eb; color:#ffffff; text-decoration:none; border-radius:6px; font-weight:600; font-size:12.5px; margin-top:6px; display:inline-flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Attachment
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- FULL WIDTH SECTIONS BELOW -->
-    <div style="padding:20px 20px 80px 20px; display:flex; flex-direction:column; gap:20px;">
-
-        <!-- Items Details -->
-        <div class="panel" id="panel_items" style="margin-bottom:0;">
-            <div class="panel-header" id="header_items">Items Details</div>
-            <table class="data-table" id="itemsTable">
-                <thead>
-                    <tr>
-                        <th style="width:3%">#</th>
-                        <th style="width:15%">Item / Product</th>
-                        <th style="width:14%">Description</th>
-                        <th style="width:6%">Qty</th>
-                        <th style="width:7%">Unit</th>
-                        <th style="width:9%">Rate</th>
-                        <th style="width:8%">Discount</th>
-                        <th style="width:8%">VAT %</th>
-                        <th style="width:10%">Amount</th>
-                        <th style="width:7%">Cost</th>
-                        <th style="width:7%">Profit</th>
-                        <th style="width:6%">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="itemsBody"></tbody>
-            </table>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-                <div style="display:flex; gap:8px;">
-                    <button type="button" class="btn" onclick="addRow()"><i class="fa-solid fa-plus"></i> Add Item</button>
-                    <button type="button" class="btn"><i class="fa-solid fa-plus"></i> Add Service</button>
-                </div>
-                <button type="button" class="btn"><i class="fa-solid fa-barcode"></i> Scan Barcode</button>
-            </div>
-        </div>
-
-        <!-- Row A: Summary | Payment & Settlement -->
-        <div id="row_a" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-
-            <!-- Summary -->
-            <div class="panel" id="panel_summary" style="margin-bottom:0;">
-                <div class="panel-header" id="header_summary">Summary</div>
-                <div class="summary-row"><span>Sub Total</span><span id="lbl_subtotal">0.00</span></div>
-                <div class="summary-row"><span>Discount</span><span id="lbl_discount">0.00</span></div>
-                <div class="summary-row"><span>VAT (13%)</span><span id="lbl_vat">0.00</span></div>
-                <div class="summary-row">
-                    <span>Round Off</span>
-                    <span><input type="number" step="0.01" name="round_off" id="inp_round_off" style="width:60px; text-align:right; border:1px solid var(--border); border-radius:3px; padding:2px 4px;" value="0.00" oninput="calculateTotals()"></span>
-                </div>
-                <div class="summary-row total" style="margin-top:8px; padding:10px 0; background:linear-gradient(135deg,#eff6ff,#dbeafe); border-radius:6px; padding:8px 10px; border:none;">
-                    <span style="font-size:14px;">Grand Total</span><span id="lbl_grand_total" style="font-size:16px;">0.00</span>
-                </div>
-                <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border);"></div>
-                <div class="summary-row" style="border:none; padding:3px 0;"><span style="color:var(--text-gray); font-size:12px;">Total Cost</span><span id="lbl_total_cost" style="font-size:12px; color:var(--text-gray);">0.00</span></div>
-                <div class="summary-row" style="border:none; padding:3px 0;"><span style="color:var(--success); font-weight:600;">Gross Profit</span><span id="lbl_gross_profit" style="color:var(--success); font-weight:600;">0.00</span></div>
-                <div class="summary-row" style="border:none; padding:3px 0;"><span style="color:#7c3aed; font-weight:600;">Profit Margin</span><span id="lbl_profit_margin" style="color:#7c3aed; font-weight:600;">0.00%</span></div>
-            </div>
-
-            <!-- Payment & Settlement -->
-            <div class="panel" id="panel_payment" style="margin-bottom:0;">
-                <div class="panel-header" id="header_payment">Payment &amp; Settlement</div>
-                <div class="payment-radios">
-                    <label><input type="radio" name="pay_type" value="Full" onchange="setFullPayment()"> Full Payment</label>
-                    <label><input type="radio" name="pay_type" value="Partial" checked> Partial Payment</label>
-                    <label><input type="radio" name="pay_type" value="Credit" onchange="setCreditPayment()"> Credit</label>
-                </div>
-
-                <!-- Each field: full row label + input -->
-                <div style="display:flex; flex-direction:column; gap:10px;">
-
-                    <!-- Amount Received -->
-                    <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                        <label style="margin:0; font-weight:600;">Amount Received <span>*</span></label>
-                        <input type="number" step="0.01" class="form-control" name="paid_amount" id="inp_paid_amount" style="text-align:right; font-weight:700; font-size:15px;" value="0.00" oninput="updateBalance(); autoDistribute();">
-                    </div>
-
-                    <!-- Payment Method -->
-                    <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                        <label style="margin:0; font-weight:600;">Payment Method <span>*</span></label>
-                        <select class="form-select" name="payment_method" id="payment_method_sel" onchange="onPayMethodChange(this.value)">
-                            <option value="Cash">Cash</option>
-                            <option value="Bank Transfer">Bank Transfer</option>
-                            <option value="Cheque">Cheque</option>
-                            <option value="Mobile Banking">Mobile Banking</option>
-                        </select>
-                    </div>
-
-                    <!-- === BANK TRANSFER EXTRA FIELDS === -->
-                    <div id="fields_bank" style="display:none; flex-direction:column; gap:10px;">
-                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                            <label style="margin:0; font-weight:600;">Bank Account <span>*</span></label>
-                            <select class="form-select" name="bank_account">
-                                <option value="">Select Bank Account</option>
-                                <option>NMB Bank - 1234567890</option>
-                                <option>Everest Bank - 9876543210</option>
-                                <option>Nabil Bank - 1122334455</option>
-                                <option>Global IME - 5566778899</option>
-                            </select>
-                        </div>
-                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                            <label style="margin:0;">Transaction ID</label>
-                            <input type="text" class="form-control" name="bank_txn_id" placeholder="Bank transaction ID">
-                        </div>
-                    </div>
-
-                    <!-- === CHEQUE EXTRA FIELDS === -->
-                    <div id="fields_cheque" style="display:none; flex-direction:column; gap:10px;">
-                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                            <label style="margin:0; font-weight:600;">Bank Name <span>*</span></label>
-                            <input type="text" class="form-control" name="cheque_bank" placeholder="e.g. Nabil Bank">
-                        </div>
-                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                            <label style="margin:0; font-weight:600;">Cheque No. <span>*</span></label>
-                            <input type="text" class="form-control" name="cheque_no" placeholder="CHQ-458796">
-                        </div>
-                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                            <label style="margin:0;">Cheque Date</label>
-                            <div class="dual-date-stack">
-                                <div class="date-row">
-                                    <span class="date-label">AD</span>
-                                    <input type="date" class="form-control" name="cheque_date" id="cheque_date_ad">
-                                </div>
-                                <div class="date-row" style="position:relative;">
-                                    <span class="date-label bs-label">BS</span>
-                                    <input type="text" class="form-control" id="cheque_date_bs" placeholder="Pick BS date">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- === MOBILE BANKING EXTRA FIELDS === -->
-                    <div id="fields_mobile" style="display:none; flex-direction:column; gap:10px;">
-                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                            <label style="margin:0; font-weight:600;">App / Wallet <span>*</span></label>
-                            <select class="form-select" name="mobile_app">
-                                <option value="">Select App</option>
-                                <option>eSewa</option>
-                                <option>Khalti</option>
-                                <option>IME Pay</option>
-                                <option>ConnectIPS</option>
-                                <option>FonePay</option>
-                            </select>
-                        </div>
-                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                            <label style="margin:0; font-weight:600;">Mobile No. <span>*</span></label>
-                            <input type="text" class="form-control" name="mobile_no" placeholder="98XXXXXXXX">
-                        </div>
-                        <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                            <label style="margin:0;">Transaction ID</label>
-                            <input type="text" class="form-control" name="mobile_txn_id" placeholder="TXN ID">
-                        </div>
-                    </div>
-
-                    <!-- Reference No. -->
-                    <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                        <label style="margin:0;">Reference No.</label>
-                        <input type="text" class="form-control" name="reference_no" placeholder="Reference number">
-                    </div>
-
-                    <!-- Payment Date -->
-                    <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                        <label style="margin:0; font-weight:600;">Payment Date <span>*</span></label>
-                        <div class="dual-date-stack">
-                            <div class="date-row">
-                                <span class="date-label">AD</span>
-                                <input type="date" class="form-control" name="payment_date" id="payment_date_ad" value="{{ today|date:'Y-m-d' }}">
-                            </div>
-                            <div class="date-row" style="position:relative;">
-                                <span class="date-label bs-label">BS</span>
-                                <input type="text" class="form-control" id="payment_date_bs" placeholder="Pick BS date">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Narration -->
-                    <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                        <label style="margin:0;">Narration</label>
-                        <textarea class="form-control" name="narration" rows="2" style="resize:none; font-size:12px;" placeholder="Payment received from customer"></textarea>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <!-- Row B: Allocate Payment | Return / Exchange -->
-        <div id="row_b" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-
-            <!-- Allocate Payment (Pending Invoices) -->
-            <div class="panel" id="panel_allocate" style="margin-bottom:0;">
-                <div class="panel-header" id="header_allocate" style="margin-bottom:0; padding-bottom:8px;">Allocate Payment</div>
-                <div style="display:flex; border-bottom:1px solid var(--border); margin-bottom:12px;">
-                    <button type="button" id="btn_manual_alloc" onclick="setAllocMode('manual')" style="flex:1; background:transparent; border:none; border-bottom:2px solid #2563eb; color:#2563eb; font-weight:600; padding:8px 0; font-size:12px; cursor:pointer;">Manual Allocation</button>
-                    <button type="button" id="btn_auto_alloc" onclick="setAllocMode('auto')" style="flex:1; background:transparent; border:none; border-bottom:2px solid transparent; color:var(--text-gray); font-weight:500; padding:8px 0; font-size:12px; cursor:pointer;">Oldest First (Auto)</button>
-                </div>
-                <div id="alloc_placeholder" style="font-size:11px; color:var(--text-gray); padding:16px; text-align:center; border:1px dashed var(--border); border-radius:6px;">
-                    <i class="fa-solid fa-circle-info" style="margin-bottom:4px; display:block;"></i>
-                    Select a customer to see pending invoices
-                </div>
-                <table id="alloc_table" class="data-table" style="display:none; font-size:11px;">
-                    <thead>
-                        <tr>
-                            <th>Invoice No.</th>
-                            <th>Date</th>
-                            <th style="text-align:right;">Due Amt</th>
-                            <th style="text-align:right; width:110px;">Allocate Amt</th>
-                        </tr>
-                    </thead>
-                    <tbody id="alloc_body"></tbody>
-                </table>
-                <div id="alloc_totals" style="display:none; border-top:2px solid var(--border); padding-top:10px; margin-top:4px;">
-                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:6px; color:var(--text-dark);"><span>Total Due</span><span id="alloc_total_due">0.00</span></div>
-                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:4px; color:var(--success);"><span>Total Allocated</span><span id="alloc_total_allocated">0.00</span></div>
-                    <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:800; color:var(--danger);"><span>Remaining</span><span id="alloc_remaining">0.00</span></div>
-                    <p style="font-size:10px; color:var(--text-gray); margin-top:6px; margin-bottom:0;">Note: Remaining amount will stay as outstanding.</p>
-                </div>
-                <p id="alloc_no_pending" style="display:none; font-size:11px; color:var(--text-gray); margin-top:8px;">No pending invoices for this customer.</p>
-            </div>
-
-            <!-- Return / Exchange -->
-            <div class="panel" id="panel_return" style="margin-bottom:0;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                    <div class="panel-header" id="header_return" style="margin-bottom:0;">Return / Exchange <span style="font-size:10px; font-weight:400; color:var(--text-gray);">(Optional)</span></div>
-                    <button type="button" class="btn" onclick="toggleReturns()"><i class="fa-solid fa-plus" id="return_toggle_icon"></i> Add Return Item</button>
-                </div>
-                <div id="return_section" style="display:none;">
-                    <table class="data-table" id="returnTable">
-                        <thead>
-                            <tr>
-                                <th style="width:5%">#</th>
-                                <th style="width:30%">Product</th>
-                                <th style="width:15%">Qty</th>
-                                <th style="width:12%">Unit</th>
-                                <th style="width:18%">Rate</th>
-                                <th style="width:15%">Return Amt</th>
-                                <th style="width:5%"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="returnBody"></tbody>
-                    </table>
-                    <button type="button" class="btn" style="margin-top:8px;" onclick="addReturnRow()"><i class="fa-solid fa-plus"></i> Add Row</button>
-                    <div style="margin-top:12px; display:flex; justify-content:flex-end; gap:16px; font-size:13px; font-weight:600;">
-                        <span>Total Return Amount:</span>
-                        <span id="return_total" style="color:var(--danger);">0.00</span>
-                    </div>
-                </div>
-                <p id="return_empty" style="font-size:11px; color:var(--text-gray); margin:0;">No return items added.</p>
-            </div>
-        </div>
-
-        <!-- Row C: Profit Sharing | Terms & Notes -->
-        <div id="row_c" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-
-            <!-- Allocation (Profit Sharing) -->
-            <div class="panel" id="panel_profit" style="margin-bottom:0;">
-                <div class="panel-header" id="header_profit">Allocation <span style="font-size:10px; font-weight:400; color:var(--text-gray);">(Profit Sharing)</span></div>
-                <table class="data-table" id="profitAllocTable" style="font-size:11px; margin-bottom:8px;">
-                    <thead>
-                        <tr>
-                            <th>Role</th>
-                            <th>Party Name</th>
-                            <th>Basis</th>
-                            <th>Value</th>
-                            <th>Amount</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="profitAllocBody"></tbody>
-                </table>
-                <button type="button" class="btn" onclick="addAllocRow()" style="width:100%;"><i class="fa-solid fa-plus"></i> Add Allocation</button>
-                <div style="display:flex; justify-content:space-between; font-size:12px; padding-top:8px; border-top:1px solid var(--border); margin-top:8px;">
-                    <span>Total Allocation</span><span style="font-weight:600;" id="alloc_profit_total">0.00</span>
-                </div>
-            </div>
-
-            <!-- Terms & Notes -->
-            <div class="panel" id="panel_terms" style="margin-bottom:0;">
-                <div class="panel-header" id="header_terms">Terms &amp; Conditions</div>
-                <textarea class="form-control" name="terms_conditions" rows="3" style="height:auto; font-size:11px; resize:none; margin-bottom:12px;">Thank you for your business.</textarea>
-                <div class="panel-header" style="margin-bottom:8px;">Notes</div>
-                <input type="text" class="form-control" name="notes" placeholder="Add note..." style="font-size:11px;">
-            </div>
-        </div>
-
-    </div> <!-- End full-width sections -->
+    </div> <!-- End invoiceWorkspace -->
 
     <!-- Settings Modal -->
-    <div id="settingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
-        <div style="background:#fff; width:400px; border-radius:8px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
+    <div id="settingsModal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div
+            style="background:#fff; width:400px; border-radius:8px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
                 <h3 style="margin:0; font-size:16px;">Page Settings</h3>
-                <button type="button" onclick="toggleSettingsModal()" style="background:transparent; border:none; cursor:pointer; font-size:18px; color:var(--text-gray);"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" onclick="toggleSettingsModal()"
+                    style="background:transparent; border:none; cursor:pointer; font-size:18px; color:var(--text-gray);"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
             <div style="padding:20px; display:flex; flex-direction:column; gap:12px;">
-                <p style="margin:0 0 8px 0; font-size:12px; color:var(--text-gray);">Select the panels you want to see:</p>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_customer" checked onchange="applySettings()"> Customer & Invoice Information</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_items" checked onchange="applySettings()"> Items Details</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_summary" checked onchange="applySettings()"> Summary</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_payment" checked onchange="applySettings()"> Payment & Settlement</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_allocate" checked onchange="applySettings()"> Allocate Payment</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_return" checked onchange="applySettings()"> Return / Exchange</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_profit" checked onchange="applySettings()"> Allocation (Profit Sharing)</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="chk_terms" checked onchange="applySettings()"> Terms & Conditions / Notes</label>
+                <p style="margin:0 0 8px 0; font-size:12px; color:var(--text-gray);">Select the panels you want to see:
+                </p>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox"
+                        id="chk_customer" checked onchange="applySettings()"> Customer & Invoice Information</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox"
+                        id="chk_items" checked onchange="applySettings()"> Items Details</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox"
+                        id="chk_summary" checked onchange="applySettings()"> Summary</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox"
+                        id="chk_payment" checked onchange="applySettings()"> Payment & Settlement</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox"
+                        id="chk_allocate" checked onchange="applySettings()"> Allocate Payment</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox"
+                        id="chk_return" checked onchange="applySettings()"> Return / Exchange</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox"
+                        id="chk_profit" checked onchange="applySettings()"> Allocation (Profit Sharing)</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox"
+                        id="chk_terms" checked onchange="applySettings()"> Terms & Conditions / Notes</label>
             </div>
-            <div style="padding:16px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; background:var(--bg-light);">
+            <div
+                style="padding:16px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; background:var(--bg-light);">
                 <button type="button" class="btn btn-primary" onclick="toggleSettingsModal()">Done</button>
             </div>
         </div>
@@ -839,7 +1551,8 @@
     <!-- Sticky Footer -->
     <div class="sticky-footer">
         <div class="footer-left">
-            <button type="button" class="btn" onclick="toggleSettingsModal()" style="padding:4px 8px; font-size:12px;"><i class="fa-solid fa-gear"></i> Settings</button>
+            <button type="button" class="btn" onclick="toggleSettingsModal()"
+                style="padding:4px 8px; font-size:12px;"><i class="fa-solid fa-gear"></i> Settings</button>
             Created By: <strong>{{ request.user.username|default:"Admin" }}</strong>
         </div>
         <div class="footer-right">
@@ -854,8 +1567,15 @@
 {% block extra_js %}
 <style>
     @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-20px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 </style>
 <script>
@@ -864,7 +1584,7 @@
     let grandTotal = 0;
 
     // 2. Add Initial Row + Init Dual Dates
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         if (typeof initDualDate === 'function') {
             initDualDate('invoice_date_ad', 'invoice_date_bs');
             initDualDate('due_date_ad', 'due_date_bs');
@@ -879,7 +1599,7 @@
     function addRow() {
         const tbody = document.getElementById("itemsBody");
         const tr = document.createElement("tr");
-        
+
         let productOptions = '<option value="">Select Product...</option>';
         products.forEach(p => {
             productOptions += `<option value="${p.id}">${p.code ? p.code + ' - ' : ''}${p.name}</option>`;
@@ -940,17 +1660,17 @@
         const tr = selectElem.closest("tr");
         const productId = selectElem.value;
         const product = products.find(p => p.id == productId);
-        
+
         if (product) {
             tr.querySelector(".row-rate").value = product.selling_price;
             tr.querySelector(".row-unit").value = product.unit || 'Pcs';
-            
+
             // Auto-fill description if not explicitly entered by user (or always overwrite on change)
             tr.querySelector("input[name='description[]']").value = product.description || '';
-            
+
             // Set raw cost for calculations (stored in dataset)
             tr.dataset.unitCost = product.purchase_price || 0;
-            
+
             calculateRow(selectElem);
         }
     }
@@ -963,31 +1683,31 @@
         const taxType = tr.querySelector(".row-tax").value;
         const disc = parseFloat(tr.querySelector(".row-disc").value) || 0;
         const overallVt = document.getElementById("vt_hidden_input")?.value || "Standard";
-        
+
         const subtotal = (qty * rate) - disc;
         let amount = subtotal;
-        
+
         const isTaxable = (overallVt === 'Standard') && (taxType === 'Standard' || taxType === 'Taxable');
         if (isTaxable) {
             amount += (subtotal * 0.13);
         }
-        
+
         tr.querySelector(".row-amount").value = amount.toFixed(2);
-        
+
         // Cost calculation
         const unitCost = parseFloat(tr.dataset.unitCost) || 0;
         const totalLineCost = qty * unitCost;
         tr.querySelector(".row-cost").value = totalLineCost.toFixed(2);
-        
+
         // Profit calculation
         const lineProfit = subtotal - totalLineCost; // Profit is usually excluding VAT
         tr.querySelector(".row-profit").value = lineProfit.toFixed(2);
-        
+
         // Store raw values for global calculations
         tr.dataset.subtotal = subtotal + disc; // Store raw gross if calculateTotals expects it
         tr.dataset.cost = totalLineCost;
         tr.dataset.taxType = taxType;
-        
+
         calculateTotals();
     }
 
@@ -1000,14 +1720,14 @@
         const overallVt = document.getElementById("vt_hidden_input")?.value || "Standard";
 
         document.querySelectorAll("#itemsBody tr").forEach(tr => {
-            const qty   = parseFloat(tr.querySelector('.row-qty')?.value) || 0;
-            const rate  = parseFloat(tr.querySelector('.row-rate')?.value) || 0;
-            const disc  = parseFloat(tr.querySelector('.row-disc')?.value) || 0;
+            const qty = parseFloat(tr.querySelector('.row-qty')?.value) || 0;
+            const rate = parseFloat(tr.querySelector('.row-rate')?.value) || 0;
+            const disc = parseFloat(tr.querySelector('.row-disc')?.value) || 0;
             const taxType = tr.querySelector('.row-tax')?.value || 'Standard';
             const lineGross = qty * rate;
-            const lineDisc  = disc; // treat as absolute discount per item for now
-            const lineSub   = lineGross - lineDisc;
-            subTotal      += lineSub;
+            const lineDisc = disc; // treat as absolute discount per item for now
+            const lineSub = lineGross - lineDisc;
+            subTotal += lineSub;
             totalDiscount += lineDisc;
 
             const isTaxable = (overallVt === 'Standard') && (taxType === 'Standard' || taxType === 'Taxable');
@@ -1057,7 +1777,7 @@
         const inpPaid = document.getElementById("inp_paid_amount");
         const paid = inpPaid ? (parseFloat(inpPaid.value) || 0) : 0;
         const remaining = grandTotal - paid;
-        
+
         const setVal = (id, val) => {
             const el = document.getElementById(id);
             if (el) el.textContent = val;
@@ -1121,9 +1841,9 @@
                 const balance = parseFloat(data.outstanding || 0);
                 const sign = balance < 0 ? '(CR) ' : '';
                 document.getElementById('customer_balance').textContent =
-                    `${sign}Rs. ${Math.abs(balance).toLocaleString('en-NP', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+                    `${sign}Rs. ${Math.abs(balance).toLocaleString('en-NP', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             })
-            .catch(() => {});
+            .catch(() => { });
 
         fetch(`/api/unpaid-invoices/${customerId}/`)
             .then(r => r.json())
@@ -1162,7 +1882,7 @@
         if (!container) return;
 
         const currentVal = document.getElementById('customer_select').value;
-        
+
         if (list.length === 0) {
             container.innerHTML = '';
             if (emptyState) emptyState.style.display = 'block';
@@ -1228,9 +1948,9 @@
 
     function filterCustOptions(q) {
         const query = q.toLowerCase().trim();
-        const filtered = custOptionsData.filter(c => 
-            c.name.toLowerCase().includes(query) || 
-            c.phone.toLowerCase().includes(query) || 
+        const filtered = custOptionsData.filter(c =>
+            c.name.toLowerCase().includes(query) ||
+            c.phone.toLowerCase().includes(query) ||
             c.pan.toLowerCase().includes(query)
         );
         renderCustOptions(filtered);
@@ -1250,7 +1970,7 @@
         if (!select || !label) return;
 
         const selectedOpt = select.options[select.selectedIndex];
-        
+
         if (selectedOpt && selectedOpt.value) {
             label.textContent = selectedOpt.textContent;
             label.style.color = '#1e293b';
@@ -1267,7 +1987,7 @@
         openAddCustomerModal();
     }
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const wrapper = document.querySelector('.cust-combo-wrapper');
         if (wrapper && !wrapper.contains(e.target)) {
             closeCustDropdown();
@@ -1314,11 +2034,11 @@
     function selectSalesType(val, iconClass, iconColor, event) {
         const select = document.getElementById('sales_type_select');
         select.value = val;
-        
+
         const container = document.getElementById('st_combo_selected');
         const displayLabel = val === 'Mixed' ? 'Mixed / Both' : val;
         container.innerHTML = `<i class="${iconClass}" style="color:${iconColor};"></i><span style="font-weight:600; color:#1e293b;">${displayLabel}</span>`;
-        
+
         const items = document.querySelectorAll('.st-option-item');
         items.forEach(item => {
             // Note: need to make sure we don't clear vt items if they share classes. 
@@ -1329,13 +2049,13 @@
                 if (check) check.style.display = 'none';
             }
         });
-        
+
         if (event && event.currentTarget) {
             event.currentTarget.classList.add('selected');
             const check = event.currentTarget.querySelector('.st-check');
             if (check) check.style.display = 'block';
         }
-        
+
         const menu = document.getElementById('st_combo_menu');
         const btn = document.getElementById('st_combo_btn');
         const arrow = document.getElementById('st_combo_arrow');
@@ -1366,10 +2086,10 @@
     function selectVatTreatment(val, displayValue, iconClass, iconColor, event) {
         const input = document.getElementById('vt_hidden_input');
         input.value = val;
-        
+
         const container = document.getElementById('vt_combo_selected');
         container.innerHTML = `<i class="${iconClass}" style="color:${iconColor};"></i><span style="font-weight:600; color:#1e293b;">${displayValue}</span>`;
-        
+
         const items = document.querySelectorAll('.st-option-item');
         items.forEach(item => {
             if (item.closest('.vt-combo-wrapper')) {
@@ -1378,13 +2098,13 @@
                 if (check) check.style.display = 'none';
             }
         });
-        
+
         if (event && event.currentTarget) {
             event.currentTarget.classList.add('selected');
             const check = event.currentTarget.querySelector('.vt-check');
             if (check) check.style.display = 'block';
         }
-        
+
         const menu = document.getElementById('vt_combo_menu');
         const btn = document.getElementById('vt_combo_btn');
         const arrow = document.getElementById('vt_combo_arrow');
@@ -1404,12 +2124,208 @@
         initCustCombobox();
     });
 
+    // ── Dynamic Split-Screen Bill Attachment Viewer Engine ───────────────
+    let currentAttachmentObjectUrl = null;
+    let currentAttachmentFile = null;
+    let billViewerScale = 1.0;
+    let billViewerRotation = 0;
+
+    function previewAttachment(file) {
+        if (!file) return;
+        currentAttachmentFile = file;
+
+        const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        // 1. Update In-form Attached Pill Status
+        const dropZone = document.getElementById('attachDropZone');
+        const previewPill = document.getElementById('attachPreview');
+        const pillName = document.getElementById('previewFileName');
+        const pillSize = document.getElementById('previewFileSize');
+        const pillIcon = document.getElementById('previewDocIcon');
+        dropZone.style.display = 'none';
+        previewPill.style.display = 'flex';
+
+        // 2. Revoke old Object URL if exists
+        if (currentAttachmentObjectUrl) {
+            URL.revokeObjectURL(currentAttachmentObjectUrl);
+        }
+        currentAttachmentObjectUrl = URL.createObjectURL(file);
+
+        // 3. Update Right Viewer Panel Elements
+        const viewerCol = document.getElementById('invoiceViewerCol');
+        const vFileName = document.getElementById('viewerFileName');
+        const vFileSize = document.getElementById('viewerFileSize');
+        const vOpenTabBtn = document.getElementById('viewerOpenTabBtn');
+        const vImgContainer = document.getElementById('viewerImgContainer');
+        const vImg = document.getElementById('viewerImg');
+        const vPdf = document.getElementById('viewerPdf');
+        const vDocFallback = document.getElementById('viewerDocFallback');
+
+        if (vFileName) vFileName.textContent = file.name;
+        if (vFileSize) vFileSize.textContent = `${sizeMB} MB`;
+        if (vOpenTabBtn) vOpenTabBtn.href = currentAttachmentObjectUrl;
+
+        // Reset transforms
+        resetBillViewer();
+
+        // 4. Render content based on File Type
+        if (file.type.startsWith('image/')) {
+            vImg.src = currentAttachmentObjectUrl;
+            vImgContainer.style.display = 'block';
+            vPdf.style.display = 'none';
+            vPdf.src = '';
+            vDocFallback.style.display = 'none';
+        } else if (file.type === 'application/pdf' || ext === 'pdf') {
+            vPdf.src = currentAttachmentObjectUrl;
+            vPdf.style.display = 'block';
+            vImgContainer.style.display = 'none';
+            vDocFallback.style.display = 'none';
+        } else {
+            vImgContainer.style.display = 'none';
+            vPdf.style.display = 'none';
+            vPdf.src = '';
+            vDocFallback.style.display = 'flex';
+
+            const fbIcon = document.getElementById('viewerFallbackIcon');
+            const fbName = document.getElementById('viewerFallbackName');
+            const fbBtn = document.getElementById('viewerFallbackDownloadBtn');
+            if (fbIcon) fbIcon.className = `fa-solid ${iconMap[ext] || 'fa-file-lines'}`;
+            if (fbName) fbName.textContent = file.name;
+            if (fbBtn) fbBtn.href = currentAttachmentObjectUrl;
+        }
+
+        // 5. Open Dynamic Split View Panel!
+        viewerCol.style.display = 'flex';
+        const ws = document.getElementById('invoiceWorkspace');
+        if (ws) ws.classList.add('split-view-active');
+
+        // Scroll right viewer into sight smoothly on mobile or small screens
+        if (window.innerWidth < 992) {
+            viewerCol.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    function toggleViewerPanel() {
+        const viewerCol = document.getElementById('invoiceViewerCol');
+        const ws = document.getElementById('invoiceWorkspace');
+        if (!viewerCol) return;
+        if (viewerCol.style.display === 'none' || viewerCol.style.display === '') {
+            const vFileName = document.getElementById('viewerFileName');
+            const hasPreloadedDoc = (vFileName && vFileName.textContent.trim().length > 0);
+            if (currentAttachmentFile || hasPreloadedDoc) {
+                viewerCol.style.display = 'flex';
+                if (ws) ws.classList.add('split-view-active');
+            } else {
+                document.getElementById('bill_attachment_input').click();
+            }
+        } else {
+            viewerCol.style.display = 'none';
+            if (ws) ws.classList.remove('split-view-active');
+        }
+    }
+
+    function handleAttachDrop(event) {
+        event.preventDefault();
+        const dz = document.getElementById('attachDropZone');
+        if (dz) {
+            dz.style.borderColor = '#cbd5e1';
+            dz.style.background = '#f8fafc';
+        }
+        const files = event.dataTransfer ? event.dataTransfer.files : null;
+        if (files && files[0]) {
+            const input = document.getElementById('bill_attachment_input');
+            const dt = new DataTransfer();
+            dt.items.add(files[0]);
+            input.files = dt.files;
+            previewAttachment(files[0]);
+        }
+    }
+
+    function clearAttachment() {
+        const input = document.getElementById('bill_attachment_input');
+        const docIdInput = document.getElementById('linked_doc_id_input');
+        const dropZone = document.getElementById('attachDropZone');
+        const previewPill = document.getElementById('attachPreview');
+        const viewerCol = document.getElementById('invoiceViewerCol');
+        const ws = document.getElementById('invoiceWorkspace');
+        const vFileName = document.getElementById('viewerFileName');
+
+        if (input) input.value = '';
+        if (docIdInput) docIdInput.value = '';
+        if (vFileName) vFileName.textContent = '';
+        if (currentAttachmentObjectUrl) {
+            URL.revokeObjectURL(currentAttachmentObjectUrl);
+            currentAttachmentObjectUrl = null;
+        }
+        currentAttachmentFile = null;
+
+        if (dropZone) dropZone.style.display = 'flex';
+        if (previewPill) previewPill.style.display = 'none';
+        if (viewerCol) viewerCol.style.display = 'none';
+        if (ws) ws.classList.remove('split-view-active');
+        resetBillViewer();
+    }
+
+    // ── Viewer Controls (Zoom, Rotate, Wheel) ──────────────────────────
+    function zoomBillViewer(delta) {
+        billViewerScale = Math.min(Math.max(0.3, billViewerScale + delta), 4.0);
+        applyBillViewerTransform();
+    }
+
+    function rotateBillViewer() {
+        billViewerRotation = (billViewerRotation + 90) % 360;
+        applyBillViewerTransform();
+    }
+
+    function resetBillViewer() {
+        billViewerScale = 1.0;
+        billViewerRotation = 0;
+        applyBillViewerTransform();
+    }
+
+    function applyBillViewerTransform() {
+        const imgContainer = document.getElementById('viewerImgContainer');
+        const zoomLabel = document.getElementById('viewerZoomVal');
+        if (imgContainer) {
+            imgContainer.style.transform = `scale(${billViewerScale}) rotate(${billViewerRotation}deg)`;
+        }
+        if (zoomLabel) {
+            zoomLabel.textContent = `${Math.round(billViewerScale * 100)}%`;
+        }
+    }
+
+    function handleViewerWheel(e) {
+        const imgContainer = document.getElementById('viewerImgContainer');
+        if (imgContainer && imgContainer.style.display !== 'none') {
+            if (e.ctrlKey || e.metaKey || e.shiftKey) {
+                e.preventDefault();
+                zoomBillViewer(e.deltaY < 0 ? 0.15 : -0.15);
+            }
+        }
+    }
+
+    // Enable Global Drag & Drop on entire invoice window
+    window.addEventListener('dragover', function (e) {
+        e.preventDefault();
+    });
+    window.addEventListener('drop', function (e) {
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            const target = e.target;
+            if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                handleAttachDrop(e);
+            }
+        }
+    });
+    // ── End Bill Attachment Preview Engine ──────────────────────────
+
     // QUICK ADD CUSTOMER MODAL HANDLERS
     function openAddCustomerModal() {
         cmOpen();
     }
 
-    window.onCustomerSaved = function(id, name) {
+    window.onCustomerSaved = function (id, name) {
         const sel = document.getElementById('customer_select');
         let newOpt = document.createElement('option');
         newOpt.value = id;
@@ -1476,7 +2392,7 @@
             `;
             tbody.appendChild(tr);
         });
-        document.getElementById('alloc_total_due').textContent = totalDue.toLocaleString('en-NP', {minimumFractionDigits:2, maximumFractionDigits:2});
+        document.getElementById('alloc_total_due').textContent = totalDue.toLocaleString('en-NP', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         updateAllocTotal();
     }
 
@@ -1488,7 +2404,7 @@
             btnManual.style.borderBottomColor = '#2563eb';
             btnManual.style.color = '#2563eb';
             btnManual.style.fontWeight = '600';
-            
+
             btnAuto.style.borderBottomColor = 'transparent';
             btnAuto.style.color = 'var(--text-gray)';
             btnAuto.style.fontWeight = '500';
@@ -1496,7 +2412,7 @@
             btnAuto.style.borderBottomColor = '#2563eb';
             btnAuto.style.color = '#2563eb';
             btnAuto.style.fontWeight = '600';
-            
+
             btnManual.style.borderBottomColor = 'transparent';
             btnManual.style.color = 'var(--text-gray)';
             btnManual.style.fontWeight = '500';
@@ -1527,12 +2443,12 @@
         document.querySelectorAll('.alloc-amt').forEach(inp => {
             total += parseFloat(inp.value) || 0;
         });
-        
+
         let dueTotal = parseFloat(document.getElementById('alloc_total_due').textContent.replace(/,/g, '')) || 0;
         let remaining = dueTotal - total;
-        
-        document.getElementById('alloc_total_allocated').textContent = total.toLocaleString('en-NP', {minimumFractionDigits:2, maximumFractionDigits:2});
-        document.getElementById('alloc_remaining').textContent = remaining.toLocaleString('en-NP', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+        document.getElementById('alloc_total_allocated').textContent = total.toLocaleString('en-NP', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('alloc_remaining').textContent = remaining.toLocaleString('en-NP', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     function clearAllocAmounts() {
@@ -1656,7 +2572,7 @@
         btn.closest('tr').remove();
         calcAllocProfitTotal();
     }
-    
+
     // Settings & Sequential Numbering Logic
     const panelConfig = [
         { key: 'customer', title: 'Customer & Invoice Information' },
@@ -1679,10 +2595,10 @@
         const p1 = document.getElementById(`panel_${key1}`);
         const p2 = document.getElementById(`panel_${key2}`);
         if (!row || !p1 || !p2) return;
-        
+
         const v1 = p1.style.display !== 'none';
         const v2 = p2.style.display !== 'none';
-        
+
         if (!v1 && !v2) {
             row.style.display = 'none';
         } else if (v1 && v2) {
@@ -1718,7 +2634,7 @@
                 panel.style.display = chk.checked ? 'block' : 'none';
             }
         });
-        
+
         // Handle customer outer wrapper padding
         const wrapperCust = document.getElementById('wrapper_customer');
         if (wrapperCust && settings['customer'] !== undefined) {
@@ -1747,9 +2663,52 @@
                         chk.checked = settings[cfg.key];
                     }
                 });
-            } catch(e){}
+            } catch (e) { }
         }
         applySettings(); // Always apply and update numbering on load
     }
+
+    // ── Preloaded Document Auto-Init (from Document Manager) ──────────────────────────
+    {% if preloaded_doc %}
+    document.addEventListener('DOMContentLoaded', function() {
+        const docUrl = "{{ preloaded_doc.file.url }}";
+        const docName = "{{ preloaded_doc.original_name|escapejs }}";
+        const docSize = "{{ preloaded_doc.file_size }}";
+        const isPdf = docName.toLowerCase().endsWith('.pdf');
+        
+        const dropZone = document.getElementById('attachDropZone');
+        const previewPill = document.getElementById('attachPreview');
+        const pillName = document.getElementById('previewFileName');
+        
+        if (dropZone) dropZone.style.display = 'none';
+        if (previewPill) previewPill.style.display = 'flex';
+        if (pillName) pillName.textContent = docName;
+        
+        const viewerCol = document.getElementById('invoiceViewerCol');
+        const vFileName = document.getElementById('viewerFileName');
+        const vFileSize = document.getElementById('viewerFileSize');
+        const vOpenTabBtn = document.getElementById('viewerOpenTabBtn');
+        const vImgContainer = document.getElementById('viewerImgContainer');
+        const vImg = document.getElementById('viewerImg');
+        const vPdf = document.getElementById('viewerPdf');
+        
+        if (vFileName) vFileName.textContent = docName;
+        if (vFileSize) vFileSize.textContent = `${docSize} MB`;
+        if (vOpenTabBtn) vOpenTabBtn.href = docUrl;
+        
+        if (isPdf) {
+            if (vPdf) { vPdf.src = docUrl; vPdf.style.display = 'block'; }
+            if (vImgContainer) vImgContainer.style.display = 'none';
+        } else {
+            if (vImg) vImg.src = docUrl;
+            if (vImgContainer) vImgContainer.style.display = 'block';
+            if (vPdf) vPdf.style.display = 'none';
+        }
+        
+        if (viewerCol) viewerCol.style.display = 'flex';
+        const ws = document.getElementById('invoiceWorkspace');
+        if (ws) ws.classList.add('split-view-active');
+    });
+    {% endif %}
 </script>
 {% endblock %}

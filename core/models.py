@@ -189,6 +189,7 @@ class Invoice(models.Model):
     # Notes & Misc
     terms_conditions = models.TextField(blank=True, null=True, default="Thank you for your business.")
     notes = models.TextField(blank=True, null=True)
+    bill_attachment = models.FileField(upload_to='invoices/attachments/', blank=True, null=True)
 
     # Audit
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='invoices_created')
@@ -598,3 +599,36 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} Profile"
+
+
+# ============================================================
+# 10. Document / Receipt Manager Inbox (Tigg-style)
+# ============================================================
+
+class ReceiptDocument(models.Model):
+    LABEL_CHOICES = (
+        ('UNLABELED', 'Add Label'),
+        ('INVOICE', 'Sales Invoice'),
+        ('PURCHASE', 'Purchase Bill'),
+        ('EXPENSE', 'Expense'),
+        ('PAYMENT', 'Payment'),
+    )
+    STATUS_CHOICES = (
+        ('PENDING', 'Pending'),
+        ('DONE', 'Done'),
+    )
+
+    file = models.FileField(upload_to='documents/receipts/')
+    original_name = models.CharField(max_length=255)
+    file_size = models.FloatField("Size (MB)", default=0.0)
+    description = models.TextField(blank=True, null=True)
+    label = models.CharField(max_length=30, choices=LABEL_CHOICES, default='UNLABELED')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+
+    linked_invoice = models.ForeignKey('Invoice', on_delete=models.SET_NULL, null=True, blank=True, related_name='linked_receipt_documents')
+
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.original_name} ({self.status})"

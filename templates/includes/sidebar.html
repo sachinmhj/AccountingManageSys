@@ -11,6 +11,28 @@
                     <span>Dashboard</span>
                 </div>
             </a>
+        <!-- ================= Workflow / Documents ================= -->
+
+        {% with doc_urls="document_manager document_upload" %}
+        <li class="menu-item has-submenu {% if request.resolver_match.url_name in doc_urls.split %}open{% endif %}">
+        {% endwith %}
+            <div class="menu-link submenu-toggle">
+                <div class="menu-left">
+                    <i class='bx bx-folder-open'></i>
+                    <span>Workflow</span>
+                </div>
+                <i class='bx bx-chevron-right submenu-arrow'></i>
+            </div>
+            <ul class="submenu">
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="{% url 'document_manager' %}"
+                           class="{% if request.resolver_match.url_name == 'document_manager' %}submenu-active{% endif %}">
+                            Document Inbox
+                        </a>
+                    </div>
+                </li>
+            </ul>
         </li>
 
 
