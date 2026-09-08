@@ -129,9 +129,9 @@ class Invoice(models.Model):
         ('Government', 'Government'),
     )
     VAT_TREATMENT_CHOICES = (
-        ('With VAT (13%)', 'With VAT (13%)'),
-        ('Non VAT', 'Non VAT'),
-        ('Zero Rated', 'Zero Rated'),
+        ('Standard', 'Standard (13%)'),
+        ('Zero Rated', 'Zero Rated (0%)'),
+        ('Exempt', 'Exempt (No VAT)'),
     )
     CURRENCY_CHOICES = (
         ('NPR', 'NPR'),
@@ -163,7 +163,7 @@ class Invoice(models.Model):
     # Classification
     sales_type = models.CharField(max_length=20, choices=SALES_TYPE_CHOICES, default='Goods')
     sale_category = models.CharField(max_length=20, choices=SALE_CATEGORY_CHOICES, default='Local Sales')
-    vat_treatment = models.CharField(max_length=20, choices=VAT_TREATMENT_CHOICES, default='With VAT (13%)')
+    vat_treatment = models.CharField(max_length=20, choices=VAT_TREATMENT_CHOICES, default='Standard')
     currency = models.CharField(max_length=5, choices=CURRENCY_CHOICES, default='NPR')
 
     # Financial Fields
@@ -221,9 +221,9 @@ class InvoiceItem(models.Model):
         ('Percentage', 'Percentage'),
     )
     TAX_TYPE_CHOICES = (
-        ('Taxable', 'Taxable'),
-        ('Non-Tax', 'Non-Tax'),
-        ('Zero Rated', 'Zero Rated'),
+        ('Standard', 'Standard (13%)'),
+        ('Zero Rated', 'Zero Rated (0%)'),
+        ('Exempt', 'Exempt (No VAT)'),
     )
 
     invoice = models.ForeignKey(Invoice, related_name='items', on_delete=models.CASCADE)
@@ -243,7 +243,7 @@ class InvoiceItem(models.Model):
     # Discount & Tax
     discount_type = models.CharField(max_length=10, choices=DISCOUNT_TYPES, default='Fixed')
     discount_value = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
-    tax_type = models.CharField(max_length=20, choices=TAX_TYPE_CHOICES, default='Taxable')
+    tax_type = models.CharField(max_length=20, choices=TAX_TYPE_CHOICES, default='Standard')
     taxable_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     vat_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=13.00)
     vat_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
@@ -417,9 +417,9 @@ class SalesReturn(models.Model):
 
 class SalesReturnItem(models.Model):
     TAX_TYPE_CHOICES = (
-        ('Taxable', 'Taxable'),
-        ('Non-Tax', 'Non-Tax'),
-        ('Zero Rated', 'Zero Rated'),
+        ('Standard', 'Standard (13%)'),
+        ('Zero Rated', 'Zero Rated (0%)'),
+        ('Exempt', 'Exempt (No VAT)'),
     )
 
     sales_return = models.ForeignKey(SalesReturn, related_name='items', on_delete=models.CASCADE)
@@ -428,7 +428,7 @@ class SalesReturnItem(models.Model):
     unit = models.CharField(max_length=20, default='Pcs')
     returned_qty = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     rate = models.DecimalField(max_digits=12, decimal_places=2)
-    tax_type = models.CharField(max_length=20, choices=TAX_TYPE_CHOICES, default='Taxable')
+    tax_type = models.CharField(max_length=20, choices=TAX_TYPE_CHOICES, default='Standard')
     tax_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
 
@@ -484,9 +484,9 @@ class Quotation(models.Model):
 
 class QuotationItem(models.Model):
     TAX_TYPE_CHOICES = (
-        ('Taxable', 'Taxable'),
-        ('Non-Tax', 'Non-Tax'),
-        ('Zero Rated', 'Zero Rated'),
+        ('Standard', 'Standard (13%)'),
+        ('Zero Rated', 'Zero Rated (0%)'),
+        ('Exempt', 'Exempt (No VAT)'),
     )
 
     quotation = models.ForeignKey(Quotation, related_name='items', on_delete=models.CASCADE)
@@ -494,7 +494,7 @@ class QuotationItem(models.Model):
     unit = models.CharField(max_length=20, default='Pcs')
     quantity = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     rate = models.DecimalField(max_digits=12, decimal_places=2)
-    tax_type = models.CharField(max_length=20, choices=TAX_TYPE_CHOICES, default='Taxable')
+    tax_type = models.CharField(max_length=20, choices=TAX_TYPE_CHOICES, default='Standard')
     tax_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
 

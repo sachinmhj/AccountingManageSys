@@ -450,9 +450,54 @@
                     <label>Sale Category <span>*</span></label>
                     <select class="form-select" name="sale_category"><option>Local Sales</option><option>Export</option></select>
                 </div>
-                <div>
+                <div class="vt-combo-wrapper" style="position:relative; width: 100%;">
                     <label>VAT Treatment <span>*</span></label>
-                    <select class="form-select" name="vat_treatment"><option>With VAT (13%)</option><option>Non VAT</option></select>
+                    <input type="hidden" name="vat_treatment" id="vt_hidden_input" value="Standard">
+                    <button type="button" class="st-combo-btn" id="vt_combo_btn" onclick="toggleVtDropdown(event)" style="height: 38px;">
+                        <span class="st-combo-selected" id="vt_combo_selected" style="display:flex; align-items:center; gap:8px;">
+                            <i class="fa-solid fa-percent" style="color:#2563eb;"></i> 
+                            <span style="font-weight:600; color:#1e293b;">Standard (13%)</span>
+                        </span>
+                        <i class="fa-solid fa-chevron-down text-muted" id="vt_combo_arrow" style="font-size:12px; transition: transform 0.2s;"></i>
+                    </button>
+                    
+                    <div class="st-combo-menu" id="vt_combo_menu" style="width: 250px;">
+                        <div class="st-options-container">
+                            <div class="st-option-item selected" onclick="selectVatTreatment('Standard', 'Standard (13%)', 'fa-solid fa-percent', '#2563eb', event)">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <div style="width:28px; height:28px; background:#eff6ff; color:#2563eb; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
+                                        <i class="fa-solid fa-percent"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:600; color:#1e293b; font-size:13px;">Standard (13%)</div>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-check vt-check" style="color:#2563eb; font-size:13px;"></i>
+                            </div>
+                            <div class="st-option-item" onclick="selectVatTreatment('Exempt', 'Exempt (No VAT)', 'fa-solid fa-ban', '#0891b2', event)">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <div style="width:28px; height:28px; background:#ecfeff; color:#0891b2; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
+                                        <i class="fa-solid fa-ban"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:600; color:#1e293b; font-size:13px;">Exempt (No VAT)</div>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-check vt-check" style="color:#2563eb; font-size:13px; display:none;"></i>
+                            </div>
+                            <div class="st-option-item" onclick="selectVatTreatment('Zero Rated', 'Zero Rated (0%)', 'fa-solid fa-0', '#10b981', event)">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <div style="width:28px; height:28px; background:#d1fae5; color:#10b981; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
+                                        <i class="fa-solid fa-0"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:600; color:#1e293b; font-size:13px;">Zero Rated (0%)</div>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-check vt-check" style="color:#2563eb; font-size:13px; display:none;"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label>Currency <span>*</span></label>
@@ -858,8 +903,9 @@
             <td><input type="number" step="0.01" class="row-disc" name="discount[]" value="0.00" oninput="calculateRow(this)"></td>
             <td>
                 <select class="form-select row-tax" name="tax_type[]" onchange="calculateRow(this)">
-                    <option value="Taxable">13%</option>
-                    <option value="Non-Tax">0%</option>
+                    <option value="Standard">Standard (13%)</option>
+                    <option value="Zero Rated">Zero Rated (0%)</option>
+                    <option value="Exempt">Exempt (No VAT)</option>
                 </select>
             </td>
             <td><input type="text" class="row-amount" value="0.00" readonly style="background:var(--bg-light); text-align:right; font-weight:600;"></td>
@@ -916,11 +962,13 @@
         const rate = parseFloat(tr.querySelector(".row-rate").value) || 0;
         const taxType = tr.querySelector(".row-tax").value;
         const disc = parseFloat(tr.querySelector(".row-disc").value) || 0;
+        const overallVt = document.getElementById("vt_hidden_input")?.value || "Standard";
         
         const subtotal = (qty * rate) - disc;
         let amount = subtotal;
         
-        if (taxType === 'Taxable') {
+        const isTaxable = (overallVt === 'Standard') && (taxType === 'Standard' || taxType === 'Taxable');
+        if (isTaxable) {
             amount += (subtotal * 0.13);
         }
         
@@ -949,18 +997,22 @@
         let totalDiscount = 0;
         let vat = 0;
         let totalCost = 0;
+        const overallVt = document.getElementById("vt_hidden_input")?.value || "Standard";
 
         document.querySelectorAll("#itemsBody tr").forEach(tr => {
             const qty   = parseFloat(tr.querySelector('.row-qty')?.value) || 0;
             const rate  = parseFloat(tr.querySelector('.row-rate')?.value) || 0;
             const disc  = parseFloat(tr.querySelector('.row-disc')?.value) || 0;
-            const taxType = tr.querySelector('.row-tax')?.value || 'Taxable';
+            const taxType = tr.querySelector('.row-tax')?.value || 'Standard';
             const lineGross = qty * rate;
             const lineDisc  = disc; // treat as absolute discount per item for now
             const lineSub   = lineGross - lineDisc;
             subTotal      += lineSub;
             totalDiscount += lineDisc;
-            if (taxType === 'Taxable') vat += lineSub * 0.13;
+
+            const isTaxable = (overallVt === 'Standard') && (taxType === 'Standard' || taxType === 'Taxable');
+            if (isTaxable) vat += lineSub * 0.13;
+
             // Cost from dataset
             totalCost += parseFloat(tr.dataset.cost) || 0;
         });
@@ -1229,6 +1281,15 @@
             if (btn) btn.classList.remove('open');
             if (arrow) arrow.style.transform = 'rotate(0deg)';
         }
+        const vtWrapper = document.querySelector('.vt-combo-wrapper');
+        if (vtWrapper && !vtWrapper.contains(e.target)) {
+            const menu = document.getElementById('vt_combo_menu');
+            const btn = document.getElementById('vt_combo_btn');
+            const arrow = document.getElementById('vt_combo_arrow');
+            if (menu) menu.style.display = 'none';
+            if (btn) btn.classList.remove('open');
+            if (arrow) arrow.style.transform = 'rotate(0deg)';
+        }
     });
 
     // SALES TYPE DROPDOWN HANDLERS
@@ -1260,9 +1321,13 @@
         
         const items = document.querySelectorAll('.st-option-item');
         items.forEach(item => {
-            item.classList.remove('selected');
-            const check = item.querySelector('.st-check');
-            if (check) check.style.display = 'none';
+            // Note: need to make sure we don't clear vt items if they share classes. 
+            // It's safer to scope it.
+            if (item.closest('.st-combo-wrapper')) {
+                item.classList.remove('selected');
+                const check = item.querySelector('.st-check');
+                if (check) check.style.display = 'none';
+            }
         });
         
         if (event && event.currentTarget) {
@@ -1277,6 +1342,62 @@
         if (menu) menu.style.display = 'none';
         if (btn) btn.classList.remove('open');
         if (arrow) arrow.style.transform = 'rotate(0deg)';
+    }
+
+    // VAT TREATMENT DROPDOWN HANDLERS
+    function toggleVtDropdown(e) {
+        if (e) e.stopPropagation();
+        const menu = document.getElementById('vt_combo_menu');
+        const btn = document.getElementById('vt_combo_btn');
+        const arrow = document.getElementById('vt_combo_arrow');
+        const isOpen = menu.style.display === 'block';
+
+        if (isOpen) {
+            menu.style.display = 'none';
+            btn.classList.remove('open');
+            arrow.style.transform = 'rotate(0deg)';
+        } else {
+            menu.style.display = 'block';
+            btn.classList.add('open');
+            arrow.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    function selectVatTreatment(val, displayValue, iconClass, iconColor, event) {
+        const input = document.getElementById('vt_hidden_input');
+        input.value = val;
+        
+        const container = document.getElementById('vt_combo_selected');
+        container.innerHTML = `<i class="${iconClass}" style="color:${iconColor};"></i><span style="font-weight:600; color:#1e293b;">${displayValue}</span>`;
+        
+        const items = document.querySelectorAll('.st-option-item');
+        items.forEach(item => {
+            if (item.closest('.vt-combo-wrapper')) {
+                item.classList.remove('selected');
+                const check = item.querySelector('.vt-check');
+                if (check) check.style.display = 'none';
+            }
+        });
+        
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('selected');
+            const check = event.currentTarget.querySelector('.vt-check');
+            if (check) check.style.display = 'block';
+        }
+        
+        const menu = document.getElementById('vt_combo_menu');
+        const btn = document.getElementById('vt_combo_btn');
+        const arrow = document.getElementById('vt_combo_arrow');
+        if (menu) menu.style.display = 'none';
+        if (btn) btn.classList.remove('open');
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
+
+        // Recalculate all row amounts and total VAT dynamically
+        document.querySelectorAll("#itemsBody tr").forEach(tr => {
+            const qtyInput = tr.querySelector('.row-qty');
+            if (qtyInput) calculateRow(qtyInput);
+        });
+        calculateTotals();
     }
 
     document.addEventListener('DOMContentLoaded', () => {

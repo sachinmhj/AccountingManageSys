@@ -332,7 +332,7 @@ class InvoiceAddView(View):
             payment_terms=request.POST.get('payment_terms', 'Immediate'),
             sales_type=request.POST.get('sales_type', 'Goods'),
             sale_category=request.POST.get('sale_category', 'Local Sales'),
-            vat_treatment=request.POST.get('vat_treatment', 'With VAT (13%)'),
+            vat_treatment=request.POST.get('vat_treatment', 'Standard'),
             currency=request.POST.get('currency', 'NPR'),
             notes=request.POST.get('notes', ''),
             terms_conditions=request.POST.get('terms_conditions', ''),
@@ -354,25 +354,35 @@ class InvoiceAddView(View):
         total_cost = Decimal('0.00')
         total_gp = Decimal('0.00')
 
+        vat_treatment = invoice.vat_treatment
+
         for i in range(len(product_ids)):
             if not product_ids[i]: continue
 
             product = Product.objects.get(id=product_ids[i])
             qty = Decimal(quantities[i]) if quantities[i] else Decimal('0')
             price = Decimal(unit_prices[i]) if unit_prices[i] else Decimal('0.00')
-            tax_type = tax_types[i] if i < len(tax_types) else 'Taxable'
+            raw_tax_type = tax_types[i] if i < len(tax_types) else 'Standard'
+            
+            if raw_tax_type in ['Taxable', '13% VAT', '13%']:
+                tax_type = 'Standard'
+            elif raw_tax_type in ['Non-Tax', '0% VAT', 'No VAT']:
+                tax_type = 'Exempt'
+            else:
+                tax_type = raw_tax_type
+
             unit = units[i] if i < len(units) else 'Pcs'
             
             is_ret = True if qty < 0 else False
             
-            # Simple line amount (excluding line-level discount for now to match UI screenshot)
             item_sub = price * qty
             
-            vat_pct = Decimal('13.00') if tax_type == 'Taxable' else Decimal('0.00')
+            is_taxable_line = (vat_treatment == 'Standard') and (tax_type == 'Standard')
+            vat_pct = Decimal('13.00') if is_taxable_line else Decimal('0.00')
             vat_amt = item_sub * (vat_pct / Decimal('100.0'))
             item_tot = item_sub + vat_amt
 
-            if tax_type == 'Taxable':
+            if vat_pct > Decimal('0.00'):
                 subtotal_taxable += item_sub
             else:
                 subtotal_nontaxable += item_sub
@@ -394,7 +404,7 @@ class InvoiceAddView(View):
                 is_return=is_ret,
                 unit_price=price,
                 tax_type=tax_type,
-                taxable_amount=item_sub if tax_type == 'Taxable' else Decimal('0'),
+                taxable_amount=item_sub if vat_pct > Decimal('0.00') else Decimal('0.00'),
                 vat_percentage=vat_pct,
                 vat_amount=vat_amt,
                 total_price=item_tot,
