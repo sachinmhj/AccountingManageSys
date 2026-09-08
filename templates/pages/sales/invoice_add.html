@@ -105,6 +105,73 @@
     }
     .form-control[readonly] { background: var(--bg-light); }
 
+    /* Custom Searchable Customer Combobox */
+    .cust-combo-btn {
+        width: 100%;
+        height: 36px;
+        padding: 6px 12px;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 7px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13px;
+        font-weight: 500;
+        color: #1e293b;
+        cursor: pointer;
+        box-sizing: border-box;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        outline: none;
+    }
+    .cust-combo-btn:hover { border-color: #94a3b8; }
+    .cust-combo-btn.open { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+    .cust-combo-menu {
+        display: none;
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        z-index: 1200;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        animation: custSlideDown 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes custSlideDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .cust-combo-add-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        border-bottom: 1px solid #dbeafe;
+        transition: background 0.15s;
+    }
+    .cust-combo-add-btn:hover { background: #dbeafe; }
+    .cust-option-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8.5px 12px;
+        border-bottom: 1px solid #f8fafc;
+        cursor: pointer;
+        font-size: 13px;
+        color: #334155;
+        transition: background 0.12s, color 0.12s;
+    }
+    .cust-option-item:hover { background: #f1f5f9; color: #1e293b; }
+    .cust-option-item.selected { background: #eff6ff; color: #2563eb; font-weight: 600; }
+
     .btn {
         padding: 6px 12px;
         border: 1px solid var(--border);
@@ -187,14 +254,58 @@
                 <div style="grid-column: span 2; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
                     <div>
                         <label>Customer <span>*</span></label>
-                        <div style="display:flex; gap:8px; align-items:center;" class="cust-select-container">
-                            <select class="form-select" name="customer" id="customer_select" required onchange="onCustomerChange(this)" style="flex:1; font-weight:500;">
-                                <option value="">Select Customer...</option>
-                                {% for c in customers %}
-                                    <option value="{{ c.id }}">{{ c.name }}</option>
-                                {% endfor %}
-                                <option value="__add_new__" style="color:#2563eb; font-weight:700; background:#eff6ff;">➕ Add New Customer</option>
-                            </select>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <!-- Custom Combobox Component Wrapper -->
+                            <div class="cust-combo-wrapper" style="position:relative; flex:1;">
+                                <!-- Hidden Native Select for Form Submit & Validation -->
+                                <select name="customer" id="customer_select" required onchange="onCustomerChange(this)" style="display:none;">
+                                    <option value="">Select Customer...</option>
+                                    {% for c in customers %}
+                                        <option value="{{ c.id }}" data-phone="{{ c.phone|default:'' }}" data-pan="{{ c.pan_vat|default:'' }}">{{ c.name }}</option>
+                                    {% endfor %}
+                                </select>
+
+                                <!-- Trigger Control Box -->
+                                <button type="button" id="cust_combo_btn" class="cust-combo-btn" onclick="toggleCustDropdown(event)">
+                                    <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                                        <i class="fa-solid fa-building-user" style="color:#64748b; font-size:14px; flex-shrink:0;"></i>
+                                        <span id="cust_combo_label" style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap; color:#64748b;">Select Customer...</span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-down" id="cust_combo_arrow" style="color:#94a3b8; font-size:12px; transition:transform 0.2s; flex-shrink:0;"></i>
+                                </button>
+
+                                <!-- Custom Floating Dropdown Menu -->
+                                <div id="cust_combo_menu" class="cust-combo-menu">
+                                    <!-- Real-time Search Box Header -->
+                                    <div style="padding:8px 10px; border-bottom:1px solid #f1f5f9; background:#f8fafc; display:flex; align-items:center; gap:8px;">
+                                        <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8; font-size:13px;"></i>
+                                        <input type="text" id="cust_search_input" placeholder="Search customer by name, phone..." 
+                                               oninput="filterCustOptions(this.value)" autocomplete="off"
+                                               style="border:none; background:transparent; outline:none; width:100%; font-size:12.5px; color:#1e293b;">
+                                    </div>
+
+                                    <!-- "+ Add New Customer" Action Button -->
+                                    <div class="cust-combo-add-btn" onclick="triggerAddNewCustFromDropdown()">
+                                        <div style="width:22px; height:22px; background:linear-gradient(135deg,#2563eb,#1d4ed8); color:white; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;">
+                                            <i class="fa-solid fa-plus"></i>
+                                        </div>
+                                        <span>Add New Customer</span>
+                                    </div>
+
+                                    <!-- Scrollable Customer Options List -->
+                                    <div id="cust_combo_list" style="max-height:220px; overflow-y:auto;">
+                                        <!-- Dynamically Populated -->
+                                    </div>
+
+                                    <!-- Empty Search State -->
+                                    <div id="cust_combo_empty" style="display:none; padding:16px; text-align:center; color:#94a3b8; font-size:12px;">
+                                        <i class="fa-solid fa-user-slash" style="font-size:18px; margin-bottom:4px; display:block; opacity:0.5;"></i>
+                                        No matching customers found.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Add Icon Button -->
                             <button type="button" id="btn_quick_add_cust" onclick="openAddCustomerModal()" title="Add New Customer"
                                 style="flex-shrink:0; width:36px; height:36px; border:none; border-radius:7px; background:linear-gradient(135deg, #2563eb, #1d4ed8); color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:0 2px 6px rgba(37,99,235,0.3); transition:transform .1s, opacity .15s;">
                                 <i class="fa-solid fa-user-plus"></i>
@@ -838,34 +949,178 @@
     }
 
     // =============================================
-    // QUICK ADD CUSTOMER MODAL
+    // CUSTOM SEARCHABLE CUSTOMER COMBOBOX
     // =============================================
+    let custOptionsData = [];
+
+    function initCustCombobox() {
+        const select = document.getElementById('customer_select');
+        if (!select) return;
+        custOptionsData = [];
+        Array.from(select.options).forEach(opt => {
+            if (opt.value && opt.value !== '__add_new__') {
+                custOptionsData.push({
+                    id: String(opt.value),
+                    name: opt.textContent,
+                    phone: opt.getAttribute('data-phone') || '',
+                    pan: opt.getAttribute('data-pan') || ''
+                });
+            }
+        });
+        renderCustOptions(custOptionsData);
+        syncCustComboboxValue();
+    }
+
+    function renderCustOptions(list) {
+        const container = document.getElementById('cust_combo_list');
+        const emptyState = document.getElementById('cust_combo_empty');
+        if (!container) return;
+
+        const currentVal = document.getElementById('customer_select').value;
+        
+        if (list.length === 0) {
+            container.innerHTML = '';
+            if (emptyState) emptyState.style.display = 'block';
+            return;
+        }
+        if (emptyState) emptyState.style.display = 'none';
+
+        let html = '';
+        list.forEach(item => {
+            const isSelected = item.id === String(currentVal);
+            const sub = item.phone || item.pan ? `${item.phone ? '📞 ' + item.phone : ''}${item.phone && item.pan ? ' | ' : ''}${item.pan ? 'PAN: ' + item.pan : ''}` : '';
+            const safeName = item.name.replace(/'/g, "\\'");
+
+            html += `
+            <div class="cust-option-item ${isSelected ? 'selected' : ''}" onclick="selectCustFromCombobox('${item.id}', '${safeName}')">
+                <div style="display:flex; align-items:center; gap:9px; min-width:0;">
+                    <div style="width:28px; height:28px; background:${isSelected ? '#2563eb' : '#e2e8f0'}; color:${isSelected ? 'white' : '#64748b'}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0;">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        <div style="font-weight:${isSelected ? '600' : '500'}; color:${isSelected ? '#2563eb' : '#1e293b'}; font-size:13px;">${item.name}</div>
+                        ${sub ? `<div style="font-size:10.5px; color:#64748b; text-overflow:ellipsis; overflow:hidden;">${sub}</div>` : ''}
+                    </div>
+                </div>
+                ${isSelected ? '<i class="fa-solid fa-check" style="color:#2563eb; font-size:13px; margin-left:8px; flex-shrink:0;"></i>' : ''}
+            </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function toggleCustDropdown(e) {
+        if (e) e.stopPropagation();
+        const menu = document.getElementById('cust_combo_menu');
+        const btn = document.getElementById('cust_combo_btn');
+        const arrow = document.getElementById('cust_combo_arrow');
+        if (!menu) return;
+
+        const isOpen = menu.style.display === 'block';
+
+        if (isOpen) {
+            closeCustDropdown();
+        } else {
+            menu.style.display = 'block';
+            if (btn) btn.classList.add('open');
+            if (arrow) arrow.style.transform = 'rotate(180deg)';
+            const input = document.getElementById('cust_search_input');
+            if (input) {
+                input.value = '';
+                filterCustOptions('');
+                setTimeout(() => input.focus(), 50);
+            }
+        }
+    }
+
+    function closeCustDropdown() {
+        const menu = document.getElementById('cust_combo_menu');
+        const btn = document.getElementById('cust_combo_btn');
+        const arrow = document.getElementById('cust_combo_arrow');
+        if (menu) menu.style.display = 'none';
+        if (btn) btn.classList.remove('open');
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
+    }
+
+    function filterCustOptions(q) {
+        const query = q.toLowerCase().trim();
+        const filtered = custOptionsData.filter(c => 
+            c.name.toLowerCase().includes(query) || 
+            c.phone.toLowerCase().includes(query) || 
+            c.pan.toLowerCase().includes(query)
+        );
+        renderCustOptions(filtered);
+    }
+
+    function selectCustFromCombobox(id, name) {
+        const select = document.getElementById('customer_select');
+        select.value = id;
+        syncCustComboboxValue();
+        closeCustDropdown();
+        onCustomerChange(select);
+    }
+
+    function syncCustComboboxValue() {
+        const select = document.getElementById('customer_select');
+        const label = document.getElementById('cust_combo_label');
+        if (!select || !label) return;
+
+        const selectedOpt = select.options[select.selectedIndex];
+        
+        if (selectedOpt && selectedOpt.value) {
+            label.textContent = selectedOpt.textContent;
+            label.style.color = '#1e293b';
+            label.style.fontWeight = '600';
+        } else {
+            label.textContent = 'Select Customer...';
+            label.style.color = '#64748b';
+            label.style.fontWeight = '400';
+        }
+    }
+
+    function triggerAddNewCustFromDropdown() {
+        closeCustDropdown();
+        openAddCustomerModal();
+    }
+
+    document.addEventListener('click', function(e) {
+        const wrapper = document.querySelector('.cust-combo-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            closeCustDropdown();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initCustCombobox();
+    });
+
+    // QUICK ADD CUSTOMER MODAL HANDLERS
     function openAddCustomerModal() {
         cmOpen();
     }
 
     window.onCustomerSaved = function(id, name) {
         const sel = document.getElementById('customer_select');
-        const addNewOpt = sel.querySelector('option[value="__add_new__"]');
-        const newOpt = document.createElement('option');
+        let newOpt = document.createElement('option');
         newOpt.value = id;
         newOpt.textContent = name;
-        if (addNewOpt) {
-            sel.insertBefore(newOpt, addNewOpt);
-        } else {
-            sel.appendChild(newOpt);
-        }
+        sel.appendChild(newOpt);
+
+        custOptionsData.push({ id: String(id), name: name, phone: '', pan: '' });
+
         sel.value = id;
+        renderCustOptions(custOptionsData);
+        syncCustComboboxValue();
         onCustomerChange(sel);
 
-        // Flash select element to indicate success
-        const wrapper = sel.closest('.cust-select-container') || sel;
-        wrapper.style.borderColor = '#16a34a';
-        wrapper.style.boxShadow = '0 0 0 3px rgba(22, 163, 74, 0.15)';
-        setTimeout(() => {
-            wrapper.style.borderColor = '';
-            wrapper.style.boxShadow = '';
-        }, 1500);
+        const btn = document.getElementById('cust_combo_btn');
+        if (btn) {
+            btn.style.borderColor = '#16a34a';
+            btn.style.boxShadow = '0 0 0 3px rgba(22, 163, 74, 0.18)';
+            setTimeout(() => {
+                btn.style.borderColor = '';
+                btn.style.boxShadow = '';
+            }, 1500);
+        }
     };
 
     function renderAllocTable() {
