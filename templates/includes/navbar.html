@@ -20,6 +20,25 @@
 
     </div>
 
+    <div class="nav-quick-actions">
+        <a href="{% url 'invoice_add' %}" class="quick-link-btn sales {% if request.resolver_match.url_name == 'invoice_add' or 'sales/invoice/add' in request.path %}active{% endif %}" title="Create New Sales Invoice">
+            <i class='bx bx-plus'></i>
+            <span>Sales</span>
+        </a>
+        <a href="{% url 'purchase_add' %}" class="quick-link-btn purchase {% if request.resolver_match.url_name == 'purchase_add' or 'purchase/add' in request.path %}active{% endif %}" title="Create New Purchase">
+            <i class='bx bx-plus'></i>
+            <span>Purchase</span>
+        </a>
+        <a href="{% url 'expenses_add' %}" class="quick-link-btn expense {% if request.resolver_match.url_name == 'expenses_add' or 'expenses/add' in request.path %}active{% endif %}" title="Create New Expense">
+            <i class='bx bx-plus'></i>
+            <span>Expense</span>
+        </a>
+        <a href="#" class="quick-link-btn asset {% if request.resolver_match.url_name == 'asset_add' or 'assets/add' in request.path %}active{% endif %}" title="Create New Asset" onclick="alert('Asset creation page is coming soon!'); return false;">
+            <i class='bx bx-plus'></i>
+            <span>Assets</span>
+        </a>
+    </div>
+
     <div class="nav-right">
 
         <span class="support">
