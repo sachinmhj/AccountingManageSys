@@ -1,0 +1,389 @@
+{% load static %}
+{# ================================================================
+   SHARED CUSTOMER MODAL — include this wherever you need it:
+       include "includes/customer_modal.html"
+   Works on:  customers.html, invoice_add.html, quotation_add.html
+   Requires:  Font Awesome 6, csrfmiddlewaretoken in page
+   Callback:  window.onCustomerSaved(id, name) — override per page
+   ================================================================ #}
+<style>
+.cm-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.60);
+    z-index: 9000;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    backdrop-filter: blur(2px);
+}
+.cm-overlay.open { display: flex; }
+.cm-dialog {
+    background: #fff;
+    border-radius: 14px;
+    width: 580px;
+    max-width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+    animation: cmSlideIn .22s cubic-bezier(.4,0,.2,1);
+}
+@keyframes cmSlideIn {
+    from { opacity: 0; transform: translateY(-18px) scale(.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.cm-header {
+    background: linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%);
+    padding: 20px 24px 18px;
+    border-radius: 14px 14px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.cm-header-left { display: flex; align-items: center; gap: 12px; }
+.cm-header-icon {
+    width: 42px; height: 42px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+}
+.cm-header-icon i { color: white; font-size: 18px; }
+.cm-header-text h3 { margin: 0; font-size: 17px; font-weight: 700; color: white; }
+.cm-header-text p  { margin: 2px 0 0; font-size: 11.5px; color: rgba(255,255,255,0.72); }
+.cm-close-btn {
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.15);
+    border: none; border-radius: 8px;
+    cursor: pointer; color: white; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+}
+.cm-close-btn:hover { background: rgba(255,255,255,0.28); }
+.cm-body { padding: 22px 24px 4px; }
+.cm-section-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.cm-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+}
+.cm-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.cm-full { grid-column: span 2; }
+.cm-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 5px;
+}
+.cm-field label .req { color: #dc2626; }
+.cm-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 7px;
+    font-size: 13px;
+    color: #1e293b;
+    background: #fff;
+    box-sizing: border-box;
+    transition: border-color .18s, box-shadow .18s;
+    outline: none;
+}
+.cm-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+.cm-input::placeholder { color: #94a3b8; }
+.cm-error {
+    background: #fff1f2;
+    border: 1.5px solid #fca5a5;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #dc2626;
+    margin-bottom: 16px;
+    align-items: center;
+    gap: 8px;
+}
+.cm-cp-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.5fr 30px;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+.cm-cp-del-btn {
+    border: none;
+    background: #fff1f2;
+    color: #dc2626;
+    border-radius: 6px;
+    width: 28px; height: 28px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+}
+.cm-cp-del-btn:hover { background: #fecaca; }
+.cm-add-cp-btn {
+    font-size: 12px;
+    font-weight: 600;
+    border: 1.5px dashed #93c5fd;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 7px;
+    padding: 7px 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .15s, border-color .15s;
+    margin-bottom: 20px;
+}
+.cm-add-cp-btn:hover { background: #dbeafe; border-color: #60a5fa; }
+.cm-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #f1f5f9;
+    background: #f8fafc;
+    border-radius: 0 0 14px 14px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    position: sticky;
+    bottom: 0;
+}
+.cm-btn-cancel {
+    padding: 9px 20px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 7px;
+    background: white;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #64748b;
+    transition: background .15s, border-color .15s;
+}
+.cm-btn-cancel:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.cm-btn-save {
+    padding: 9px 22px;
+    border: none;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.30);
+    transition: opacity .15s, transform .1s;
+}
+.cm-btn-save:hover  { opacity: .92; }
+.cm-btn-save:active { transform: scale(.97); }
+.cm-btn-save:disabled { opacity: .6; cursor: not-allowed; }
+</style>
+
+<div class="cm-overlay" id="customerModal" role="dialog" aria-modal="true" aria-labelledby="cmModalTitle">
+    <div class="cm-dialog">
+        <div class="cm-header">
+            <div class="cm-header-left">
+                <div class="cm-header-icon">
+                    <i class="fa-solid fa-user-plus" id="cmHeaderIcon"></i>
+                </div>
+                <div class="cm-header-text">
+                    <h3 id="cmModalTitle">Add New Customer</h3>
+                    <p id="cmModalSubtitle">Fill in the details to create a new customer</p>
+                </div>
+            </div>
+            <button type="button" class="cm-close-btn" onclick="cmClose()" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="cm-body">
+            <div class="cm-error" id="cmError" style="display:none;">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="cmErrorMsg">Something went wrong.</span>
+            </div>
+            <input type="hidden" id="cm_customer_id" value="">
+            <div class="cm-section-label">Company Info</div>
+            <div class="cm-grid-2">
+                <div class="cm-field cm-full">
+                    <label>Company / Full Name <span class="req">*</span></label>
+                    <input type="text" id="cm_name" class="cm-input" placeholder="e.g. ABC Traders Pvt. Ltd." autocomplete="off">
+                </div>
+                <div class="cm-field">
+                    <label>Phone Number</label>
+                    <input type="text" id="cm_phone" class="cm-input" placeholder="Main phone">
+                </div>
+                <div class="cm-field">
+                    <label>PAN / VAT Number</label>
+                    <input type="text" id="cm_pan" class="cm-input" placeholder="e.g. 600123456">
+                </div>
+                <div class="cm-field cm-full">
+                    <label>Address</label>
+                    <input type="text" id="cm_address" class="cm-input" placeholder="City, District">
+                </div>
+            </div>
+            <div class="cm-section-label">Contact Persons</div>
+            <div id="cmCpList"></div>
+            <button type="button" class="cm-add-cp-btn" onclick="cmAddCpRow()">
+                <i class="fa-solid fa-plus"></i> Add Another Contact Person
+            </button>
+        </div>
+        <div class="cm-footer">
+            <button type="button" class="cm-btn-cancel" onclick="cmClose()">Cancel</button>
+            <button type="button" class="cm-btn-save" id="cmSaveBtn" onclick="cmSave()">
+                <i class="fa-solid fa-floppy-disk"></i> Save Customer
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    if (typeof window.onCustomerSaved !== 'function') {
+        window.onCustomerSaved = function(id, name) { window.location.reload(); };
+    }
+    function getCSRF() {
+        var el = document.querySelector('[name=csrfmiddlewaretoken]');
+        return el ? el.value : '';
+    }
+    function cmEmptyCpRow(removable) {
+        var row = document.createElement('div');
+        row.className = 'cm-cp-row';
+        row.innerHTML =
+            '<input type="text"  name="cp_name[]"        class="cm-input" placeholder="Name (e.g. Ram Sharma)">' +
+            '<input type="text"  name="cp_designation[]" class="cm-input" placeholder="Role (Owner, MD…)">' +
+            '<input type="text"  name="cp_phone[]"       class="cm-input" placeholder="Phone">' +
+            '<input type="email" name="cp_email[]"       class="cm-input" placeholder="Email">' +
+            (removable
+                ? '<button type="button" class="cm-cp-del-btn" onclick="this.closest(\'.cm-cp-row\').remove()" title="Remove"><i class="fa-solid fa-xmark"></i></button>'
+                : '<span></span>');
+        return row;
+    }
+    function cmInitCpList() {
+        var list = document.getElementById('cmCpList');
+        list.innerHTML = '';
+        list.appendChild(cmEmptyCpRow(false));
+    }
+    window.cmOpen = function() {
+        document.getElementById('cmModalTitle').textContent    = 'Add New Customer';
+        document.getElementById('cmModalSubtitle').textContent = 'Fill in the details to create a new customer';
+        document.getElementById('cmHeaderIcon').className      = 'fa-solid fa-user-plus';
+        document.getElementById('cm_customer_id').value = '';
+        document.getElementById('cm_name').value    = '';
+        document.getElementById('cm_phone').value   = '';
+        document.getElementById('cm_pan').value     = '';
+        document.getElementById('cm_address').value = '';
+        document.getElementById('cmError').style.display = 'none';
+        var btn = document.getElementById('cmSaveBtn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Customer';
+        cmInitCpList();
+        document.getElementById('customerModal').classList.add('open');
+        setTimeout(function(){ document.getElementById('cm_name').focus(); }, 80);
+    };
+    window.cmOpenEdit = function(data) {
+        document.getElementById('cmModalTitle').textContent    = 'Edit Customer';
+        document.getElementById('cmModalSubtitle').textContent = 'Update the customer information below';
+        document.getElementById('cmHeaderIcon').className      = 'fa-solid fa-pen-to-square';
+        document.getElementById('cm_customer_id').value = data.id || '';
+        document.getElementById('cm_name').value    = data.name    || '';
+        document.getElementById('cm_phone').value   = (data.phone   && data.phone   !== 'N/A') ? data.phone   : '';
+        document.getElementById('cm_pan').value     = (data.pan_vat && data.pan_vat !== 'N/A') ? data.pan_vat : '';
+        document.getElementById('cm_address').value = (data.address && data.address !== 'N/A') ? data.address : '';
+        document.getElementById('cmError').style.display = 'none';
+        var btn = document.getElementById('cmSaveBtn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Update Customer';
+        var list = document.getElementById('cmCpList');
+        list.innerHTML = '';
+        var persons = data.contact_persons || [];
+        if (persons.length > 0) {
+            persons.forEach(function(cp, idx) {
+                var row = cmEmptyCpRow(idx > 0);
+                row.querySelector('[name="cp_name[]"]').value        = cp.name || '';
+                row.querySelector('[name="cp_designation[]"]').value = (cp.designation && cp.designation !== 'Contact') ? cp.designation : '';
+                row.querySelector('[name="cp_phone[]"]').value       = (cp.phone !== 'N/A') ? (cp.phone || '') : '';
+                row.querySelector('[name="cp_email[]"]').value       = (cp.email !== 'N/A') ? (cp.email || '') : '';
+                list.appendChild(row);
+            });
+        } else {
+            list.appendChild(cmEmptyCpRow(false));
+        }
+        document.getElementById('customerModal').classList.add('open');
+        setTimeout(function(){ document.getElementById('cm_name').focus(); }, 80);
+    };
+    window.cmClose = function() {
+        document.getElementById('customerModal').classList.remove('open');
+    };
+    window.cmAddCpRow = function() {
+        document.getElementById('cmCpList').appendChild(cmEmptyCpRow(true));
+    };
+    window.cmSave = function() {
+        var name = document.getElementById('cm_name').value.trim();
+        if (!name) {
+            document.getElementById('cmErrorMsg').textContent = 'Customer name / company name is required.';
+            document.getElementById('cmError').style.display = 'flex';
+            document.getElementById('cm_name').focus();
+            return;
+        }
+        document.getElementById('cmError').style.display = 'none';
+        var btn = document.getElementById('cmSaveBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving\u2026';
+        var fd = new FormData();
+        var cid = document.getElementById('cm_customer_id').value;
+        if (cid) fd.append('customer_id', cid);
+        fd.append('name',    name);
+        fd.append('phone',   document.getElementById('cm_phone').value.trim());
+        fd.append('pan_vat', document.getElementById('cm_pan').value.trim());
+        fd.append('address', document.getElementById('cm_address').value.trim());
+        fd.append('csrfmiddlewaretoken', getCSRF());
+        document.querySelectorAll('#cmCpList .cm-cp-row').forEach(function(row) {
+            fd.append('cp_name[]',        row.querySelector('[name="cp_name[]"]')?.value        || '');
+            fd.append('cp_designation[]', row.querySelector('[name="cp_designation[]"]')?.value || '');
+            fd.append('cp_phone[]',       row.querySelector('[name="cp_phone[]"]')?.value       || '');
+            fd.append('cp_email[]',       row.querySelector('[name="cp_email[]"]')?.value       || '');
+        });
+        fetch('/api/customers/add/', { method: 'POST', body: fd })
+            .then(function(r){ return r.json(); })
+            .then(function(data) {
+                if (data.status === 'success') {
+                    cmClose();
+                    window.onCustomerSaved(data.id, data.name);
+                } else {
+                    document.getElementById('cmErrorMsg').textContent = data.message || 'Failed to save customer.';
+                    document.getElementById('cmError').style.display = 'flex';
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Customer';
+                }
+            })
+            .catch(function() {
+                document.getElementById('cmErrorMsg').textContent = 'Network error. Please try again.';
+                document.getElementById('cmError').style.display = 'flex';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Customer';
+            });
+    };
+    document.getElementById('customerModal').addEventListener('click', function(e) {
+        if (e.target === this) cmClose();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('customerModal').classList.contains('open')) {
+            cmClose();
+        }
+    });
+})();
+</script>

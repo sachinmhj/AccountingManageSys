@@ -77,11 +77,31 @@
 
     .form-control, .form-select {
         width: 100%;
-        padding: 6px 10px;
-        border: 1px solid var(--border);
-        border-radius: 4px;
+        padding: 6px 12px;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 7px;
         font-size: 13px;
-        height: 32px;
+        height: 36px;
+        color: #1e293b;
+        background-color: #ffffff;
+        box-sizing: border-box;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        outline: none;
+    }
+    .form-select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 18px 18px;
+        padding-right: 34px;
+        cursor: pointer;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
     .form-control[readonly] { background: var(--bg-light); }
 
@@ -167,12 +187,19 @@
                 <div style="grid-column: span 2; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
                     <div>
                         <label>Customer <span>*</span></label>
-                        <select class="form-select" name="customer" id="customer_select" required onchange="onCustomerChange(this)">
-                            <option value="">Select Customer</option>
-                            {% for c in customers %}
-                                <option value="{{ c.id }}">{{ c.name }}</option>
-                            {% endfor %}
-                        </select>
+                        <div style="display:flex; gap:8px; align-items:center;" class="cust-select-container">
+                            <select class="form-select" name="customer" id="customer_select" required onchange="onCustomerChange(this)" style="flex:1; font-weight:500;">
+                                <option value="">Select Customer...</option>
+                                {% for c in customers %}
+                                    <option value="{{ c.id }}">{{ c.name }}</option>
+                                {% endfor %}
+                                <option value="__add_new__" style="color:#2563eb; font-weight:700; background:#eff6ff;">➕ Add New Customer</option>
+                            </select>
+                            <button type="button" id="btn_quick_add_cust" onclick="openAddCustomerModal()" title="Add New Customer"
+                                style="flex-shrink:0; width:36px; height:36px; border:none; border-radius:7px; background:linear-gradient(135deg, #2563eb, #1d4ed8); color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:0 2px 6px rgba(37,99,235,0.3); transition:transform .1s, opacity .15s;">
+                                <i class="fa-solid fa-user-plus"></i>
+                            </button>
+                        </div>
                     </div>
                     <div>
                         <label>Customer Balance</label>
@@ -518,6 +545,11 @@
         </div>
     </div>
 
+    <!-- ======================== Quick Add Customer Modal ======================== -->
+    {% include "includes/customer_modal.html" %}
+    <!-- ======================== End Quick Add Customer Modal ======================== -->
+    <!-- ======================== End Quick Add Customer Modal ======================== -->
+
     <!-- Sticky Footer -->
     <div class="sticky-footer">
         <div class="footer-left">
@@ -534,6 +566,12 @@
 {% endblock %}
 
 {% block extra_js %}
+<style>
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+</style>
 <script>
     // 1. Load Products from backend JSON
     const products = JSON.parse('{{ products_json|safe|escapejs }}');
@@ -757,6 +795,13 @@
     function onCustomerChange(sel) {
         const customerId = sel.value;
 
+        // If user picks "Add New Customer" option, open the modal instead
+        if (customerId === '__add_new__') {
+            sel.value = '';  // reset dropdown back to empty
+            openAddCustomerModal();
+            return;
+        }
+
         // Reset allocation table
         document.getElementById('alloc_placeholder').style.display = 'block';
         document.getElementById('alloc_table').style.display = 'none';
@@ -791,6 +836,37 @@
                 renderAllocTable();
             });
     }
+
+    // =============================================
+    // QUICK ADD CUSTOMER MODAL
+    // =============================================
+    function openAddCustomerModal() {
+        cmOpen();
+    }
+
+    window.onCustomerSaved = function(id, name) {
+        const sel = document.getElementById('customer_select');
+        const addNewOpt = sel.querySelector('option[value="__add_new__"]');
+        const newOpt = document.createElement('option');
+        newOpt.value = id;
+        newOpt.textContent = name;
+        if (addNewOpt) {
+            sel.insertBefore(newOpt, addNewOpt);
+        } else {
+            sel.appendChild(newOpt);
+        }
+        sel.value = id;
+        onCustomerChange(sel);
+
+        // Flash select element to indicate success
+        const wrapper = sel.closest('.cust-select-container') || sel;
+        wrapper.style.borderColor = '#16a34a';
+        wrapper.style.boxShadow = '0 0 0 3px rgba(22, 163, 74, 0.15)';
+        setTimeout(() => {
+            wrapper.style.borderColor = '';
+            wrapper.style.boxShadow = '';
+        }, 1500);
+    };
 
     function renderAllocTable() {
         const placeholder = document.getElementById('alloc_placeholder');
