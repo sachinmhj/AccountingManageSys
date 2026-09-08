@@ -172,6 +172,58 @@
     .cust-option-item:hover { background: #f1f5f9; color: #1e293b; }
     .cust-option-item.selected { background: #eff6ff; color: #2563eb; font-weight: 600; }
 
+    /* Custom Sales Type Combobox */
+    .st-combo-btn {
+        width: 100%;
+        height: 36px;
+        padding: 6px 12px;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 7px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 13px;
+        font-weight: 500;
+        color: #1e293b;
+        cursor: pointer;
+        box-sizing: border-box;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        outline: none;
+    }
+    .st-combo-btn:hover { border-color: #94a3b8; }
+    .st-combo-btn.open { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+    .st-combo-menu {
+        display: none;
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        z-index: 1200;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        animation: stSlideDown 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes stSlideDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .st-option-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 12px;
+        border-bottom: 1px solid #f8fafc;
+        cursor: pointer;
+        transition: background 0.12s;
+    }
+    .st-option-item:last-child { border-bottom: none; }
+    .st-option-item:hover { background: #f8fafc; }
+    .st-option-item.selected { background: #eff6ff; }
+
     .btn {
         padding: 6px 12px;
         border: 1px solid var(--border);
@@ -341,7 +393,58 @@
                 </div>
                 <div>
                     <label>Sales Type <span>*</span></label>
-                    <select class="form-select" name="sales_type"><option>Goods</option><option>Services</option></select>
+                    <div class="st-combo-wrapper" style="position:relative;">
+                        <select name="sales_type" id="sales_type_select" style="display:none;">
+                            <option value="Goods" selected>Goods</option>
+                            <option value="Services">Services</option>
+                            <option value="Mixed">Mixed / Both</option>
+                        </select>
+                        <button type="button" id="st_combo_btn" class="st-combo-btn" onclick="toggleStDropdown(event)">
+                            <div style="display:flex; align-items:center; gap:8px;" id="st_combo_selected">
+                                <i class="fa-solid fa-box" style="color:#2563eb;"></i>
+                                <span style="font-weight:600; color:#1e293b;">Goods</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-down" id="st_combo_arrow" style="color:#94a3b8; font-size:12px; transition:transform 0.2s;"></i>
+                        </button>
+                        <div id="st_combo_menu" class="st-combo-menu">
+                            <div class="st-option-item selected" onclick="selectSalesType('Goods', 'fa-solid fa-box', '#2563eb', event)">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <div style="width:28px; height:28px; background:#eff6ff; color:#2563eb; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
+                                        <i class="fa-solid fa-box"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:600; color:#1e293b; font-size:13px;">Goods</div>
+                                        <div style="font-size:11px; color:#64748b;">Physical inventory & items</div>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-check st-check" style="color:#2563eb; font-size:13px;"></i>
+                            </div>
+                            <div class="st-option-item" onclick="selectSalesType('Services', 'fa-solid fa-wrench', '#0891b2', event)">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <div style="width:28px; height:28px; background:#ecfeff; color:#0891b2; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
+                                        <i class="fa-solid fa-wrench"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:600; color:#1e293b; font-size:13px;">Services</div>
+                                        <div style="font-size:11px; color:#64748b;">Consulting, labor & work</div>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-check st-check" style="color:#2563eb; font-size:13px; display:none;"></i>
+                            </div>
+                            <div class="st-option-item" onclick="selectSalesType('Mixed', 'fa-solid fa-layer-group', '#8b5cf6', event)">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <div style="width:28px; height:28px; background:#f5f3ff; color:#8b5cf6; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px;">
+                                        <i class="fa-solid fa-layer-group"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:600; color:#1e293b; font-size:13px;">Mixed / Both</div>
+                                        <div style="font-size:11px; color:#64748b;">Goods & Services combined</div>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-check st-check" style="color:#2563eb; font-size:13px; display:none;"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label>Sale Category <span>*</span></label>
@@ -1117,7 +1220,64 @@
         if (wrapper && !wrapper.contains(e.target)) {
             closeCustDropdown();
         }
+        const stWrapper = document.querySelector('.st-combo-wrapper');
+        if (stWrapper && !stWrapper.contains(e.target)) {
+            const menu = document.getElementById('st_combo_menu');
+            const btn = document.getElementById('st_combo_btn');
+            const arrow = document.getElementById('st_combo_arrow');
+            if (menu) menu.style.display = 'none';
+            if (btn) btn.classList.remove('open');
+            if (arrow) arrow.style.transform = 'rotate(0deg)';
+        }
     });
+
+    // SALES TYPE DROPDOWN HANDLERS
+    function toggleStDropdown(e) {
+        if (e) e.stopPropagation();
+        const menu = document.getElementById('st_combo_menu');
+        const btn = document.getElementById('st_combo_btn');
+        const arrow = document.getElementById('st_combo_arrow');
+        const isOpen = menu.style.display === 'block';
+
+        if (isOpen) {
+            menu.style.display = 'none';
+            btn.classList.remove('open');
+            arrow.style.transform = 'rotate(0deg)';
+        } else {
+            menu.style.display = 'block';
+            btn.classList.add('open');
+            arrow.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    function selectSalesType(val, iconClass, iconColor, event) {
+        const select = document.getElementById('sales_type_select');
+        select.value = val;
+        
+        const container = document.getElementById('st_combo_selected');
+        const displayLabel = val === 'Mixed' ? 'Mixed / Both' : val;
+        container.innerHTML = `<i class="${iconClass}" style="color:${iconColor};"></i><span style="font-weight:600; color:#1e293b;">${displayLabel}</span>`;
+        
+        const items = document.querySelectorAll('.st-option-item');
+        items.forEach(item => {
+            item.classList.remove('selected');
+            const check = item.querySelector('.st-check');
+            if (check) check.style.display = 'none';
+        });
+        
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('selected');
+            const check = event.currentTarget.querySelector('.st-check');
+            if (check) check.style.display = 'block';
+        }
+        
+        const menu = document.getElementById('st_combo_menu');
+        const btn = document.getElementById('st_combo_btn');
+        const arrow = document.getElementById('st_combo_arrow');
+        if (menu) menu.style.display = 'none';
+        if (btn) btn.classList.remove('open');
+        if (arrow) arrow.style.transform = 'rotate(0deg)';
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         initCustCombobox();
