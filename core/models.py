@@ -21,6 +21,7 @@ class Contact(models.Model):
     address = models.TextField(blank=True, null=True)
     city = models.CharField(max_length=100, blank=True, null=True)
     pan_vat_number = models.CharField("PAN/VAT Number", max_length=50, blank=True, null=True)
+    pan_type = models.CharField("PAN/VAT Type", max_length=10, choices=[('PAN', 'PAN'), ('VAT', 'VAT')], default='PAN')
     vat_registered = models.BooleanField("VAT Registered", default=False)
     contact_type = models.CharField(max_length=10, choices=CONTACT_TYPES, default='Customer')
 

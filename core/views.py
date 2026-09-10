@@ -776,7 +776,8 @@ class CustomerDetailAPIView(View):
             'phone': customer.phone or "N/A",
             'address': customer.address or "N/A",
             'pan_vat': customer.pan_vat_number or "N/A",
-            'vat_registered': customer.vat_registered,
+            'pan_type': customer.pan_type or "PAN",
+            'vat_registered': customer.vat_registered or (customer.pan_type == 'VAT'),
             'contact_person': customer.contact_person or "N/A",
             'contact_persons': contact_persons,
             'outstanding': outstanding,
@@ -795,16 +796,21 @@ class CustomerAddAPIView(View):
         name = request.POST.get('name')
         phone = request.POST.get('phone')
         pan_vat = request.POST.get('pan_vat')
+        pan_type = request.POST.get('pan_type', 'PAN')
         address = request.POST.get('address')
 
         if not name:
             return JsonResponse({'status': 'error', 'message': 'Name is required'}, status=400)
+
+        is_vat = (pan_type == 'VAT')
 
         if customer_id:
             customer = get_object_or_404(Contact, id=customer_id)
             customer.name = name
             customer.phone = phone
             customer.pan_vat_number = pan_vat
+            customer.pan_type = pan_type
+            customer.vat_registered = is_vat
             customer.address = address
             customer.save()
             # Delete old contact persons to replace them
@@ -814,6 +820,8 @@ class CustomerAddAPIView(View):
                 name=name,
                 phone=phone,
                 pan_vat_number=pan_vat,
+                pan_type=pan_type,
+                vat_registered=is_vat,
                 address=address,
                 opening_balance=Decimal('0.00'),
                 credit_limit=Decimal('0.00'),

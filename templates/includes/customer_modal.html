@@ -227,8 +227,14 @@
                     <input type="text" id="cm_phone" class="cm-input" placeholder="Main phone">
                 </div>
                 <div class="cm-field">
-                    <label>PAN / VAT Number</label>
-                    <input type="text" id="cm_pan" class="cm-input" placeholder="e.g. 600123456">
+                    <label>Tax Number Type & ID</label>
+                    <div style="display:flex; gap:6px;">
+                        <select id="cm_pan_type" class="cm-input" style="width:85px; flex-shrink:0; font-weight:600; cursor:pointer; background-color:#f8fafc;">
+                            <option value="PAN">PAN</option>
+                            <option value="VAT">VAT</option>
+                        </select>
+                        <input type="text" id="cm_pan" class="cm-input" placeholder="e.g. 600123456" style="flex:1;">
+                    </div>
                 </div>
                 <div class="cm-field cm-full">
                     <label>Address</label>
@@ -256,8 +262,18 @@
         window.onCustomerSaved = function(id, name) { window.location.reload(); };
     }
     function getCSRF() {
-        var el = document.querySelector('[name=csrfmiddlewaretoken]');
-        return el ? el.value : '';
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, 10) === ('csrftoken=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(10));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
     function cmEmptyCpRow(removable) {
         var row = document.createElement('div');
@@ -285,6 +301,7 @@
         document.getElementById('cm_name').value    = '';
         document.getElementById('cm_phone').value   = '';
         document.getElementById('cm_pan').value     = '';
+        document.getElementById('cm_pan_type').value= 'PAN';
         document.getElementById('cm_address').value = '';
         document.getElementById('cmError').style.display = 'none';
         var btn = document.getElementById('cmSaveBtn');
@@ -302,6 +319,7 @@
         document.getElementById('cm_name').value    = data.name    || '';
         document.getElementById('cm_phone').value   = (data.phone   && data.phone   !== 'N/A') ? data.phone   : '';
         document.getElementById('cm_pan').value     = (data.pan_vat && data.pan_vat !== 'N/A') ? data.pan_vat : '';
+        document.getElementById('cm_pan_type').value= data.pan_type || 'PAN';
         document.getElementById('cm_address').value = (data.address && data.address !== 'N/A') ? data.address : '';
         document.getElementById('cmError').style.display = 'none';
         var btn = document.getElementById('cmSaveBtn');
@@ -349,6 +367,7 @@
         fd.append('name',    name);
         fd.append('phone',   document.getElementById('cm_phone').value.trim());
         fd.append('pan_vat', document.getElementById('cm_pan').value.trim());
+        fd.append('pan_type',document.getElementById('cm_pan_type').value);
         fd.append('address', document.getElementById('cm_address').value.trim());
         fd.append('csrfmiddlewaretoken', getCSRF());
         document.querySelectorAll('#cmCpList .cm-cp-row').forEach(function(row) {
