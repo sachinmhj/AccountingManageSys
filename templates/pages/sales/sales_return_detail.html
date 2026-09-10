@@ -56,6 +56,14 @@
                 </div>
             </div>
         </div>
+        {% if sales_return.bill_attachment %}
+        <div style="margin-top:24px; padding-top:16px; border-top:1px solid #e2e8f0;">
+            <h4 style="margin:0 0 10px; font-size:14px; color:#475569;">Attached Bill / Memo</h4>
+            <a href="{{ sales_return.bill_attachment.url }}" target="_blank" style="display:inline-flex; align-items:center; gap:8px; padding:8px 12px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; color:#2563eb; text-decoration:none; font-size:13px; font-weight:500;">
+                <i class="fa-solid fa-paperclip"></i> View / Download Attachment
+            </a>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

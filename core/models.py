@@ -403,6 +403,7 @@ class SalesReturn(models.Model):
     refund_method = models.CharField(max_length=30, choices=REFUND_METHOD_CHOICES, default='Adjust in Next Invoice')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     notes = models.TextField(blank=True, null=True)
+    bill_attachment = models.FileField(upload_to='sales_returns/attachments/', blank=True, null=True)
 
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

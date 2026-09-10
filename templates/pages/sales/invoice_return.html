@@ -67,7 +67,7 @@
     </div>
 
     <!-- Return Form -->
-    <form method="POST" action="{% url 'invoice_return' %}" id="returnForm">
+    <form method="POST" action="{% url 'invoice_return' %}" id="returnForm" enctype="multipart/form-data">
         {% csrf_token %}
 
         <!-- Section 1: Header -->
@@ -121,7 +121,55 @@
                         <option value="Refund to Customer">Refund to Customer</option>
                     </select>
                 </div>
-                <div style="grid-column:span 2;">
+                <div>
+                    <label><i class="fa-solid fa-paperclip" style="color:var(--primary); margin-right:4px;"></i> Bill Image / Memo</label>
+                    <input type="file" name="bill_attachment" id="return_attachment_input" accept="image/*,.pdf" style="display:none;" onchange="handleReturnFileSelect(this.files[0])">
+                    
+                    <!-- Drop Zone -->
+                    <div id="return_attach_dropzone" 
+                        style="border:2px dashed #cbd5e1; border-radius:8px; padding:6px 12px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:#f8fafc; transition:all 0.2s;"
+                        onclick="document.getElementById('return_attachment_input').click();"
+                        ondragover="event.preventDefault(); this.style.borderColor='#2563eb'; this.style.background='#eff6ff';"
+                        ondragleave="this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc';"
+                        ondrop="handleReturnFileDrop(event);">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div style="width:30px; height:30px; background:#eff6ff; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#2563eb;">
+                                <i class="fa-solid fa-cloud-arrow-up" style="font-size:13px;"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:11.5px; font-weight:600; color:#334155;">Upload Bill / Memo</div>
+                                <div style="font-size:10px; color:#94a3b8;">PNG, JPG, PDF</div>
+                            </div>
+                        </div>
+                        <span style="font-size:10.5px; font-weight:600; color:#2563eb; background:#dbeafe; padding:3px 8px; border-radius:5px;">Browse</span>
+                    </div>
+
+                    <!-- Attachment Summary Pill (shown after file selected) -->
+                    <div id="return_attach_preview_pill" 
+                        style="display:none; border:1px solid #bfdbfe; background:#eff6ff; border-radius:8px; padding:6px 10px; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                            <div style="width:30px; height:30px; background:#2563eb; color:#fff; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                <i id="return_preview_icon" class="fa-solid fa-file-image"></i>
+                            </div>
+                            <div style="min-width:0; overflow:hidden;">
+                                <div id="return_preview_filename" style="font-size:11.5px; font-weight:600; color:#1e293b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:90px;"></div>
+                                <div style="font-size:10px; color:#16a34a; font-weight:600;"><i class="fa-solid fa-circle-check"></i> Attached</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+                            <button type="button" class="btn" style="padding:4px 7px; font-size:10.5px; background:#2563eb; color:#fff; border:none;" onclick="openAttachmentPreviewModal()" title="Preview File">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button type="button" class="btn" style="padding:4px 7px; font-size:10.5px; background:#fff; color:#475569; border:1px solid #cbd5e1;" onclick="document.getElementById('return_attachment_input').click()" title="Change File">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button type="button" class="btn" style="padding:4px 7px; font-size:10.5px; background:#fee2e2; color:#dc2626; border:none;" onclick="clearReturnAttachment()" title="Remove File">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div>
                     <label>Reason for Return</label>
                     <input type="text" class="form-control" name="notes" placeholder="e.g. Defective item, Wrong product delivered...">
                 </div>
@@ -484,5 +532,126 @@
         }
         applySettings();
     }
+
+    /* ── Attachment Handling & Preview Modal ────────────────────── */
+    let returnAttachmentFile = null;
+    let returnAttachmentObjectUrl = null;
+
+    function handleReturnFileSelect(file) {
+        if (!file) return;
+        returnAttachmentFile = file;
+
+        if (returnAttachmentObjectUrl) {
+            URL.revokeObjectURL(returnAttachmentObjectUrl);
+        }
+        returnAttachmentObjectUrl = URL.createObjectURL(file);
+
+        const dropzone = document.getElementById('return_attach_dropzone');
+        const pill = document.getElementById('return_attach_preview_pill');
+        const filenameEl = document.getElementById('return_preview_filename');
+        const iconEl = document.getElementById('return_preview_icon');
+
+        if (filenameEl) filenameEl.textContent = file.name;
+        if (iconEl) {
+            if (file.type.startsWith('image/')) {
+                iconEl.className = 'fa-solid fa-file-image';
+            } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+                iconEl.className = 'fa-solid fa-file-pdf';
+            } else {
+                iconEl.className = 'fa-solid fa-file-lines';
+            }
+        }
+
+        if (dropzone) dropzone.style.display = 'none';
+        if (pill) pill.style.display = 'flex';
+    }
+
+    function handleReturnFileDrop(e) {
+        e.preventDefault();
+        const dropzone = document.getElementById('return_attach_dropzone');
+        if (dropzone) {
+            dropzone.style.borderColor = '#cbd5e1';
+            dropzone.style.background = '#f8fafc';
+        }
+        const files = e.dataTransfer ? e.dataTransfer.files : null;
+        if (files && files[0]) {
+            const input = document.getElementById('return_attachment_input');
+            const dt = new DataTransfer();
+            dt.items.add(files[0]);
+            input.files = dt.files;
+            handleReturnFileSelect(files[0]);
+        }
+    }
+
+    function clearReturnAttachment() {
+        const input = document.getElementById('return_attachment_input');
+        const dropzone = document.getElementById('return_attach_dropzone');
+        const pill = document.getElementById('return_attach_preview_pill');
+
+        if (input) input.value = '';
+        if (returnAttachmentObjectUrl) {
+            URL.revokeObjectURL(returnAttachmentObjectUrl);
+            returnAttachmentObjectUrl = null;
+        }
+        returnAttachmentFile = null;
+
+        if (dropzone) dropzone.style.display = 'flex';
+        if (pill) pill.style.display = 'none';
+    }
+
+    function openAttachmentPreviewModal() {
+        if (!returnAttachmentFile || !returnAttachmentObjectUrl) return;
+        const modal = document.getElementById('attachmentPreviewModal');
+        const img = document.getElementById('modal_preview_image');
+        const pdf = document.getElementById('modal_preview_pdf');
+        const fallback = document.getElementById('modal_preview_fallback');
+        const filenameLabel = document.getElementById('modal_preview_filename');
+
+        if (filenameLabel) filenameLabel.textContent = returnAttachmentFile.name;
+
+        if (returnAttachmentFile.type.startsWith('image/')) {
+            img.src = returnAttachmentObjectUrl;
+            img.style.display = 'block';
+            pdf.style.display = 'none';
+            fallback.style.display = 'none';
+        } else if (returnAttachmentFile.type === 'application/pdf' || returnAttachmentFile.name.endsWith('.pdf')) {
+            pdf.src = returnAttachmentObjectUrl;
+            pdf.style.display = 'block';
+            img.style.display = 'none';
+            fallback.style.display = 'none';
+        } else {
+            img.style.display = 'none';
+            pdf.style.display = 'none';
+            fallback.style.display = 'block';
+        }
+
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeAttachmentPreviewModal() {
+        const modal = document.getElementById('attachmentPreviewModal');
+        if (modal) modal.style.display = 'none';
+    }
 </script>
+
+<!-- Attachment Preview Modal -->
+<div id="attachmentPreviewModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.65); backdrop-filter:blur(3px); z-index:99999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#fff; border-radius:12px; width:100%; max-width:850px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
+        <div style="padding:14px 20px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-paperclip" style="color:#2563eb;"></i>
+                <span id="modal_preview_filename" style="font-weight:600; color:#1e293b; font-size:14px;">Bill Preview</span>
+            </div>
+            <button type="button" onclick="closeAttachmentPreviewModal()" style="background:none; border:none; font-size:20px; color:#64748b; cursor:pointer; line-height:1;">&times;</button>
+        </div>
+        <div style="padding:20px; flex:1; overflow:auto; display:flex; align-items:center; justify-content:center; background:#f1f5f9;">
+            <img id="modal_preview_image" src="" style="max-width:100%; max-height:70vh; object-fit:contain; border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,0.15); display:none;">
+            <iframe id="modal_preview_pdf" src="" style="width:100%; height:70vh; border:none; border-radius:6px; display:none;"></iframe>
+            <div id="modal_preview_fallback" style="display:none; text-align:center; padding:40px; color:#64748b;">
+                <i class="fa-solid fa-file-arrow-down" style="font-size:48px; color:#94a3b8; margin-bottom:12px;"></i>
+                <p style="margin:0;">Preview not available for this file type.</p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

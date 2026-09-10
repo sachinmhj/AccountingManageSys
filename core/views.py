@@ -170,6 +170,8 @@ class SalesReturnView(View):
         if original_invoice_id:
             original_invoice = Invoice.objects.filter(id=original_invoice_id).first()
 
+        bill_attachment = request.FILES.get('bill_attachment')
+
         sales_return = SalesReturn.objects.create(
             customer=customer,
             original_invoice=original_invoice,
@@ -178,6 +180,7 @@ class SalesReturnView(View):
             mobile=mobile,
             refund_method=refund_method,
             notes=notes,
+            bill_attachment=bill_attachment,
             status='Pending',
             created_by=request.user if request.user.is_authenticated else None
         )
