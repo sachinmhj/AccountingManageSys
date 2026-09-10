@@ -551,7 +551,7 @@
 
     .table-responsive-wrap .data-table {
         margin-bottom: 0;
-        min-width: 920px;
+        min-width: 1300px;
     }
 
     .table-responsive-wrap.alloc-table-wrap .data-table {
@@ -582,6 +582,20 @@
 
     .table-responsive-wrap::-webkit-scrollbar-thumb:hover {
         background: #94a3b8;
+    }
+
+    /* Hide number spin arrows for numeric row inputs */
+    .row-disc::-webkit-outer-spin-button,
+    .row-disc::-webkit-inner-spin-button,
+    .row-qty::-webkit-outer-spin-button,
+    .row-qty::-webkit-inner-spin-button,
+    .row-rate::-webkit-outer-spin-button,
+    .row-rate::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .row-disc, .row-qty, .row-rate {
+        -moz-appearance: textfield;
     }
 
     .viewer-header {
@@ -1072,18 +1086,18 @@
                         <table class="data-table" id="itemsTable">
                             <thead>
                                 <tr>
-                                    <th style="width:3%">#</th>
-                                    <th style="width:15%">Item / Product</th>
-                                    <th style="width:14%">Description</th>
-                                    <th style="width:6%">Qty</th>
-                                    <th style="width:7%">Unit</th>
-                                    <th style="width:9%">Rate</th>
-                                    <th style="width:8%">Discount</th>
-                                    <th style="width:8%">VAT %</th>
-                                    <th style="width:10%">Amount</th>
-                                    <th style="width:7%">Cost</th>
-                                    <th style="width:7%">Profit</th>
-                                    <th style="width:6%">Action</th>
+                                    <th style="min-width:40px; width:40px;">#</th>
+                                    <th style="min-width:175px;">Item / Product</th>
+                                    <th style="min-width:140px;">Description</th>
+                                    <th style="min-width:70px;">Qty</th>
+                                    <th style="min-width:80px;">Unit</th>
+                                    <th style="min-width:100px;">Rate</th>
+                                    <th style="min-width:130px;">Discount</th>
+                                    <th style="min-width:120px;">VAT %</th>
+                                    <th style="min-width:110px;">Amount</th>
+                                    <th style="min-width:90px;">Cost</th>
+                                    <th style="min-width:90px;">Profit</th>
+                                    <th style="min-width:80px;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="itemsBody"></tbody>
@@ -1620,7 +1634,17 @@
                 </select>
             </td>
             <td><input type="number" step="0.01" class="row-rate" name="unit_price[]" value="0.00" oninput="calculateRow(this)" required></td>
-            <td><input type="number" step="0.01" class="row-disc" name="discount[]" value="0.00" oninput="calculateRow(this)"></td>
+            <td style="padding:4px 6px;">
+                <div style="display:flex; align-items:stretch; border:1px solid #cbd5e1; border-radius:5px; overflow:hidden; background:#fff; height:30px;">
+                    <input type="number" step="0.01" class="row-disc" name="discount[]" value="0.00" oninput="calculateRow(this)"
+                        style="flex:1; width:0; border:none; outline:none; padding:0 6px; text-align:right; font-size:12px;">
+                    <select class="row-disc-type" name="discount_type[]" onchange="calculateRow(this)"
+                        style="width:38px; flex-shrink:0; border:none; border-left:1px solid #cbd5e1; background:#f1f5f9; color:#334155; padding:0 2px; font-size:11px; outline:none; cursor:pointer; font-weight:700; text-align:center; -webkit-appearance:none; -moz-appearance:none; appearance:none;">
+                        <option value="Amount">Amt</option>
+                        <option value="Percent">%</option>
+                    </select>
+                </div>
+            </td>
             <td>
                 <select class="form-select row-tax" name="tax_type[]" onchange="calculateRow(this)">
                     <option value="Standard">Standard (13%)</option>
@@ -1681,10 +1705,19 @@
         const qty = parseFloat(tr.querySelector(".row-qty").value) || 0;
         const rate = parseFloat(tr.querySelector(".row-rate").value) || 0;
         const taxType = tr.querySelector(".row-tax").value;
-        const disc = parseFloat(tr.querySelector(".row-disc").value) || 0;
+        const discValue = parseFloat(tr.querySelector(".row-disc").value) || 0;
+        const discType = tr.querySelector(".row-disc-type").value;
         const overallVt = document.getElementById("vt_hidden_input")?.value || "Standard";
 
-        const subtotal = (qty * rate) - disc;
+        const grossAmount = qty * rate;
+        let disc = 0;
+        if (discType === 'Percent') {
+            disc = grossAmount * (discValue / 100);
+        } else {
+            disc = discValue;
+        }
+
+        const subtotal = grossAmount - disc;
         let amount = subtotal;
 
         const isTaxable = (overallVt === 'Standard') && (taxType === 'Standard' || taxType === 'Taxable');
@@ -1722,11 +1755,19 @@
         document.querySelectorAll("#itemsBody tr").forEach(tr => {
             const qty = parseFloat(tr.querySelector('.row-qty')?.value) || 0;
             const rate = parseFloat(tr.querySelector('.row-rate')?.value) || 0;
-            const disc = parseFloat(tr.querySelector('.row-disc')?.value) || 0;
+            const discValue = parseFloat(tr.querySelector('.row-disc')?.value) || 0;
+            const discType = tr.querySelector('.row-disc-type')?.value || 'Amount';
             const taxType = tr.querySelector('.row-tax')?.value || 'Standard';
+            
             const lineGross = qty * rate;
-            const lineDisc = disc; // treat as absolute discount per item for now
+            let lineDisc = 0;
+            if (discType === 'Percent') {
+                lineDisc = lineGross * (discValue / 100);
+            } else {
+                lineDisc = discValue;
+            }
             const lineSub = lineGross - lineDisc;
+            
             subTotal += lineSub;
             totalDiscount += lineDisc;
 
