@@ -312,7 +312,7 @@ class InvoiceAddView(View):
                 preloaded_doc = None
 
         # Serialize products for JavaScript to auto-populate Rate, Unit, Tax Type, Cost, Description
-        product_list = list(products.values('id', 'name', 'code', 'selling_price', 'unit', 'purchase_price', 'description'))
+        product_list = list(products.values('id', 'name', 'code', 'hs_code', 'selling_price', 'unit', 'purchase_price', 'description'))
         
         context = {
             'customers': customers,
@@ -357,6 +357,7 @@ class InvoiceAddView(View):
         unit_prices = request.POST.getlist('unit_price[]')
         tax_types = request.POST.getlist('tax_type[]')
         units = request.POST.getlist('unit[]')
+        hs_codes = request.POST.getlist('hs_code[]')
 
         subtotal_taxable = Decimal('0.00')
         subtotal_nontaxable = Decimal('0.00')
@@ -410,6 +411,7 @@ class InvoiceAddView(View):
                 invoice=invoice,
                 product=product,
                 item_code=product.code,
+                hs_code=hs_codes[i] if i < len(hs_codes) else (product.hs_code or ''),
                 unit=unit,
                 quantity=qty,
                 is_return=is_ret,
@@ -950,6 +952,7 @@ class InventoryProductView(View):
             return redirect('inventory_product')
 
         code = request.POST.get('code') or None
+        hs_code = request.POST.get('hs_code') or None
         product_type = request.POST.get('product_type', 'Goods')
         category_id = request.POST.get('category') or None
         unit = request.POST.get('unit', 'Pcs')
@@ -960,6 +963,7 @@ class InventoryProductView(View):
         Product.objects.create(
             name=name,
             code=code,
+            hs_code=hs_code,
             product_type=product_type,
             category_id=category_id if category_id else None,
             unit=unit,

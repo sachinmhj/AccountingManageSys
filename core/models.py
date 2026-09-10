@@ -89,6 +89,7 @@ class Product(models.Model):
     )
     code = models.CharField("Item Code", max_length=50, blank=True, null=True, unique=True)
     name = models.CharField(max_length=255)
+    hs_code = models.CharField("HS Code", max_length=20, blank=True, null=True, help_text="Harmonized System Code for customs/tax classification")
     product_type = models.CharField(max_length=10, choices=PRODUCT_TYPES, default='Goods')
     category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, null=True, blank=True)
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES, default='Pcs')
@@ -232,6 +233,7 @@ class InvoiceItem(models.Model):
 
     # Item details
     item_code = models.CharField(max_length=50, blank=True, null=True)
+    hs_code = models.CharField("HS Code", max_length=20, blank=True, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
     unit = models.CharField(max_length=20, default='Pcs')
 

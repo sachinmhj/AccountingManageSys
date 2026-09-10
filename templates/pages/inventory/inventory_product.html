@@ -125,6 +125,7 @@
                     <th>Product Name</th>
                     <th>Type</th>
                     <th>Category</th>
+                    <th>HS Code</th>
                     <th>Unit</th>
                     <th style="text-align:right">Cost Price</th>
                     <th style="text-align:right">Selling Price</th>
@@ -145,6 +146,7 @@
                         {% endif %}
                     </td>
                     <td>{{ p.category.name|default:"—" }}</td>
+                    <td style="color:var(--text-gray); font-family:monospace;">{{ p.hs_code|default:"—" }}</td>
                     <td>{{ p.unit }}</td>
                     <td style="text-align:right;">Rs. {{ p.purchase_price|floatformat:2 }}</td>
                     <td style="text-align:right; font-weight:600; color:var(--primary);">Rs. {{ p.selling_price|floatformat:2 }}</td>
@@ -184,6 +186,10 @@
                 <div class="form-group">
                     <label>Item Code / SKU</label>
                     <input type="text" name="code" class="form-control" placeholder="e.g. HP-001">
+                </div>
+                <div class="form-group">
+                    <label>HS Code</label>
+                    <input type="text" name="hs_code" class="form-control" placeholder="e.g. 8471.30">
                 </div>
                 <div class="form-group">
                     <label>Product Type <span>*</span></label>
