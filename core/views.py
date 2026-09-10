@@ -925,6 +925,43 @@ class UnpaidInvoicesJsonView(View):
         return JsonResponse({'invoices': data})
 
 
+class CustomerInvoicesJsonView(View):
+    """Return all invoices for a customer, optionally filtered by product IDs."""
+    def get(self, request, customer_id):
+        # Optional: filter by comma-separated product IDs
+        product_ids_str = request.GET.get('products', '')
+        product_ids = [int(x) for x in product_ids_str.split(',') if x.strip().isdigit()]
+
+        qs = Invoice.objects.filter(customer_id=customer_id).order_by('-date')
+
+        # If product IDs are given, only include invoices that contain at least one of those products
+        if product_ids:
+            qs = qs.filter(items__product_id__in=product_ids).distinct()
+
+        data = []
+        for inv in qs:
+            # Gather products in this invoice that match the filter (or all if no filter)
+            items_qs = inv.items.select_related('product')
+            if product_ids:
+                items_qs = items_qs.filter(product_id__in=product_ids)
+
+            items_count = items_qs.count()
+
+            data.append({
+                'id': inv.id,
+                'invoice_number': inv.invoice_number,
+                'date': inv.date.strftime('%Y-%m-%d'),
+                'date_display': inv.date.strftime('%b %d, %Y'),
+                'status': inv.status,
+                'total_amount': str(inv.total_amount),
+                'paid_amount': str(inv.paid_amount),
+                'balance_due': str(inv.balance_due),
+                'items_count': items_count,
+            })
+
+        return JsonResponse({'invoices': data})
+
+
 # ==================== INVENTORY ====================
 
 class InventoryView(TemplateView):

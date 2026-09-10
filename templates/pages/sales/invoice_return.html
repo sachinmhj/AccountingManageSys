@@ -76,7 +76,7 @@
             <div class="grid-4">
                 <div>
                     <label>Customer <span>*</span></label>
-                    <select class="form-select" name="customer" required>
+                    <select class="form-select" name="customer" id="return_customer" onchange="onCustomerChange()" required>
                         <option value="">Select Customer</option>
                         {% for c in customers %}
                             <option value="{{ c.id }}">{{ c.name }}</option>
@@ -166,55 +166,45 @@
 
     </form>
 
-    <!-- Recent Returns History -->
+    <!-- Customer Invoices Panel -->
     <div class="panel" id="panel_return_history">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-            <div class="panel-header" style="margin:0;"><i class="fa-solid fa-clock-rotate-left"></i> Recent Returns</div>
-            {% if recent_returns %}
-            <button type="button" id="btn_see_all_returns" onclick="toggleAllReturns()" style="background:transparent; border:none; color:var(--primary); font-size:12px; font-weight:600; cursor:pointer;">See All</button>
-            {% endif %}
+            <div class="panel-header" style="margin:0;"><i class="fa-solid fa-file-invoice"></i> Customer Invoices</div>
+            <span id="cust_inv_count" style="font-size:12px; color:var(--text-gray);"></span>
         </div>
-        {% if recent_returns %}
-        <table class="hist-table">
-            <thead>
-                <tr>
-                    <th>Return No.</th>
-                    <th>Date</th>
-                    <th>Customer</th>
-                    <th>Original Invoice</th>
-                    <th>Refund Method</th>
-                    <th style="text-align:right">Amount</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for r in recent_returns %}
-                <tr class="return-history-row" {% if forloop.counter > 5 %}style="display:none;"{% endif %} data-index="{{ forloop.counter }}">
-                    <td style="color:var(--danger); font-weight:500;">{{ r.return_number }}</td>
-                    <td>{{ r.return_date }}</td>
-                    <td>{{ r.customer.name }}</td>
-                    <td style="color:var(--primary);">{{ r.original_invoice.invoice_number|default:"—" }}</td>
-                    <td style="color:var(--text-gray);">{{ r.refund_method }}</td>
-                    <td style="text-align:right; font-weight:600;">Rs. {{ r.total_amount|floatformat:2 }}</td>
-                    <td>
-                        {% if r.status == 'Pending' %}
-                            <span class="status-badge status-pending">Pending</span>
-                        {% elif r.status == 'Adjusted' %}
-                            <span class="status-badge status-adjusted">Adjusted</span>
-                        {% else %}
-                            <span class="status-badge status-refunded">Refunded</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div style="text-align:center; padding:40px; color:var(--text-gray);">
-            <i class="fa-solid fa-rotate-left" style="font-size:32px; display:block; margin-bottom:8px; opacity:0.25;"></i>
-            No sales returns processed yet.
+
+        <!-- Empty state -->
+        <div id="cust_inv_empty" style="text-align:center; padding:40px; color:var(--text-gray);">
+            <i class="fa-solid fa-user-clock" style="font-size:32px; display:block; margin-bottom:8px; opacity:0.25;"></i>
+            Select a customer above to view their invoices.
         </div>
-        {% endif %}
+
+        <!-- Loading state -->
+        <div id="cust_inv_loading" style="display:none; text-align:center; padding:30px; color:var(--text-gray);">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size:24px; margin-bottom:8px; display:block;"></i>
+            Loading invoices...
+        </div>
+
+        <!-- Invoices table -->
+        <div id="cust_inv_table_wrap" style="display:none;">
+            <table class="hist-table" id="cust_inv_table">
+                <thead>
+                    <tr>
+                        <th>Invoice No.</th>
+                        <th>Date</th>
+                        <th style="text-align:right">Total</th>
+                        <th style="text-align:right">Paid</th>
+                        <th style="text-align:right">Due</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="cust_inv_tbody"></tbody>
+            </table>
+            <div id="cust_inv_no_match" style="display:none; text-align:center; padding:24px; color:var(--text-gray); font-size:13px;">
+                <i class="fa-solid fa-magnifying-glass" style="font-size:24px; display:block; margin-bottom:8px; opacity:0.3;"></i>
+                No invoices contain the selected products.
+            </div>
+        </div>
     </div>
 
     <!-- Settings Modal -->
@@ -265,7 +255,7 @@
 
         tr.innerHTML = `
             <td>
-                <select class="form-select row-product" name="product_id[]" onchange="returnProductSelected(this)" required>
+                <select class="form-select row-product" name="product_id[]" onchange="returnProductSelected(this); refreshInvoices();" required>
                     ${productOptions}
                 </select>
             </td>
@@ -302,6 +292,7 @@
     function removeReturnRow(btn) {
         btn.closest("tr").remove();
         calcReturnTotals();
+        refreshInvoices();
     }
 
     function returnProductSelected(sel) {
@@ -344,7 +335,112 @@
         document.getElementById("lbl_total").textContent    = returnGrandTotal.toFixed(2);
     }
 
-    // Settings Modal Logic
+    /* ── Customer Invoices Panel ─────────────────────────────────── */
+    let _lastCustomerId = null;
+    let _allInvoicesCache = []; // all invoices for current customer
+
+    function onCustomerChange() {
+        const customerId = document.getElementById('return_customer').value;
+        _lastCustomerId = customerId || null;
+        _allInvoicesCache = [];
+
+        if (!customerId) {
+            showInvEmpty();
+            return;
+        }
+        loadCustomerInvoices(customerId, []);
+    }
+
+    function getSelectedProductIds() {
+        const ids = [];
+        document.querySelectorAll('#returnItemsBody .row-product').forEach(sel => {
+            if (sel.value) ids.push(parseInt(sel.value));
+        });
+        return [...new Set(ids)]; // dedupe
+    }
+
+    function refreshInvoices() {
+        if (!_lastCustomerId) return;
+        const productIds = getSelectedProductIds();
+        loadCustomerInvoices(_lastCustomerId, productIds);
+    }
+
+    function showInvEmpty() {
+        document.getElementById('cust_inv_empty').style.display = '';
+        document.getElementById('cust_inv_loading').style.display = 'none';
+        document.getElementById('cust_inv_table_wrap').style.display = 'none';
+        document.getElementById('cust_inv_count').textContent = '';
+    }
+
+    function loadCustomerInvoices(customerId, productIds) {
+        document.getElementById('cust_inv_empty').style.display = 'none';
+        document.getElementById('cust_inv_loading').style.display = '';
+        document.getElementById('cust_inv_table_wrap').style.display = 'none';
+
+        let url = `/api/customer-invoices/${customerId}/`;
+        if (productIds.length > 0) url += `?products=${productIds.join(',')}`;
+
+        fetch(url)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('cust_inv_loading').style.display = 'none';
+                renderInvoiceTable(data.invoices || []);
+            })
+            .catch(() => {
+                document.getElementById('cust_inv_loading').style.display = 'none';
+                showInvEmpty();
+            });
+    }
+
+    function renderInvoiceTable(invoices) {
+        const tbody = document.getElementById('cust_inv_tbody');
+        const noMatch = document.getElementById('cust_inv_no_match');
+        const wrap = document.getElementById('cust_inv_table_wrap');
+        const countEl = document.getElementById('cust_inv_count');
+
+        tbody.innerHTML = '';
+        wrap.style.display = '';
+
+        if (invoices.length === 0) {
+            document.getElementById('cust_inv_table').style.display = 'none';
+            noMatch.style.display = '';
+            countEl.textContent = 'No matching invoices';
+            return;
+        }
+
+        document.getElementById('cust_inv_table').style.display = '';
+        noMatch.style.display = 'none';
+        countEl.textContent = `${invoices.length} invoice${invoices.length !== 1 ? 's' : ''} found`;
+
+        const statusColors = {
+            'Paid': { bg: '#f0fdf4', color: '#16a34a' },
+            'Unpaid': { bg: '#fef2f2', color: '#dc2626' },
+            'Partially Paid': { bg: '#fff7ed', color: '#d97706' },
+            'Draft': { bg: '#f1f5f9', color: '#64748b' },
+        };
+
+        invoices.forEach(inv => {
+            const sc = statusColors[inv.status] || { bg: '#f1f5f9', color: '#64748b' };
+
+            const due = parseFloat(inv.balance_due);
+            const dueStr = due > 0
+                ? `<span style="color:#dc2626; font-weight:600;">Rs. ${parseFloat(inv.balance_due).toLocaleString('en-NP', {minimumFractionDigits:2})}</span>`
+                : `<span style="color:#16a34a;">Rs. ${parseFloat(inv.balance_due).toLocaleString('en-NP', {minimumFractionDigits:2})}</span>`;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="color:#2563eb; font-weight:500;">${inv.invoice_number}</td>
+                <td>${inv.date_display}</td>
+                <td style="text-align:right;">Rs. ${parseFloat(inv.total_amount).toLocaleString('en-NP', {minimumFractionDigits:2})}</td>
+                <td style="text-align:right; color:#16a34a;">Rs. ${parseFloat(inv.paid_amount).toLocaleString('en-NP', {minimumFractionDigits:2})}</td>
+                <td style="text-align:right;">${dueStr}</td>
+                <td><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;background:${sc.bg};color:${sc.color};">${inv.status}</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    /* ── Settings Modal Logic ────────────────────────────────────── */
     const returnPanels = ['return_info', 'return_items', 'return_summary', 'return_history'];
 
     function toggleSettingsModal() {
@@ -371,20 +467,6 @@
         }
 
         localStorage.setItem('sales_return_settings', JSON.stringify(settings));
-    }
-
-    // Toggle See All / See Less for Recent Returns
-    let allReturnsVisible = false;
-    function toggleAllReturns() {
-        allReturnsVisible = !allReturnsVisible;
-        document.querySelectorAll('.return-history-row').forEach(row => {
-            const idx = parseInt(row.dataset.index);
-            if (idx > 5) {
-                row.style.display = allReturnsVisible ? '' : 'none';
-            }
-        });
-        const btn = document.getElementById('btn_see_all_returns');
-        if (btn) btn.textContent = allReturnsVisible ? 'See Less' : 'See All';
     }
 
     function loadSettings() {
