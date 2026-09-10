@@ -13,7 +13,8 @@ from .models import (
     InvoiceAllocation, PaymentAllocation, CustomerPayment,
     PurchaseBill, PurchaseBillItem, Expense, ExpenseCategory,
     SupplierPayment, SalesReturn, SalesReturnItem, UserProfile,
-    ContactPerson, Quotation, QuotationItem, ReceiptDocument
+    ContactPerson, Quotation, QuotationItem, ReceiptDocument,
+    SalesOrder, SalesOrderItem
 )
 from .forms import ProductForm, ProductCategoryForm, ContactForm, ExpenseForm, ExpenseCategoryForm
 
@@ -316,13 +317,68 @@ class InvoiceAddView(View):
 
         # Serialize products for JavaScript to auto-populate Rate, Unit, Tax Type, Cost, Description
         product_list = list(products.values('id', 'name', 'code', 'hs_code', 'selling_price', 'unit', 'purchase_price', 'description'))
-        
+
+        # Pre-fill from Quotation
+        prefill_invoice = None
+        quotation_id = request.GET.get('quotation_id')
+        sales_order_id = request.GET.get('sales_order_id')
+
+        if quotation_id:
+            try:
+                q = Quotation.objects.prefetch_related('items__product').get(id=quotation_id)
+                items = []
+                for it in q.items.all():
+                    items.append({
+                        'product_id': it.product.id,
+                        'product_name': it.product.name,
+                        'unit': it.unit,
+                        'quantity': str(it.quantity),
+                        'rate': str(it.rate),
+                        'tax_type': it.tax_type,
+                    })
+                prefill_invoice = {
+                    'source': 'quotation',
+                    'source_id': q.id,
+                    'customer_id': q.customer.id,
+                    'customer_name': q.customer.name,
+                    'notes': q.notes or '',
+                    'currency': q.currency,
+                    'items': items,
+                }
+            except Quotation.DoesNotExist:
+                pass
+        elif sales_order_id:
+            try:
+                so = SalesOrder.objects.prefetch_related('items__product').get(id=sales_order_id)
+                items = []
+                for it in so.items.all():
+                    items.append({
+                        'product_id': it.product.id,
+                        'product_name': it.product.name,
+                        'unit': it.unit,
+                        'quantity': str(it.quantity),
+                        'rate': str(it.rate),
+                        'tax_type': it.tax_type,
+                    })
+                prefill_invoice = {
+                    'source': 'sales_order',
+                    'source_id': so.id,
+                    'customer_id': so.customer.id,
+                    'customer_name': so.customer.name,
+                    'notes': so.notes or '',
+                    'currency': so.currency,
+                    'items': items,
+                }
+            except SalesOrder.DoesNotExist:
+                pass
+
         context = {
             'customers': customers,
             'products': products,
             'products_json': json.dumps(product_list, cls=DjangoJSONEncoder),
             'today': today,
             'preloaded_doc': preloaded_doc,
+            'prefill_invoice_json': json.dumps(prefill_invoice, cls=DjangoJSONEncoder) if prefill_invoice else 'null',
         }
         return render(request, self.template_name, context)
 
@@ -337,6 +393,22 @@ class InvoiceAddView(View):
 
         customer = get_object_or_404(Contact, id=customer_id)
 
+        # Resolve source quotation / sales order from hidden form fields
+        source_quotation_id = request.POST.get('source_quotation_id') or None
+        source_sales_order_id = request.POST.get('source_sales_order_id') or None
+        source_quotation = None
+        source_sales_order = None
+        if source_quotation_id:
+            try:
+                source_quotation = Quotation.objects.get(id=source_quotation_id)
+            except Quotation.DoesNotExist:
+                pass
+        if source_sales_order_id:
+            try:
+                source_sales_order = SalesOrder.objects.get(id=source_sales_order_id)
+            except SalesOrder.DoesNotExist:
+                pass
+
         # 1. Create Invoice with new fields
         invoice = Invoice.objects.create(
             customer=customer,
@@ -350,6 +422,8 @@ class InvoiceAddView(View):
             notes=request.POST.get('notes', ''),
             terms_conditions=request.POST.get('terms_conditions', ''),
             bill_attachment=request.FILES.get('bill_attachment'),
+            quotation=source_quotation,
+            sales_order=source_sales_order,
             status='Draft',
             created_by=request.user if request.user.is_authenticated else None
         )
@@ -579,6 +653,14 @@ class InvoiceAddView(View):
             except (ReceiptDocument.DoesNotExist, ValueError):
                 pass
 
+        # Update source document statuses
+        if source_quotation:
+            source_quotation.status = 'Invoiced'
+            source_quotation.save(update_fields=['status'])
+        if source_sales_order:
+            source_sales_order.status = 'Invoiced'
+            source_sales_order.save(update_fields=['status'])
+
         return redirect('invoice')
 
 class QuotationView(TemplateView):
@@ -677,6 +759,193 @@ class QuotationAddView(View):
         quotation.save()
 
         return redirect('quotation')
+
+
+# ============================================================
+# Sales Order Views
+# ============================================================
+
+class SalesOrderView(TemplateView):
+    template_name = "pages/sales/sales_order.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["sales_orders"] = SalesOrder.objects.select_related('customer', 'quotation').order_by('-date', '-id')
+        return context
+
+
+class SalesOrderAddView(View):
+    template_name = "pages/sales/sales_order_add.html"
+
+    def get(self, request):
+        customers = Contact.objects.filter(contact_type__in=['Customer', 'Both'])
+        products = Product.objects.all()
+        today = timezone.now().date()
+        product_list = list(products.values('id', 'name', 'code', 'selling_price', 'unit', 'purchase_price', 'description'))
+
+        prefill = None
+        quotation_id = request.GET.get('quotation_id')
+        if quotation_id:
+            try:
+                q = Quotation.objects.prefetch_related('items__product').get(id=quotation_id)
+                items = []
+                for it in q.items.all():
+                    items.append({
+                        'product_id': it.product.id,
+                        'product_name': it.product.name,
+                        'unit': it.unit,
+                        'quantity': str(it.quantity),
+                        'rate': str(it.rate),
+                        'tax_type': it.tax_type,
+                        'tax_amount': str(it.tax_amount),
+                        'amount': str(it.amount),
+                    })
+                prefill = {
+                    'customer_id': q.customer.id,
+                    'customer_name': q.customer.name,
+                    'quotation_id': q.id,
+                    'quotation_number': q.quotation_number,
+                    'notes': q.notes or '',
+                    'currency': q.currency,
+                    'items': items,
+                }
+            except Quotation.DoesNotExist:
+                prefill = None
+
+        context = {
+            'customers': customers,
+            'products': products,
+            'products_json': json.dumps(product_list, cls=DjangoJSONEncoder),
+            'today': today,
+            'prefill_json': json.dumps(prefill, cls=DjangoJSONEncoder) if prefill else 'null',
+        }
+        return render(request, self.template_name, context)
+
+    @transaction.atomic
+    def post(self, request):
+        customer_id = request.POST.get('customer')
+        if not customer_id:
+            return redirect('sales_order_add')
+
+        customer = get_object_or_404(Contact, id=customer_id)
+        quotation_id = request.POST.get('quotation_id') or None
+        source_quotation = None
+        if quotation_id:
+            try:
+                source_quotation = Quotation.objects.get(id=quotation_id)
+            except Quotation.DoesNotExist:
+                pass
+
+        order = SalesOrder.objects.create(
+            customer=customer,
+            quotation=source_quotation,
+            date=request.POST.get('date', timezone.now().date()),
+            delivery_date=request.POST.get('delivery_date') or None,
+            status=request.POST.get('status', 'Confirmed'),
+            currency=request.POST.get('currency', 'NPR'),
+            notes=request.POST.get('notes', ''),
+            created_by=request.user if request.user.is_authenticated else None,
+        )
+
+        product_ids = request.POST.getlist('product_id[]')
+        quantities = request.POST.getlist('quantity[]')
+        unit_prices = request.POST.getlist('unit_price[]')
+        tax_types = request.POST.getlist('tax_type[]')
+        units = request.POST.getlist('unit[]')
+
+        subtotal = Decimal('0.00')
+        total_vat = Decimal('0.00')
+
+        for i in range(len(product_ids)):
+            if not product_ids[i]:
+                continue
+            product = Product.objects.get(id=product_ids[i])
+            qty = Decimal(quantities[i]) if quantities[i] else Decimal('0')
+            price = Decimal(unit_prices[i]) if unit_prices[i] else Decimal('0.00')
+            tax_type = tax_types[i] if i < len(tax_types) else 'Standard'
+            unit = units[i] if i < len(units) else 'Pcs'
+
+            line_amt = price * qty
+            vat_pct = Decimal('13.00') if tax_type == 'Standard' else Decimal('0.00')
+            vat_amt = line_amt * (vat_pct / Decimal('100.0'))
+            item_tot = line_amt + vat_amt
+
+            subtotal += line_amt
+            total_vat += vat_amt
+
+            SalesOrderItem.objects.create(
+                sales_order=order,
+                product=product,
+                unit=unit,
+                quantity=qty,
+                rate=price,
+                tax_type=tax_type,
+                tax_amount=vat_amt,
+                amount=item_tot,
+            )
+
+        round_off_val = request.POST.get('round_off', '0.00')
+        order.round_off = Decimal(round_off_val) if round_off_val else Decimal('0.00')
+        grand_total = subtotal + total_vat + order.round_off
+        order.subtotal = subtotal
+        order.vat_amount = total_vat
+        order.total_amount = grand_total
+        order.save()
+
+        # Mark source quotation as Converted
+        if source_quotation:
+            source_quotation.status = 'Converted'
+            source_quotation.save(update_fields=['status'])
+
+        return redirect('sales_order')
+
+
+class ConvertQuotationToSOView(View):
+    """One-click: convert a Quotation to a Sales Order."""
+    def post(self, request, pk):
+        quotation = get_object_or_404(Quotation, pk=pk)
+        # If already converted, just redirect to SO list
+        if quotation.status in ('Converted', 'Invoiced'):
+            return redirect('sales_order')
+
+        order = SalesOrder.objects.create(
+            customer=quotation.customer,
+            quotation=quotation,
+            date=timezone.now().date(),
+            status='Confirmed',
+            currency=quotation.currency,
+            notes=quotation.notes or '',
+            subtotal=quotation.subtotal,
+            vat_amount=quotation.vat_amount,
+            discount_amount=quotation.discount_amount,
+            round_off=quotation.round_off,
+            total_amount=quotation.total_amount,
+            created_by=request.user if request.user.is_authenticated else None,
+        )
+
+        for it in quotation.items.all():
+            SalesOrderItem.objects.create(
+                sales_order=order,
+                product=it.product,
+                unit=it.unit,
+                quantity=it.quantity,
+                rate=it.rate,
+                tax_type=it.tax_type,
+                tax_amount=it.tax_amount,
+                amount=it.amount,
+            )
+
+        quotation.status = 'Converted'
+        quotation.save(update_fields=['status'])
+
+        return redirect('sales_order')
+
+
+class ConvertSOToInvoiceView(View):
+    """Redirect to Invoice Add pre-filled from a Sales Order."""
+    def get(self, request, pk):
+        return redirect(f"/sales/invoice/add/?sales_order_id={pk}")
+
 
 class CustomersView(TemplateView):
     template_name = "pages/sales/customers.html"

@@ -38,7 +38,7 @@
 
         <!-- ================= Sales ================= -->
 
-        {% with sales_urls="invoice_add invoice quotation quotation_add invoice_return customers" %}
+        {% with sales_urls="invoice_add invoice quotation quotation_add invoice_return customers sales_order sales_order_add" %}
         <li class="menu-item has-submenu {% if request.resolver_match.url_name in sales_urls.split %}open{% endif %}">
         {% endwith %}
 
@@ -81,6 +81,14 @@
                         <a href="{% url 'customers' %}"
                            class="{% if request.resolver_match.url_name == 'customers' %}submenu-active{% endif %}">
                            Customers
+                        </a>
+                    </div>
+                </li>
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="{% url 'sales_order' %}"
+                           class="{% if request.resolver_match.url_name == 'sales_order' or request.resolver_match.url_name == 'sales_order_add' %}submenu-active{% endif %}">
+                            Sales Orders
                         </a>
                     </div>
                 </li>

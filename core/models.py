@@ -188,6 +188,10 @@ class Invoice(models.Model):
     paid_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Draft')
 
+    # Linked Sales Documents
+    quotation = models.ForeignKey('Quotation', on_delete=models.SET_NULL, null=True, blank=True, related_name='invoices')
+    sales_order = models.ForeignKey('SalesOrder', on_delete=models.SET_NULL, null=True, blank=True, related_name='invoices')
+
     # Notes & Misc
     terms_conditions = models.TextField(blank=True, null=True, default="Thank you for your business.")
     notes = models.TextField(blank=True, null=True)
@@ -463,6 +467,8 @@ class Quotation(models.Model):
         ('Draft', 'Draft'),
         ('Sent', 'Sent'),
         ('Accepted', 'Accepted'),
+        ('Converted', 'Converted'),
+        ('Invoiced', 'Invoiced'),
         ('Rejected', 'Rejected'),
     )
 
@@ -495,6 +501,61 @@ class QuotationItem(models.Model):
     )
 
     quotation = models.ForeignKey(Quotation, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    unit = models.CharField(max_length=20, default='Pcs')
+    quantity = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+    rate = models.DecimalField(max_digits=12, decimal_places=2)
+    tax_type = models.CharField(max_length=20, choices=TAX_TYPE_CHOICES, default='Standard')
+    tax_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
+
+
+def generate_sales_order_number():
+    last = SalesOrder.objects.order_by('-id').first()
+    next_id = (last.id + 1) if last else 1
+    return f"SO-{next_id:06d}"
+
+class SalesOrder(models.Model):
+    STATUS_CHOICES = (
+        ('Draft', 'Draft'),
+        ('Confirmed', 'Confirmed'),
+        ('Invoiced', 'Invoiced'),
+        ('Cancelled', 'Cancelled'),
+    )
+
+    order_number = models.CharField(max_length=50, unique=True, default=generate_sales_order_number)
+    customer = models.ForeignKey(Contact, on_delete=models.CASCADE, related_name='sales_orders')
+    quotation = models.ForeignKey(Quotation, on_delete=models.SET_NULL, null=True, blank=True, related_name='sales_orders')
+    date = models.DateField(default=timezone.now)
+    delivery_date = models.DateField(blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Confirmed')
+    
+    currency = models.CharField(max_length=10, default="NPR")
+    notes = models.TextField(blank=True, null=True)
+    
+    subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    vat_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    round_off = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.order_number
+
+class SalesOrderItem(models.Model):
+    TAX_TYPE_CHOICES = (
+        ('Standard', 'Standard (13%)'),
+        ('Zero Rated', 'Zero Rated (0%)'),
+        ('Exempt', 'Exempt (No VAT)'),
+    )
+
+    sales_order = models.ForeignKey(SalesOrder, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     unit = models.CharField(max_length=20, default='Pcs')
     quantity = models.DecimalField(max_digits=10, decimal_places=2, default=1)

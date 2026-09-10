@@ -1031,6 +1031,8 @@
                                     accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx" style="display:none;"
                                     onchange="previewAttachment(this.files[0]);">
                                 <input type="hidden" name="linked_doc_id" id="linked_doc_id_input" value="{% if preloaded_doc %}{{ preloaded_doc.id }}{% endif %}">
+                                <input type="hidden" name="source_quotation_id" id="sourceQuotationId" value="">
+                                <input type="hidden" name="source_sales_order_id" id="sourceSalesOrderId" value="">
 
                                 <!-- Attached File Summary Pill (shown when file is selected) -->
                                 <div id="attachPreview"
@@ -2757,5 +2759,68 @@
         if (ws) ws.classList.add('split-view-active');
     });
     {% endif %}
+    // ── Pre-fill from Quotation or Sales Order ──────────────────────────────────────
+    const INVOICE_PREFILL = {{ prefill_invoice_json|safe }};
+    if (INVOICE_PREFILL) {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show a banner
+            const bannerEl = document.createElement('div');
+            bannerEl.style.cssText = 'background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#1d4ed8;display:flex;align-items:center;gap:8px;';
+            const srcLabel = INVOICE_PREFILL.source === 'sales_order' ? 'Sales Order' : 'Quotation';
+            bannerEl.innerHTML = '<i class="fa-solid fa-link"></i> Pre-filled from ' + srcLabel + ': <strong>' + INVOICE_PREFILL.customer_name + '</strong>';
+            const formEl = document.querySelector('form');
+            if (formEl) formEl.prepend(bannerEl);
+
+            // Set hidden source IDs
+            if (INVOICE_PREFILL.source === 'quotation') {
+                const hq = document.getElementById('sourceQuotationId');
+                if (hq) hq.value = INVOICE_PREFILL.source_id;
+            } else {
+                const hs = document.getElementById('sourceSalesOrderId');
+                if (hs) hs.value = INVOICE_PREFILL.source_id;
+            }
+
+            // Set customer
+            const csel = document.getElementById('customer_select');
+            if (csel && INVOICE_PREFILL.customer_id) {
+                csel.value = INVOICE_PREFILL.customer_id;
+                csel.dispatchEvent(new Event('change'));
+            }
+
+            // Set notes
+            if (INVOICE_PREFILL.notes) {
+                const notesEl = document.querySelector('textarea[name="notes"], input[name="notes"]');
+                if (notesEl) notesEl.value = INVOICE_PREFILL.notes;
+            }
+
+            // Add line items after existing rows are cleared
+            if (INVOICE_PREFILL.items && INVOICE_PREFILL.items.length) {
+                // Clear any auto-added blank row first
+                const tbody = document.getElementById('itemsBody');
+                if (tbody) tbody.innerHTML = '';
+                INVOICE_PREFILL.items.forEach(function(it) {
+                    addRow();
+                    const rows = document.querySelectorAll('#itemsBody tr');
+                    const tr = rows[rows.length - 1];
+                    if (!tr) return;
+                    const psel = tr.querySelector('.row-product');
+                    if (psel) {
+                        psel.value = it.product_id;
+                        productSelected(psel);
+                    }
+                    const qtyEl = tr.querySelector('.row-qty');
+                    if (qtyEl) { qtyEl.value = it.quantity; calculateRow(qtyEl); }
+                    const rateEl = tr.querySelector('.row-rate');
+                    if (rateEl) { rateEl.value = it.rate; calculateRow(rateEl); }
+                    const taxEl = tr.querySelector('.row-tax');
+                    if (taxEl) {
+                        taxEl.value = it.tax_type;
+                        calculateRow(taxEl);
+                    }
+                });
+                updateTotals();
+            }
+        });
+    }
 </script>
 {% endblock %}

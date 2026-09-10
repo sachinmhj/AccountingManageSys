@@ -45,6 +45,10 @@ from .views import (
     ProductionJournalAddView,
     QuotationView,
     QuotationAddView,
+    SalesOrderView,
+    SalesOrderAddView,
+    ConvertQuotationToSOView,
+    ConvertSOToInvoiceView,
 )
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
@@ -55,6 +59,10 @@ urlpatterns = [
     path("sales/customers/add/", CustomerAddView.as_view(), name="customer_add"),
     path("sales/quotation/", QuotationView.as_view(), name="quotation"),
     path("sales/quotation/add/", QuotationAddView.as_view(), name="quotation_add"),
+    path("sales/quotation/<int:pk>/convert-to-so/", ConvertQuotationToSOView.as_view(), name="quotation_convert_to_so"),
+    path("sales/order/", SalesOrderView.as_view(), name="sales_order"),
+    path("sales/order/add/", SalesOrderAddView.as_view(), name="sales_order_add"),
+    path("sales/order/<int:pk>/convert-to-invoice/", ConvertSOToInvoiceView.as_view(), name="so_convert_to_invoice"),
     path("sales/invoice/", InvoiceView.as_view(), name="invoice"),
     path("sales/invoice/<int:pk>/", InvoiceDetailView.as_view(), name="invoice_detail"),
     path("sales/invoice/return/", SalesReturnView.as_view(), name="invoice_return"),
