@@ -135,6 +135,55 @@
     }
 
     /* ── Public API ───────────────────────────────────────────────── */
+    window.adToBS = adToBS;
+    window.bsToAD = bsToAD;
+    window.fmtBS  = fmtBS;
+    window.fmtAD  = fmtAD;
+
+    window.initBSPicker = function(bsId, onChangeCallback) {
+        const bsInput = document.getElementById(bsId);
+        if (!bsInput) return;
+
+        bsInput.readOnly = true;
+        bsInput.style.cssText += ';cursor:pointer;background:#fffbf0;border-color:#f59e0b;';
+        if (!bsInput.getAttribute('placeholder')) {
+            bsInput.setAttribute('placeholder', '📅 Pick BS date');
+        }
+
+        let picker = null;
+
+        function closePicker() { if (picker){ picker.remove(); picker=null; } }
+
+        bsInput.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (picker) { closePicker(); return; }
+
+            let selBS = null;
+            if (bsInput.value) {
+                const p = bsInput.value.split('-').map(Number);
+                if (p.length === 3 && !isNaN(p[0])) {
+                    selBS = {year: p[0], month: p[1], day: p[2]};
+                }
+            }
+            let sbs = selBS || adToBS(new Date());
+
+            picker = buildPopup(sbs.year, sbs.month, sbs.day, function(y, m, d) {
+                bsInput.value = fmtBS({year:y, month:m, day:d});
+                if (typeof onChangeCallback === 'function') {
+                    onChangeCallback(bsInput.value);
+                } else {
+                    bsInput.dispatchEvent(new Event('change'));
+                }
+                closePicker();
+            });
+
+            bsInput.parentElement.style.position = 'relative';
+            bsInput.parentElement.appendChild(picker);
+        });
+
+        document.addEventListener('click', closePicker, false);
+    };
+
     window.initDualDate = function(adId, bsId) {
         const adInput = document.getElementById(adId);
         const bsInput = document.getElementById(bsId);

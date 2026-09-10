@@ -134,9 +134,16 @@
     <div class="sh-topbar">
         <h1>Sales History</h1>
         <div class="sh-filters">
-            <input type="date" id="filter_start_date" onchange="applyFilters()" title="Start Date">
-            <span style="color:var(--text-gray);">—</span>
-            <input type="date" id="filter_end_date" onchange="applyFilters()" title="End Date">
+            <!-- Date Mode Selector (AD / BS) -->
+            <div style="display:inline-flex; align-items:center; gap:6px; background:#f8fafc; border:1px solid var(--border); border-radius:6px; padding:3px 8px;">
+                <label for="filter_date_mode" style="font-size:12px; font-weight:600; color:var(--text-gray); margin:0;"><i class="fa-solid fa-calendar-days" style="margin-right:4px;"></i>Date Type:</label>
+                <select id="filter_date_mode" onchange="onDateModeChange()" style="font-size:12px; font-weight:700; border:none; background:transparent; cursor:pointer; color:var(--primary); outline:none;">
+                    <option value="">-- Select --</option>
+                    <option value="AD">AD (Gregorian)</option>
+                    <option value="BS">BS (Bikram Sambat)</option>
+                </select>
+            </div>
+
             <select id="filter_customer" onchange="applyFilters()">
                 <option value="">All Customers</option>
                 {% for c in customers %}
@@ -148,6 +155,27 @@
             <button type="button" class="btn-export" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
             <button type="button" class="btn-export" style="background:#64748b;" onclick="toggleSettingsModal()"><i class="fa-solid fa-gear"></i> Settings</button>
         </div>
+    </div>
+
+    <!-- Date Range Row (shown only when a date type is selected) -->
+    <div id="date_range_row" style="display:none; align-items:center; gap:10px; margin-bottom:14px; padding:10px 14px; background:white; border:1px solid var(--border); border-radius:8px; flex-wrap:wrap;">
+        <span id="date_range_label" style="font-size:12px; font-weight:600; color:var(--text-gray);">Filter by Date Range:</span>
+
+        <!-- AD Date Inputs -->
+        <div id="ad_date_container" style="display:none; align-items:center; gap:8px;">
+            <input type="date" id="filter_start_date_ad" onchange="applyFilters()" title="Start Date (AD)" placeholder="Start Date">
+            <span style="color:var(--text-gray);">—</span>
+            <input type="date" id="filter_end_date_ad" onchange="applyFilters()" title="End Date (AD)" placeholder="End Date">
+        </div>
+
+        <!-- BS Date Inputs -->
+        <div id="bs_date_container" style="display:none; align-items:center; gap:8px;">
+            <input type="text" id="filter_start_date_bs" title="Start Date (BS)" placeholder="📅 Start Date (BS)" style="width:140px; font-size:13px; padding:5px 10px; border-radius:6px; border:1px solid #f59e0b; background:#fffbf0; cursor:pointer;">
+            <span style="color:var(--text-gray);">—</span>
+            <input type="text" id="filter_end_date_bs" title="End Date (BS)" placeholder="📅 End Date (BS)" style="width:140px; font-size:13px; padding:5px 10px; border-radius:6px; border:1px solid #f59e0b; background:#fffbf0; cursor:pointer;">
+        </div>
+
+        <button type="button" onclick="clearDateRange()" style="font-size:12px; color:#dc2626; background:none; border:1px solid #fca5a5; border-radius:4px; padding:3px 10px; cursor:pointer;">✕ Clear</button>
     </div>
 
     <!-- Summary Cards -->
@@ -228,7 +256,10 @@
                     data-vat="{{ invoice.vat_amount|default:0 }}"
                     data-paid="{{ invoice.paid_amount|default:0 }}"
                     data-due="{{ invoice.balance_due|default:0 }}">
-                    <td class="col-date">{{ invoice.date }}</td>
+                    <td class="col-date">
+                        <div class="ad-date-text">{{ invoice.date }}</div>
+                        <div class="bs-date-badge" style="display:none; font-size:13px; color:var(--text-dark); font-weight:400;"></div>
+                    </td>
                     <td class="col-inv" style="color:var(--primary); font-weight:500;">{{ invoice.invoice_number }}</td>
                     <td class="col-customer">{{ invoice.customer.name }}</td>
                     <td class="col-pan" style="color:var(--text-gray);">{{ invoice.customer.pan_vat_number|default:"—" }}</td>
@@ -325,9 +356,72 @@ function filterByStatus(status, btn) {
     applyFilters();
 }
 
+function onDateModeChange() {
+    const mode = document.getElementById('filter_date_mode') ? document.getElementById('filter_date_mode').value : '';
+    const adContainer = document.getElementById('ad_date_container');
+    const bsContainer = document.getElementById('bs_date_container');
+    const dateRangeRow = document.getElementById('date_range_row');
+    const label = document.getElementById('date_range_label');
+
+    if (dateRangeRow) {
+        if (!mode) {
+            // No date type selected — hide the row entirely
+            dateRangeRow.style.display = 'none';
+            if (adContainer) adContainer.style.display = 'none';
+            if (bsContainer) bsContainer.style.display = 'none';
+        } else {
+            // Show the date range row
+            dateRangeRow.style.display = 'flex';
+            if (mode === 'BS') {
+                if (adContainer) adContainer.style.display = 'none';
+                if (bsContainer) bsContainer.style.display = 'flex';
+                if (label) label.textContent = 'Filter by Date Range (BS):';
+            } else {
+                if (adContainer) adContainer.style.display = 'flex';
+                if (bsContainer) bsContainer.style.display = 'none';
+                if (label) label.textContent = 'Filter by Date Range (AD):';
+            }
+        }
+    }
+
+    // Toggle date column: show AD or BS date in the table rows
+    document.querySelectorAll('#invoiceTable tbody tr.invoice-row').forEach(row => {
+        const adDiv = row.querySelector('.ad-date-text');
+        const bsDiv = row.querySelector('.bs-date-badge');
+        if (adDiv) adDiv.style.display = (mode === 'BS') ? 'none' : '';
+        if (bsDiv) bsDiv.style.display = (mode === 'BS') ? '' : 'none';
+    });
+
+    applyFilters();
+}
+
+function initBsDates() {
+    const rows = document.querySelectorAll('#invoiceTable tbody tr.invoice-row');
+    rows.forEach(row => {
+        const adDateStr = row.dataset.date; // e.g. "2026-09-08"
+        if (adDateStr && typeof window.adToBS === 'function') {
+            const parts = adDateStr.split('-').map(Number);
+            if (parts.length === 3 && !isNaN(parts[0])) {
+                const bsObj = window.adToBS(new Date(parts[0], parts[1]-1, parts[2]));
+                const bsStr = window.fmtBS(bsObj); // e.g. "2083-05-23"
+                row.dataset.bsDate = bsStr;
+
+                const badge = row.querySelector('.bs-date-badge');
+                if (badge) {
+                    badge.textContent = bsStr;
+                }
+            }
+        }
+    });
+}
+
 function applyFilters() {
-    const startDate = document.getElementById('filter_start_date').value;
-    const endDate = document.getElementById('filter_end_date').value;
+    const dateMode = document.getElementById('filter_date_mode') ? document.getElementById('filter_date_mode').value : 'AD';
+    const startDateAD = document.getElementById('filter_start_date_ad') ? document.getElementById('filter_start_date_ad').value : '';
+    const endDateAD = document.getElementById('filter_end_date_ad') ? document.getElementById('filter_end_date_ad').value : '';
+    const startDateBS = document.getElementById('filter_start_date_bs') ? document.getElementById('filter_start_date_bs').value : '';
+    const endDateBS = document.getElementById('filter_end_date_bs') ? document.getElementById('filter_end_date_bs').value : '';
+
     const selectedCustomer = (document.getElementById('filter_customer').value || '').toLowerCase().trim();
     const searchVal = (document.getElementById('filter_search').value || '').toLowerCase().trim();
 
@@ -343,7 +437,8 @@ function applyFilters() {
         const rowCustomer = (row.dataset.customer || '').toLowerCase();
         const rowInvoice = (row.dataset.invoice || '').toLowerCase();
         const rowPan = (row.dataset.pan || '').toLowerCase();
-        const rowDate = row.dataset.date || '';
+        const rowDateAD = row.dataset.date || '';
+        const rowDateBS = row.dataset.bsDate || '';
 
         // Status filter
         let matchStatus = (currentStatusFilter === 'All' || rowStatus === currentStatusFilter);
@@ -351,15 +446,20 @@ function applyFilters() {
         // Customer dropdown filter
         let matchCustomer = (!selectedCustomer || selectedCustomer === 'all' || rowCustomer === selectedCustomer);
 
-        // Date range filter
+        // Date range filter based on active Date Type (AD or BS)
         let matchDate = true;
-        if (startDate && rowDate && rowDate < startDate) matchDate = false;
-        if (endDate && rowDate && rowDate > endDate) matchDate = false;
+        if (dateMode === 'BS') {
+            if (startDateBS && rowDateBS && rowDateBS < startDateBS) matchDate = false;
+            if (endDateBS && rowDateBS && rowDateBS > endDateBS) matchDate = false;
+        } else {
+            if (startDateAD && rowDateAD && rowDateAD < startDateAD) matchDate = false;
+            if (endDateAD && rowDateAD && rowDateAD > endDateAD) matchDate = false;
+        }
 
         // Search text filter
         let matchSearch = true;
         if (searchVal) {
-            matchSearch = rowInvoice.includes(searchVal) || rowCustomer.includes(searchVal) || rowPan.includes(searchVal);
+            matchSearch = rowInvoice.includes(searchVal) || rowCustomer.includes(searchVal) || rowPan.includes(searchVal) || rowDateBS.includes(searchVal);
         }
 
         if (matchStatus && matchCustomer && matchDate && matchSearch) {
@@ -408,10 +508,13 @@ function applyFilters() {
 
 // Reset / Clear all filters
 function resetFilters() {
-    document.getElementById('filter_start_date').value = '';
-    document.getElementById('filter_end_date').value = '';
-    document.getElementById('filter_customer').value = '';
-    document.getElementById('filter_search').value = '';
+    if (document.getElementById('filter_date_mode')) document.getElementById('filter_date_mode').value = '';
+    if (document.getElementById('filter_start_date_ad')) document.getElementById('filter_start_date_ad').value = '';
+    if (document.getElementById('filter_end_date_ad')) document.getElementById('filter_end_date_ad').value = '';
+    if (document.getElementById('filter_start_date_bs')) document.getElementById('filter_start_date_bs').value = '';
+    if (document.getElementById('filter_end_date_bs')) document.getElementById('filter_end_date_bs').value = '';
+    if (document.getElementById('filter_customer')) document.getElementById('filter_customer').value = '';
+    if (document.getElementById('filter_search')) document.getElementById('filter_search').value = '';
 
     // Reset status tab to 'All'
     currentStatusFilter = 'All';
@@ -420,6 +523,15 @@ function resetFilters() {
         else t.classList.remove('active');
     });
 
+    onDateModeChange();
+}
+
+// Clear only the date range inputs (keep other filters intact)
+function clearDateRange() {
+    if (document.getElementById('filter_start_date_ad')) document.getElementById('filter_start_date_ad').value = '';
+    if (document.getElementById('filter_end_date_ad')) document.getElementById('filter_end_date_ad').value = '';
+    if (document.getElementById('filter_start_date_bs')) document.getElementById('filter_start_date_bs').value = '';
+    if (document.getElementById('filter_end_date_bs')) document.getElementById('filter_end_date_bs').value = '';
     applyFilters();
 }
 
@@ -432,7 +544,9 @@ function exportToExcel() {
 
     rows.forEach(row => {
         if (row.style.display !== 'none') {
-            const date = row.querySelector('.col-date')?.textContent?.trim() || '';
+            const date = row.dataset.date || '';
+            const bsDate = row.dataset.bsDate || '';
+            const dateDisplay = bsDate ? `${date} (${bsDate} BS)` : date;
             const inv = row.querySelector('.col-inv')?.textContent?.trim() || '';
             const customer = row.querySelector('.col-customer')?.textContent?.trim() || '';
             const pan = row.querySelector('.col-pan')?.textContent?.trim() || '';
@@ -442,7 +556,7 @@ function exportToExcel() {
             const due = parseFloat(row.dataset.due) || 0;
             const status = row.querySelector('.col-status')?.textContent?.trim() || '';
 
-            data.push([date, inv, customer, pan, total, vat, paid, due, status]);
+            data.push([dateDisplay, inv, customer, pan, total, vat, paid, due, status]);
         }
     });
 
@@ -530,7 +644,170 @@ function loadCardSettings() {
     applyCardSettings();
 }
 
+/* ── Standalone BS Picker for filter inputs ────────────────────────────────
+   Appends the popup to document.body with fixed positioning so it is never
+   clipped by any parent container (flex bars, overflow:hidden wrappers, etc.)
+   ──────────────────────────────────────────────────────────────────────── */
+function attachFilterBSPicker(inputId, onChange) {
+    const inp = document.getElementById(inputId);
+    if (!inp || typeof window.adToBS !== 'function') return;
+
+    inp.readOnly = true;
+
+    let activePicker = null;
+
+    function closePicker() {
+        if (activePicker) { activePicker.remove(); activePicker = null; }
+    }
+
+    function buildFilterPopup(initY, initM, initD) {
+        const BS_DATA = window._bsData || null; // may not be exposed; rebuild inline
+
+        /* ---------- lightweight BS data table (same as bs_date.js) ---------- */
+        const BD = {
+            2050:[30,32,31,32,31,30,30,30,29,30,29,31],2051:[31,31,32,31,31,31,30,29,30,29,30,30],
+            2052:[31,31,32,32,31,30,30,29,30,29,30,30],2053:[31,32,31,32,31,30,30,30,29,29,30,31],
+            2054:[30,32,31,32,31,30,30,30,29,30,29,31],2055:[31,31,32,31,31,32,30,29,30,29,30,30],
+            2056:[31,32,31,32,31,30,30,29,30,29,30,30],2057:[31,32,31,32,31,30,30,30,29,29,30,31],
+            2058:[30,32,31,32,31,30,30,30,29,30,29,31],2059:[31,31,32,31,31,31,30,29,30,29,30,30],
+            2060:[31,31,32,32,31,30,30,29,30,29,30,30],2061:[31,32,31,32,31,30,30,30,29,29,30,31],
+            2062:[30,32,31,32,31,30,30,30,29,30,29,31],2063:[31,31,32,31,31,32,30,29,30,29,30,30],
+            2064:[31,32,31,32,31,30,30,29,30,29,30,30],2065:[31,32,31,32,31,30,30,30,29,29,30,31],
+            2066:[31,31,31,32,31,31,30,29,30,29,30,30],2067:[31,31,32,31,31,31,30,29,30,29,30,30],
+            2068:[31,31,32,32,31,30,30,29,30,29,30,30],2069:[31,32,31,32,31,30,30,30,29,29,30,31],
+            2070:[30,32,31,32,31,30,30,30,29,30,29,31],2071:[31,31,32,31,31,31,30,29,30,29,30,30],
+            2072:[31,31,32,32,31,30,30,29,30,29,30,30],2073:[31,32,31,32,31,30,30,30,29,29,30,31],
+            2074:[30,32,31,32,31,30,30,30,29,30,29,31],2075:[31,31,32,31,31,31,30,29,30,29,30,30],
+            2076:[31,31,32,32,31,30,30,29,30,29,30,30],2077:[31,32,31,32,31,30,30,30,29,29,30,31],
+            2078:[31,31,31,32,31,31,29,30,30,29,29,31],2079:[31,31,32,31,31,31,30,29,30,29,30,30],
+            2080:[31,31,32,32,31,30,30,29,30,29,30,30],2081:[31,32,31,32,31,30,30,30,29,29,30,31],
+            2082:[30,32,31,32,31,30,30,30,29,30,29,31],2083:[31,31,32,31,31,31,30,29,30,29,30,30],
+            2084:[31,31,32,32,31,30,30,29,30,29,30,30],2085:[31,32,31,32,31,30,30,30,29,29,30,31],
+            2086:[30,32,31,32,31,30,30,30,29,30,29,31],2087:[31,31,32,31,31,31,30,29,30,29,30,30],
+            2088:[31,31,32,32,31,30,30,29,30,29,30,30],2089:[31,32,31,32,31,30,30,30,29,29,30,31],
+            2090:[30,32,31,32,31,30,30,30,29,30,29,31]
+        };
+        const AD_REF = new Date(1993, 3, 14);
+        const MONTHS = ['Baisakh','Jestha','Ashadh','Shrawan','Bhadra','Ashwin','Kartik','Mangsir','Poush','Magh','Falgun','Chaitra'];
+        const DAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+        function bsToADLocal(y,m,d) {
+            let days=0;
+            for(let iy=2050;iy<y;iy++){if(!BD[iy])return null;BD[iy].forEach(x=>days+=x);}
+            for(let im=1;im<m;im++)days+=(BD[y]||[])[im-1]||0;
+            days+=d-1;
+            let dt=new Date(AD_REF);dt.setDate(dt.getDate()+days);return dt;
+        }
+        function pad(n){return String(n).padStart(2,'0');}
+        function fmtB(y,m,d){return y+'-'+pad(m)+'-'+pad(d);}
+
+        let vy=initY, vm=initM, selD=initD;
+
+        const popup = document.createElement('div');
+        popup.style.cssText='position:fixed;z-index:999999;width:270px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.22);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px;overflow:hidden;';
+
+        function positionPopup() {
+            const rect = inp.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - rect.bottom;
+            if (spaceBelow < 280) {
+                popup.style.top = (rect.top - 290) + 'px';
+            } else {
+                popup.style.top = (rect.bottom + 4) + 'px';
+            }
+            popup.style.left = Math.min(rect.left, window.innerWidth - 275) + 'px';
+        }
+
+        function render() {
+            const dim = (BD[vy]||[])[vm-1]||30;
+            const firstAD = bsToADLocal(vy,vm,1);
+            const dow = firstAD ? firstAD.getDay() : 0;
+
+            let cells='';
+            for(let i=0;i<dow;i++) cells+='<div></div>';
+            for(let d=1;d<=dim;d++){
+                const isSel=(d===selD&&vm===initM&&vy===initY);
+                cells+=`<div class="fbsd" data-d="${d}" style="padding:5px 2px;text-align:center;border-radius:5px;cursor:pointer;${isSel?'background:#2563eb;color:#fff;font-weight:700;':'color:#1e293b;'}">${d}</div>`;
+            }
+
+            popup.innerHTML=`
+<div style="background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;">
+  <button class="fbsp" data-dir="-1" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;">&#8249;</button>
+  <div style="font-weight:600;font-size:14px;">${MONTHS[vm-1]} ${vy}</div>
+  <button class="fbsp" data-dir="1" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;">&#8250;</button>
+</div>
+<div style="padding:8px 10px;">
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;">
+    ${DAYS.map(d=>`<div style="text-align:center;font-size:11px;color:#94a3b8;font-weight:600;padding:3px 0;">${d}</div>`).join('')}
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;">${cells}</div>
+</div>
+<div style="padding:4px 12px 8px;font-size:11px;color:#94a3b8;border-top:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;">
+  <span>BS ${vy}-${pad(vm)}</span>
+  <button id="fpClear" style="font-size:11px;color:#dc2626;background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px;border:1px solid #fca5a5;">✕ Clear</button>
+</div>`;
+
+            popup.querySelectorAll('.fbsp').forEach(btn=>{
+                btn.addEventListener('click',e=>{
+                    e.stopPropagation();
+                    vm+=parseInt(btn.dataset.dir);
+                    if(vm<1){vm=12;vy--;}
+                    if(vm>12){vm=1;vy++;}
+                    render();
+                });
+            });
+            popup.querySelectorAll('.fbsd').forEach(cell=>{
+                cell.addEventListener('mouseenter',()=>{if(!cell.style.background||cell.style.background==='')cell.style.background='#eff6ff';});
+                cell.addEventListener('mouseleave',()=>{if(cell.style.background==='rgb(239, 246, 255)')cell.style.background='';});
+                cell.addEventListener('click',e=>{
+                    e.stopPropagation();
+                    const d=parseInt(cell.dataset.d);
+                    inp.value=fmtB(vy,vm,d);
+                    closePicker();
+                    if(typeof onChange==='function') onChange();
+                });
+            });
+            const clrBtn=popup.querySelector('#fpClear');
+            if(clrBtn){
+                clrBtn.addEventListener('click',e=>{
+                    e.stopPropagation();
+                    inp.value='';
+                    closePicker();
+                    if(typeof onChange==='function') onChange();
+                });
+            }
+            popup.addEventListener('click',e=>e.stopPropagation());
+        }
+
+        render();
+        positionPopup();
+        return popup;
+    }
+
+    inp.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (activePicker) { closePicker(); return; }
+
+        let y, m, d;
+        if (inp.value) {
+            const p = inp.value.split('-').map(Number);
+            if (p.length === 3 && !isNaN(p[0])) { y=p[0]; m=p[1]; d=p[2]; }
+        }
+        if (!y) {
+            const today = typeof window.adToBS === 'function' ? window.adToBS(new Date()) : {year:2081,month:5,day:1};
+            y=today.year; m=today.month; d=today.day;
+        }
+
+        activePicker = buildFilterPopup(y, m, d);
+        document.body.appendChild(activePicker);
+    });
+
+    document.addEventListener('click', closePicker, false);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    initBsDates();
+    attachFilterBSPicker('filter_start_date_bs', applyFilters);
+    attachFilterBSPicker('filter_end_date_bs', applyFilters);
     loadCardSettings();
     applyFilters();
 });
