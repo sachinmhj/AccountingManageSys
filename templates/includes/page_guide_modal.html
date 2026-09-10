@@ -1,0 +1,706 @@
+<!-- ============================================================ -->
+<!-- Scoped Styles for Page Guide Modals (Overrides any page CSS) -->
+<!-- ============================================================ -->
+<style type="text/css">
+    #pageNotesModal .btn-guide-warning,
+    #pageVideoModal .btn-guide-warning {
+        background-color: #f59e0b !important;
+        color: #0f172a !important;
+        border: 1px solid #d97706 !important;
+        font-weight: 700 !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.12) !important;
+    }
+    #pageNotesModal .btn-guide-warning:hover,
+    #pageVideoModal .btn-guide-warning:hover {
+        background-color: #d97706 !important;
+        color: #ffffff !important;
+    }
+
+    #pageNotesModal .btn-guide-danger,
+    #pageVideoModal .btn-guide-danger {
+        background-color: #ef4444 !important;
+        color: #ffffff !important;
+        border: 1px solid #dc2626 !important;
+        font-weight: 700 !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.12) !important;
+    }
+    #pageNotesModal .btn-guide-danger:hover,
+    #pageVideoModal .btn-guide-danger:hover {
+        background-color: #dc2626 !important;
+        color: #ffffff !important;
+    }
+
+    .btn-guide-edit {
+        background-color: #eff6ff !important;
+        color: #2563eb !important;
+        border: 1px solid #bfdbfe !important;
+        font-weight: 600 !important;
+        padding: 4px 12px !important;
+        font-size: 11.5px !important;
+        border-radius: 20px !important;
+        cursor: pointer !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        text-decoration: none !important;
+    }
+    .btn-guide-edit:hover {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        border-color: #2563eb !important;
+    }
+
+    .btn-guide-delete {
+        background-color: #fef2f2 !important;
+        color: #dc2626 !important;
+        border: 1px solid #fecaca !important;
+        font-weight: 600 !important;
+        padding: 4px 12px !important;
+        font-size: 11.5px !important;
+        border-radius: 20px !important;
+        cursor: pointer !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        text-decoration: none !important;
+    }
+    .btn-guide-delete:hover {
+        background-color: #dc2626 !important;
+        color: #ffffff !important;
+        border-color: #dc2626 !important;
+    }
+
+    .btn-guide-light {
+        background-color: #f1f5f9 !important;
+        color: #334155 !important;
+        border: 1px solid #cbd5e1 !important;
+        font-weight: 600 !important;
+    }
+    .btn-guide-light:hover {
+        background-color: #e2e8f0 !important;
+        color: #0f172a !important;
+    }
+</style>
+
+<!-- ============================================================ -->
+<!-- 1. Dedicated Multi-Notes Modal -->
+<!-- ============================================================ -->
+<div class="modal fade" id="pageNotesModal" tabindex="-1" aria-labelledby="pageNotesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 14px; overflow: hidden;">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 16px 24px;">
+                <div class="d-flex align-items-center gap-2.5">
+                    <div style="width: 40px; height: 40px; background: rgba(245, 158, 11, 0.25); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 19px; color: #fbbf24;">
+                        <i class="fa-solid fa-note-sticky"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0 fw-bold text-white" id="pageNotesModalTitle" style="font-size: 17px;">Page Notes</h5>
+                        <small class="text-white-50" id="pageNotesModalSubtitle" style="font-size: 12px;">Operational Guidelines & Instructions</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body p-4" style="background: #f8fafc; min-height: 380px;">
+                
+                <!-- BODY ACTION TOOLBAR -->
+                <div id="pageNotesHeaderBar" class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                    <div class="d-flex align-items-center gap-2">
+                        <h6 class="fw-bold text-dark mb-0" style="font-size: 15px;">
+                            <i class="fa-solid fa-list-check text-warning me-1"></i> Saved Notes
+                        </h6>
+                        <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-2.5 py-1 border border-warning-subtle" id="pageNotesCountBadge" style="font-size: 11px; font-weight: 600; display: none;">0 Notes</span>
+                    </div>
+                    <button type="button" class="btn btn-guide-warning d-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill shadow-xs" onclick="showAddNoteForm()" id="btnAddNoteHeader" style="font-size: 12.5px;">
+                        <i class="fa-solid fa-plus"></i> Add Note
+                    </button>
+                </div>
+
+                <!-- NOTES LIST CONTAINER -->
+                <div id="pageNotesListContainer">
+                    <div class="text-center py-4 text-muted">
+                        <i class="fa-solid fa-spinner fa-spin fa-2x mb-2 text-warning"></i>
+                        <p class="mb-0">Loading notes...</p>
+                    </div>
+                </div>
+
+                <!-- ADD / EDIT NOTE FORM (Hidden by default) -->
+                <div id="pageNoteFormWrapper" class="card border-0 shadow-sm p-4" style="display: none; border-radius: 12px; background: white;">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <h6 class="fw-bold mb-0 text-dark" id="noteFormHeaderTitle">
+                            <i class="fa-solid fa-pen-to-square text-warning me-1"></i> Add New Note
+                        </h6>
+                        <button type="button" class="btn-close" onclick="cancelNoteForm()"></button>
+                    </div>
+                    <form id="noteForm" onsubmit="submitNoteForm(event)">
+                        <input type="hidden" id="form_note_id" name="id">
+                        <input type="hidden" id="form_note_page_key" name="page_key">
+
+                        <div class="mb-3">
+                            <label for="form_note_title" class="form-label fw-bold text-dark mb-1" style="font-size: 13px;">
+                                Note Title / Topic <span class="text-muted font-normal" style="font-weight: 400; font-size: 11.5px;">(Optional)</span>
+                            </label>
+                            <input type="text" class="form-control" id="form_note_title" placeholder="e.g. Tax & Discount Guidelines (Optional)">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_note_content" class="form-label fw-bold text-dark mb-1" style="font-size: 13px;">Note Details / Instructions <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="form_note_content" rows="6" placeholder="Enter detailed guidelines, rules, or operational notes for team members..." required style="font-size: 13px; line-height: 1.6;"></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-guide-light px-4" onclick="cancelNoteForm()">Cancel</button>
+                            <button type="submit" class="btn btn-guide-warning px-4" id="btnSaveNoteForm">
+                                <i class="fa-solid fa-floppy-disk me-1"></i> Save Note
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 2. Dedicated Multi-Video Tutorials Modal -->
+<!-- ============================================================ -->
+<div class="modal fade" id="pageVideoModal" tabindex="-1" aria-labelledby="pageVideoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 14px; overflow: hidden;">
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); padding: 16px 24px;">
+                <div class="d-flex align-items-center gap-2.5">
+                    <div style="width: 40px; height: 40px; background: rgba(220, 38, 38, 0.25); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #ef4444;">
+                        <i class="fa-brands fa-youtube"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0 fw-bold text-white" id="pageVideoModalTitle" style="font-size: 17px;">Video Tutorials</h5>
+                        <small class="text-white-50" id="pageVideoModalSubtitle" style="font-size: 12px;">Watch training videos for this page</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body p-4" style="background: #f8fafc; min-height: 380px;">
+                
+                <!-- BODY ACTION TOOLBAR -->
+                <div id="pageVideoHeaderBar" class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                    <div class="d-flex align-items-center gap-2">
+                        <h6 class="fw-bold text-dark mb-0" style="font-size: 15px;">
+                            <i class="fa-brands fa-youtube text-danger me-1"></i> Tutorial Videos
+                        </h6>
+                        <span class="badge bg-danger-subtle text-danger-emphasis rounded-pill px-2.5 py-1 border border-danger-subtle" id="pageVideoCountBadge" style="font-size: 11px; font-weight: 600; display: none;">0 Videos</span>
+                    </div>
+                    <button type="button" class="btn btn-guide-danger d-flex align-items-center gap-1.5 px-3 py-1.5 rounded-pill shadow-xs" onclick="showAddVideoForm()" id="btnAddVideoHeader" style="font-size: 12.5px;">
+                        <i class="fa-solid fa-plus"></i> Add Video
+                    </button>
+                </div>
+
+                <!-- VIDEOS LIST CONTAINER -->
+                <div id="pageVideosListContainer">
+                    <div class="text-center py-4 text-muted">
+                        <i class="fa-solid fa-spinner fa-spin fa-2x mb-2 text-danger"></i>
+                        <p class="mb-0">Loading tutorial videos...</p>
+                    </div>
+                </div>
+
+                <!-- ADD / EDIT VIDEO FORM (Hidden by default) -->
+                <div id="pageVideoFormWrapper" class="card border-0 shadow-sm p-4" style="display: none; border-radius: 12px; background: white;">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <h6 class="fw-bold mb-0 text-dark" id="videoFormHeaderTitle">
+                            <i class="fa-brands fa-youtube text-danger me-1"></i> Add New Video Tutorial
+                        </h6>
+                        <button type="button" class="btn-close" onclick="cancelVideoForm()"></button>
+                    </div>
+                    <form id="videoForm" onsubmit="submitVideoForm(event)">
+                        <input type="hidden" id="form_video_id" name="id">
+                        <input type="hidden" id="form_video_page_key" name="page_key">
+
+                        <div class="mb-3">
+                            <label for="form_video_title" class="form-label fw-bold text-dark mb-1" style="font-size: 13px;">
+                                Tutorial Video Title <span class="text-muted font-normal" style="font-weight: 400; font-size: 11.5px;">(Optional)</span>
+                            </label>
+                            <input type="text" class="form-control" id="form_video_title" placeholder="e.g. Invoice Walkthrough Video (Optional)">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="form_video_url" class="form-label fw-bold text-dark mb-1" style="font-size: 13px;">YouTube / Video URL <span class="text-danger">*</span></label>
+                            <input type="url" class="form-control" id="form_video_url" placeholder="https://www.youtube.com/watch?v=YOUR_VIDEO_ID" required>
+                            <div class="form-text mt-1" style="font-size: 11.5px;">Paste any YouTube link (e.g. <code>https://www.youtube.com/watch?v=xxx</code> or <code>https://youtu.be/xxx</code>)</div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-guide-light px-4" onclick="cancelVideoForm()">Cancel</button>
+                            <button type="submit" class="btn btn-guide-danger px-4" id="btnSaveVideoForm">
+                                <i class="fa-solid fa-floppy-disk me-1"></i> Save Video
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    let activeNotesPageKey = '';
+    let activeVideosPageKey = '';
+    let currentNotesList = [];
+    let currentVideosList = [];
+
+    // Robust YouTube Video ID & Embed Parser
+    function getYouTubeVideoId(url) {
+        if (!url) return null;
+        url = url.trim();
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        if (match && match[2] && match[2].length === 11) {
+            return match[2];
+        }
+        return null;
+    }
+
+    function parseYouTubeEmbedUrl(url) {
+        const videoId = getYouTubeVideoId(url);
+        if (videoId) {
+            return `https://www.youtube.com/embed/${videoId}?rel=0&enablejsapi=1`;
+        }
+        return null;
+    }
+
+    // ============================================================
+    // 1. PAGE NOTES MANAGEMENT
+    // ============================================================
+
+    function openPageNotesModal(pageKey, pageTitle) {
+        activeNotesPageKey = pageKey;
+        document.getElementById('pageNotesModalTitle').innerText = (pageTitle ? pageTitle + ' Notes' : 'Page Notes');
+        document.getElementById('pageNotesModalSubtitle').innerText = 'Page Key: ' + pageKey;
+        
+        cancelNoteForm();
+        loadPageNotes(pageKey);
+
+        const modalEl = document.getElementById('pageNotesModal');
+        let modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+
+    function loadPageNotes(pageKey) {
+        const container = document.getElementById('pageNotesListContainer');
+        container.innerHTML = `
+            <div class="text-center py-4 text-muted">
+                <i class="fa-solid fa-spinner fa-spin fa-2x mb-2 text-warning"></i>
+                <p class="mb-0">Loading notes...</p>
+            </div>
+        `;
+
+        fetch(`/api/page-notes/?page_key=${encodeURIComponent(pageKey)}`)
+            .then(res => res.json())
+            .then(data => {
+                currentNotesList = data.notes || [];
+                renderNotesList(currentNotesList);
+            })
+            .catch(err => {
+                console.error("Error fetching page notes:", err);
+                container.innerHTML = `<div class="alert alert-danger mb-0">Failed to load notes. Please try again.</div>`;
+            });
+    }
+
+    function renderNotesList(notes) {
+        const container = document.getElementById('pageNotesListContainer');
+        const badge = document.getElementById('pageNotesCountBadge');
+        if (badge) {
+            if (notes && notes.length > 0) {
+                badge.innerText = `${notes.length} Note${notes.length > 1 ? 's' : ''}`;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        if (!notes || notes.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-5 bg-white rounded-3 border p-4 shadow-xs">
+                    <div class="text-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 54px; height: 54px; font-size: 24px; background: #fffbe6;">
+                        <i class="fa-solid fa-note-sticky"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark mb-1">No Notes Added Yet</h6>
+                    <p class="text-muted mb-3" style="font-size: 13px;">Add step-by-step notes, SOP guidelines, or rules for this page.</p>
+                    <button type="button" class="btn btn-guide-warning rounded-pill px-4 btn-sm" onclick="showAddNoteForm()">
+                        <i class="fa-solid fa-plus me-1"></i> Add First Note
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '<div class="d-flex flex-column gap-3">';
+        notes.forEach(note => {
+            const displayTitle = (note.title && note.title.trim() !== '') ? note.title : 'Page Note';
+            html += `
+                <div class="card border-0 shadow-sm" style="border-radius: 10px; overflow: hidden; background: white;">
+                    <div class="card-header bg-white py-2.5 px-3 border-bottom d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-sticky-note text-warning me-1"></i>
+                            <h6 class="mb-0 fw-bold text-dark" style="font-size: 14px;">${escapeHtml(displayTitle)}</h6>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted me-2" style="font-size: 11px;">${note.created_at}</span>
+                            <button type="button" class="btn-guide-edit" onclick="editNoteItem(${note.id})">
+                                <i class="fa-solid fa-pen"></i> Edit
+                            </button>
+                            <button type="button" class="btn-guide-delete" onclick="deleteNoteItem(${note.id})">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-3 bg-white">
+                        <div style="font-size: 13.5px; line-height: 1.6; color: #334155; white-space: pre-wrap;">${escapeHtml(note.content)}</div>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function showAddNoteForm() {
+        document.getElementById('pageNotesListContainer').style.display = 'none';
+        const headerBar = document.getElementById('pageNotesHeaderBar');
+        if (headerBar) headerBar.style.display = 'none';
+        document.getElementById('pageNoteFormWrapper').style.display = 'block';
+        
+        document.getElementById('noteFormHeaderTitle').innerHTML = `<i class="fa-solid fa-plus text-warning me-1"></i> Add New Note`;
+        document.getElementById('form_note_id').value = '';
+        document.getElementById('form_note_page_key').value = activeNotesPageKey;
+        document.getElementById('form_note_title').value = '';
+        document.getElementById('form_note_content').value = '';
+    }
+
+    function editNoteItem(noteId) {
+        const note = currentNotesList.find(n => n.id === noteId);
+        if (!note) return;
+
+        document.getElementById('pageNotesListContainer').style.display = 'none';
+        const headerBar = document.getElementById('pageNotesHeaderBar');
+        if (headerBar) headerBar.style.display = 'none';
+        document.getElementById('pageNoteFormWrapper').style.display = 'block';
+        
+        document.getElementById('noteFormHeaderTitle').innerHTML = `<i class="fa-solid fa-pen text-warning me-1"></i> Edit Note`;
+        document.getElementById('form_note_id').value = note.id;
+        document.getElementById('form_note_page_key').value = note.page_key;
+        document.getElementById('form_note_title').value = note.title || '';
+        document.getElementById('form_note_content').value = note.content || '';
+    }
+
+    function cancelNoteForm() {
+        document.getElementById('pageNotesListContainer').style.display = 'block';
+        const headerBar = document.getElementById('pageNotesHeaderBar');
+        if (headerBar) headerBar.style.display = 'flex';
+        document.getElementById('pageNoteFormWrapper').style.display = 'none';
+    }
+
+    function submitNoteForm(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnSaveNoteForm');
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Saving...`;
+
+        const payload = {
+            id: document.getElementById('form_note_id').value || null,
+            page_key: document.getElementById('form_note_page_key').value,
+            title: document.getElementById('form_note_title').value,
+            content: document.getElementById('form_note_content').value
+        };
+
+        fetch('/api/page-notes/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-floppy-disk me-1"></i> Save Note`;
+            if (data.success) {
+                cancelNoteForm();
+                loadPageNotes(payload.page_key);
+            } else {
+                alert("Error saving note: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-floppy-disk me-1"></i> Save Note`;
+            alert("Error: " + err.message);
+        });
+    }
+
+    function deleteNoteItem(noteId) {
+        if (!confirm("Are you sure you want to delete this note?")) return;
+
+        fetch('/api/page-notes/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ action: 'delete', id: noteId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                loadPageNotes(activeNotesPageKey);
+            } else {
+                alert("Failed to delete note.");
+            }
+        });
+    }
+
+
+    // ============================================================
+    // 2. PAGE VIDEOS MANAGEMENT
+    // ============================================================
+
+    function openPageVideoModal(pageKey, pageTitle) {
+        activeVideosPageKey = pageKey;
+        document.getElementById('pageVideoModalTitle').innerText = (pageTitle ? pageTitle + ' Videos' : 'Video Tutorials');
+        document.getElementById('pageVideoModalSubtitle').innerText = 'Page Key: ' + pageKey;
+
+        cancelVideoForm();
+        loadPageVideos(pageKey);
+
+        const modalEl = document.getElementById('pageVideoModal');
+        let modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+
+    function loadPageVideos(pageKey) {
+        const container = document.getElementById('pageVideosListContainer');
+        container.innerHTML = `
+            <div class="text-center py-4 text-muted">
+                <i class="fa-solid fa-spinner fa-spin fa-2x mb-2 text-danger"></i>
+                <p class="mb-0">Loading tutorial videos...</p>
+            </div>
+        `;
+
+        fetch(`/api/page-videos/?page_key=${encodeURIComponent(pageKey)}`)
+            .then(res => res.json())
+            .then(data => {
+                currentVideosList = data.videos || [];
+                renderVideosList(currentVideosList);
+            })
+            .catch(err => {
+                console.error("Error fetching page videos:", err);
+                container.innerHTML = `<div class="alert alert-danger mb-0">Failed to load videos. Please try again.</div>`;
+            });
+    }
+
+    function renderVideosList(videos) {
+        const container = document.getElementById('pageVideosListContainer');
+        const badge = document.getElementById('pageVideoCountBadge');
+        if (badge) {
+            if (videos && videos.length > 0) {
+                badge.innerText = `${videos.length} Video${videos.length > 1 ? 's' : ''}`;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        if (!videos || videos.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-5 bg-white rounded-3 border p-4 shadow-xs">
+                    <div class="text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 54px; height: 54px; font-size: 24px; background: #fef2f2;">
+                        <i class="fa-brands fa-youtube"></i>
+                    </div>
+                    <h6 class="fw-bold text-dark mb-1">No Video Tutorials Added Yet</h6>
+                    <p class="text-muted mb-3" style="font-size: 13px;">Add YouTube video links to provide visual training videos for this page.</p>
+                    <button type="button" class="btn btn-guide-danger rounded-pill px-4 btn-sm" onclick="showAddVideoForm()">
+                        <i class="fa-solid fa-plus me-1"></i> Add First Video
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '<div class="d-flex flex-column gap-4">';
+        videos.forEach(video => {
+            const displayTitle = (video.title && video.title.trim() !== '') ? video.title : 'Tutorial Video';
+            const embedUrl = parseYouTubeEmbedUrl(video.video_url);
+
+            html += `
+                <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden; background: white;">
+                    <div class="card-header bg-white py-2.5 px-3 border-bottom d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-brands fa-youtube text-danger fs-5 me-1"></i>
+                            <h6 class="mb-0 fw-bold text-dark" style="font-size: 14px;">${escapeHtml(displayTitle)}</h6>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted me-2" style="font-size: 11px;">${video.created_at}</span>
+                            <button type="button" class="btn-guide-edit" onclick="editVideoItem(${video.id})">
+                                <i class="fa-solid fa-pen"></i> Edit
+                            </button>
+                            <button type="button" class="btn-guide-delete" onclick="deleteVideoItem(${video.id})">
+                                <i class="fa-solid fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+            `;
+
+            if (embedUrl) {
+                html += `
+                    <div class="ratio ratio-16x9 rounded-3 overflow-hidden shadow-xs border mb-2">
+                        <iframe src="${embedUrl}" title="${escapeHtml(displayTitle)}" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                    </div>
+                `;
+            }
+
+            html += `
+                        <div class="d-flex align-items-center justify-content-between p-2.5 bg-light rounded-3 border">
+                            <div class="d-flex align-items-center gap-2 text-truncate me-2" style="font-size: 12px;">
+                                <i class="fa-solid fa-link text-secondary"></i>
+                                <span class="text-muted text-truncate" style="max-width: 380px;">${escapeHtml(video.video_url)}</span>
+                            </div>
+                            <a href="${escapeHtml(video.video_url)}" target="_blank" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-bold flex-shrink-0" style="font-size: 11.5px; text-decoration: none;">
+                                <i class="fa-brands fa-youtube me-1"></i> Watch on YouTube
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function showAddVideoForm() {
+        document.getElementById('pageVideosListContainer').style.display = 'none';
+        const headerBar = document.getElementById('pageVideoHeaderBar');
+        if (headerBar) headerBar.style.display = 'none';
+        document.getElementById('pageVideoFormWrapper').style.display = 'block';
+        
+        document.getElementById('videoFormHeaderTitle').innerHTML = `<i class="fa-brands fa-youtube text-danger me-1"></i> Add New Video Tutorial`;
+        document.getElementById('form_video_id').value = '';
+        document.getElementById('form_video_page_key').value = activeVideosPageKey;
+        document.getElementById('form_video_title').value = '';
+        document.getElementById('form_video_url').value = '';
+    }
+
+    function editVideoItem(videoId) {
+        const video = currentVideosList.find(v => v.id === videoId);
+        if (!video) return;
+
+        document.getElementById('pageVideosListContainer').style.display = 'none';
+        const headerBar = document.getElementById('pageVideoHeaderBar');
+        if (headerBar) headerBar.style.display = 'none';
+        document.getElementById('pageVideoFormWrapper').style.display = 'block';
+        
+        document.getElementById('videoFormHeaderTitle').innerHTML = `<i class="fa-solid fa-pen text-danger me-1"></i> Edit Video Tutorial`;
+        document.getElementById('form_video_id').value = video.id;
+        document.getElementById('form_video_page_key').value = video.page_key;
+        document.getElementById('form_video_title').value = video.title || '';
+        document.getElementById('form_video_url').value = video.video_url || '';
+    }
+
+    function cancelVideoForm() {
+        document.getElementById('pageVideosListContainer').style.display = 'block';
+        const headerBar = document.getElementById('pageVideoHeaderBar');
+        if (headerBar) headerBar.style.display = 'flex';
+        document.getElementById('pageVideoFormWrapper').style.display = 'none';
+    }
+
+    function submitVideoForm(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnSaveVideoForm');
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i> Saving...`;
+
+        const payload = {
+            id: document.getElementById('form_video_id').value || null,
+            page_key: document.getElementById('form_video_page_key').value,
+            title: document.getElementById('form_video_title').value,
+            video_url: document.getElementById('form_video_url').value
+        };
+
+        fetch('/api/page-videos/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-floppy-disk me-1"></i> Save Video`;
+            if (data.success) {
+                cancelVideoForm();
+                loadPageVideos(payload.page_key);
+            } else {
+                alert("Error saving video: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-floppy-disk me-1"></i> Save Video`;
+            alert("Error: " + err.message);
+        });
+    }
+
+    function deleteVideoItem(videoId) {
+        if (!confirm("Are you sure you want to delete this video tutorial?")) return;
+
+        fetch('/api/page-videos/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ action: 'delete', id: videoId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                loadPageVideos(activeVideosPageKey);
+            } else {
+                alert("Failed to delete video tutorial.");
+            }
+        });
+    }
+
+
+    // Shared Utilities
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function getCsrfToken() {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, 10) === ('csrftoken=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(10));
+                    break;
+                }
+            }
+        }
+        return cookieValue || '';
+    }
+</script>

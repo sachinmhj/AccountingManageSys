@@ -6,52 +6,255 @@
 {% block extra_css %}
 <style>
     :root {
-        --primary: #2563eb; --success: #16a34a; --danger: #dc2626; --border: #e2e8f0;
-        --bg-light: #f8fafc; --text-dark: #1e293b; --text-gray: #64748b;
+        --primary: #2563eb;
+        --success: #16a34a;
+        --danger: #dc2626;
+        --border: #e2e8f0;
+        --bg-light: #f8fafc;
+        --text-dark: #1e293b;
+        --text-gray: #64748b;
     }
-    .so-page { padding: 20px; background: #f1f5f9; min-height: calc(100vh - 60px); }
-    .so-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-    .so-topbar h1 { font-size: 22px; font-weight: 700; color: var(--text-dark); margin: 0; }
-    .btn-back { display: inline-flex; align-items: center; gap: 6px; background: white; border: 1px solid var(--border); color: var(--text-dark); padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 500; }
-    .btn-back:hover { background: var(--bg-light); }
 
-    .form-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 16px; }
-    .form-card h3 { font-size: 14px; font-weight: 700; color: var(--text-dark); margin: 0 0 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
-    .form-grid { display: grid; gap: 14px; }
-    .form-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
-    .form-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
-    .form-group { display: flex; flex-direction: column; gap: 5px; }
-    .form-group label { font-size: 12px; font-weight: 600; color: var(--text-gray); }
-    .form-group input, .form-group select, .form-group textarea {
-        border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px;
-        font-size: 13px; color: var(--text-dark); background: white; width: 100%; box-sizing: border-box;
-        outline: none; transition: border-color .2s;
+    .so-page {
+        padding: 20px;
+        background: #f1f5f9;
+        min-height: calc(100vh - 60px);
     }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+
+    .so-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .so-topbar h1 {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: white;
+        border: 1px solid var(--border);
+        color: var(--text-dark);
+        padding: 6px 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .btn-back:hover {
+        background: var(--bg-light);
+    }
+
+    .form-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 24px;
+        margin-bottom: 16px;
+    }
+
+    .form-card h3 {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0 0 16px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-grid {
+        display: grid;
+        gap: 14px;
+    }
+
+    .form-grid.cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .form-grid.cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-gray);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 8px 10px;
+        font-size: 13px;
+        color: var(--text-dark);
+        background: white;
+        width: 100%;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color .2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: var(--primary);
+    }
 
     /* Line Items */
-    .items-table { width: 100%; border-collapse: collapse; }
-    .items-table th { background: var(--bg-light); padding: 9px 10px; font-size: 11px; font-weight: 700; color: var(--text-gray); text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid var(--border); }
-    .items-table td { padding: 7px 6px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-    .items-table .inp { border: 1px solid var(--border); border-radius: 5px; padding: 6px 8px; font-size: 12px; width: 100%; box-sizing: border-box; outline: none; }
-    .items-table .inp:focus { border-color: var(--primary); }
-    .btn-remove-row { background: #fef2f2; border: none; color: #dc2626; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 12px; }
-    .btn-add-row { background: var(--bg-light); border: 1px dashed var(--border); color: var(--primary); border-radius: 6px; padding: 8px 14px; cursor: pointer; font-size: 13px; font-weight: 600; width: 100%; margin-top: 10px; }
-    .btn-add-row:hover { background: #eff6ff; }
+    .items-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .items-table th {
+        background: var(--bg-light);
+        padding: 9px 10px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-gray);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .items-table td {
+        padding: 7px 6px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+    }
+
+    .items-table .inp {
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        padding: 6px 8px;
+        font-size: 12px;
+        width: 100%;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+    .items-table .inp:focus {
+        border-color: var(--primary);
+    }
+
+    .btn-remove-row {
+        background: #fef2f2;
+        border: none;
+        color: #dc2626;
+        border-radius: 4px;
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    .btn-add-row {
+        background: var(--bg-light);
+        border: 1px dashed var(--border);
+        color: var(--primary);
+        border-radius: 6px;
+        padding: 8px 14px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .btn-add-row:hover {
+        background: #eff6ff;
+    }
 
     /* Totals */
-    .totals-box { display: flex; justify-content: flex-end; margin-top: 14px; }
-    .totals-inner { width: 300px; }
-    .totals-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; color: var(--text-dark); }
-    .totals-row.total { font-size: 15px; font-weight: 800; border-top: 2px solid var(--text-dark); padding-top: 8px; margin-top: 4px; }
+    .totals-box {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 14px;
+    }
+
+    .totals-inner {
+        width: 300px;
+    }
+
+    .totals-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        font-size: 13px;
+        color: var(--text-dark);
+    }
+
+    .totals-row.total {
+        font-size: 15px;
+        font-weight: 800;
+        border-top: 2px solid var(--text-dark);
+        padding-top: 8px;
+        margin-top: 4px;
+    }
 
     /* Actions */
-    .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
-    .btn-save { background: var(--primary); color: white; border: none; border-radius: 7px; padding: 10px 24px; font-size: 14px; font-weight: 700; cursor: pointer; }
-    .btn-save:hover { background: #1d4ed8; }
-    .btn-cancel { background: white; border: 1px solid var(--border); color: var(--text-dark); border-radius: 7px; padding: 10px 20px; font-size: 14px; cursor: pointer; }
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 16px;
+    }
 
-    .source-banner { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; color: #1d4ed8; display: flex; align-items: center; gap: 8px; }
+    .btn-save {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 7px;
+        padding: 10px 24px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .btn-save:hover {
+        background: #1d4ed8;
+    }
+
+    .btn-cancel {
+        background: white;
+        border: 1px solid var(--border);
+        color: var(--text-dark);
+        border-radius: 7px;
+        padding: 10px 20px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .source-banner {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
@@ -59,7 +262,20 @@
 {% block content %}
 <div class="so-page">
     <div class="so-topbar">
-        <h1><i class="fa-solid fa-clipboard-list" style="color:var(--primary); margin-right:8px;"></i>New Sales Order</h1>
+        <div class="d-flex align-items-center gap-2">
+            <h1 class="m-0 me-2"><i class="fa-solid fa-clipboard-list"
+                    style="color:var(--primary); margin-right:8px;"></i>New Sales Order</h1>
+            <button type="button" class="btn btn-sm d-inline-flex align-items-center gap-1 shadow-xs rounded-pill"
+                onclick="openPageNotesModal('sales_order_add', 'New Sales Order')"
+                style="font-size: 11.5px; font-weight: 600; background: #fffbe6; color: #d97706; border: 1px solid #fde68a;">
+                <i class="fa-solid fa-note-sticky text-warning"></i> Notes
+            </button>
+            <button type="button" class="btn btn-sm d-inline-flex align-items-center gap-1 shadow-xs rounded-pill"
+                onclick="openPageVideoModal('sales_order_add', 'New Sales Order')"
+                style="font-size: 11.5px; font-weight: 600; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;">
+                <i class="fa-brands fa-youtube text-danger"></i> Video
+            </button>
+        </div>
         <a href="{% url 'sales_order' %}" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
     </div>
 
@@ -134,7 +350,8 @@
                 </thead>
                 <tbody id="itemsBody"></tbody>
             </table>
-            <button type="button" class="btn-add-row" onclick="addRow()"><i class="fa-solid fa-plus"></i> Add Item</button>
+            <button type="button" class="btn-add-row" onclick="addRow()"><i class="fa-solid fa-plus"></i> Add
+                Item</button>
 
             <!-- Totals -->
             <div class="totals-box">
@@ -155,20 +372,20 @@
 </div>
 
 <script>
-const PRODUCTS = {{ products_json|safe }};
-const PREFILL  = {{ prefill_json|safe }};
+    const PRODUCTS = {{ products_json| safe }};
+    const PREFILL = {{ prefill_json| safe }};
 
-const productMap = {};
-PRODUCTS.forEach(p => productMap[p.id] = p);
+    const productMap = {};
+    PRODUCTS.forEach(p => productMap[p.id] = p);
 
-let rowIndex = 0;
+    let rowIndex = 0;
 
-function addRow(data = {}) {
-    const tbody = document.getElementById('itemsBody');
-    const ri = rowIndex++;
-    const tr = document.createElement('tr');
-    tr.id = 'row-' + ri;
-    tr.innerHTML = `
+    function addRow(data = {}) {
+        const tbody = document.getElementById('itemsBody');
+        const ri = rowIndex++;
+        const tr = document.createElement('tr');
+        tr.id = 'row-' + ri;
+        tr.innerHTML = `
         <td>
             <select name="product_id[]" class="inp" onchange="onProductChange(this, ${ri})">
                 <option value="">— Product —</option>
@@ -180,92 +397,92 @@ function addRow(data = {}) {
         <td><input type="number" name="unit_price[]" class="inp" id="rate-${ri}" value="${data.rate || ''}" step="0.01" min="0" onchange="calcRow(${ri})"></td>
         <td>
             <select name="tax_type[]" class="inp" id="tax-${ri}" onchange="calcRow(${ri})">
-                <option value="Standard" ${(data.tax_type||'Standard')=='Standard'?'selected':''}>13% VAT</option>
-                <option value="Zero Rated" ${data.tax_type=='Zero Rated'?'selected':''}>Zero Rated</option>
-                <option value="Exempt" ${data.tax_type=='Exempt'?'selected':''}>Exempt</option>
+                <option value="Standard" ${(data.tax_type || 'Standard') == 'Standard' ? 'selected' : ''}>13% VAT</option>
+                <option value="Zero Rated" ${data.tax_type == 'Zero Rated' ? 'selected' : ''}>Zero Rated</option>
+                <option value="Exempt" ${data.tax_type == 'Exempt' ? 'selected' : ''}>Exempt</option>
             </select>
         </td>
         <td style="text-align:right;"><span id="amt-${ri}" style="font-weight:600;">0.00</span></td>
         <td><button type="button" class="btn-remove-row" onclick="removeRow(${ri})"><i class="fa-solid fa-xmark"></i></button></td>
     `;
-    tbody.appendChild(tr);
-    if (data.rate) calcRow(ri);
-}
-
-function onProductChange(sel, ri) {
-    const p = productMap[sel.value];
-    if (!p) return;
-    document.getElementById('unit-' + ri).value = p.unit || 'Pcs';
-    document.getElementById('rate-' + ri).value = p.selling_price || '';
-    calcRow(ri);
-}
-
-function calcRow(ri) {
-    const qty  = parseFloat(document.getElementById('qty-' + ri)?.value)  || 0;
-    const rate = parseFloat(document.getElementById('rate-'+ ri)?.value) || 0;
-    const tax  = document.getElementById('tax-' + ri)?.value;
-    const base = qty * rate;
-    const vat  = tax === 'Standard' ? base * 0.13 : 0;
-    const total = base + vat;
-    const el = document.getElementById('amt-' + ri);
-    if (el) el.textContent = total.toFixed(2);
-    calcTotals();
-}
-
-function calcTotals() {
-    const currency = document.getElementById('currencySelect').value;
-    let sub = 0, vatTotal = 0;
-    document.querySelectorAll('#itemsBody tr').forEach(tr => {
-        const ri = tr.id.replace('row-', '');
-        const qty  = parseFloat(document.getElementById('qty-'  + ri)?.value) || 0;
-        const rate = parseFloat(document.getElementById('rate-' + ri)?.value) || 0;
-        const tax  = document.getElementById('tax-' + ri)?.value;
-        const base = qty * rate;
-        const vat  = tax === 'Standard' ? base * 0.13 : 0;
-        sub += base;
-        vatTotal += vat;
-    });
-    const total = sub + vatTotal;
-    document.getElementById('displaySubtotal').textContent = currency + ' ' + sub.toFixed(2);
-    document.getElementById('displayVat').textContent      = currency + ' ' + vatTotal.toFixed(2);
-    document.getElementById('displayTotal').textContent    = currency + ' ' + total.toFixed(2);
-}
-
-function removeRow(ri) {
-    const tr = document.getElementById('row-' + ri);
-    if (tr) tr.remove();
-    calcTotals();
-}
-
-document.getElementById('currencySelect').addEventListener('change', calcTotals);
-
-// Apply Prefill
-if (PREFILL) {
-    // Set source banner
-    const banner = document.getElementById('sourceBanner');
-    const bannerText = document.getElementById('sourceBannerText');
-    bannerText.textContent = 'Pre-filled from Quotation: ' + PREFILL.quotation_number;
-    banner.style.display = 'flex';
-
-    document.getElementById('quotationIdField').value = PREFILL.quotation_id;
-
-    // Set customer
-    const csel = document.getElementById('customerSelect');
-    if (PREFILL.customer_id) csel.value = PREFILL.customer_id;
-
-    // Set currency
-    const curSel = document.getElementById('currencySelect');
-    if (PREFILL.currency) curSel.value = PREFILL.currency;
-
-    // Set notes
-    if (PREFILL.notes) document.getElementById('notesInput').value = PREFILL.notes;
-
-    // Add items
-    if (PREFILL.items && PREFILL.items.length) {
-        PREFILL.items.forEach(it => addRow(it));
+        tbody.appendChild(tr);
+        if (data.rate) calcRow(ri);
     }
-} else {
-    addRow();
-}
+
+    function onProductChange(sel, ri) {
+        const p = productMap[sel.value];
+        if (!p) return;
+        document.getElementById('unit-' + ri).value = p.unit || 'Pcs';
+        document.getElementById('rate-' + ri).value = p.selling_price || '';
+        calcRow(ri);
+    }
+
+    function calcRow(ri) {
+        const qty = parseFloat(document.getElementById('qty-' + ri)?.value) || 0;
+        const rate = parseFloat(document.getElementById('rate-' + ri)?.value) || 0;
+        const tax = document.getElementById('tax-' + ri)?.value;
+        const base = qty * rate;
+        const vat = tax === 'Standard' ? base * 0.13 : 0;
+        const total = base + vat;
+        const el = document.getElementById('amt-' + ri);
+        if (el) el.textContent = total.toFixed(2);
+        calcTotals();
+    }
+
+    function calcTotals() {
+        const currency = document.getElementById('currencySelect').value;
+        let sub = 0, vatTotal = 0;
+        document.querySelectorAll('#itemsBody tr').forEach(tr => {
+            const ri = tr.id.replace('row-', '');
+            const qty = parseFloat(document.getElementById('qty-' + ri)?.value) || 0;
+            const rate = parseFloat(document.getElementById('rate-' + ri)?.value) || 0;
+            const tax = document.getElementById('tax-' + ri)?.value;
+            const base = qty * rate;
+            const vat = tax === 'Standard' ? base * 0.13 : 0;
+            sub += base;
+            vatTotal += vat;
+        });
+        const total = sub + vatTotal;
+        document.getElementById('displaySubtotal').textContent = currency + ' ' + sub.toFixed(2);
+        document.getElementById('displayVat').textContent = currency + ' ' + vatTotal.toFixed(2);
+        document.getElementById('displayTotal').textContent = currency + ' ' + total.toFixed(2);
+    }
+
+    function removeRow(ri) {
+        const tr = document.getElementById('row-' + ri);
+        if (tr) tr.remove();
+        calcTotals();
+    }
+
+    document.getElementById('currencySelect').addEventListener('change', calcTotals);
+
+    // Apply Prefill
+    if (PREFILL) {
+        // Set source banner
+        const banner = document.getElementById('sourceBanner');
+        const bannerText = document.getElementById('sourceBannerText');
+        bannerText.textContent = 'Pre-filled from Quotation: ' + PREFILL.quotation_number;
+        banner.style.display = 'flex';
+
+        document.getElementById('quotationIdField').value = PREFILL.quotation_id;
+
+        // Set customer
+        const csel = document.getElementById('customerSelect');
+        if (PREFILL.customer_id) csel.value = PREFILL.customer_id;
+
+        // Set currency
+        const curSel = document.getElementById('currencySelect');
+        if (PREFILL.currency) curSel.value = PREFILL.currency;
+
+        // Set notes
+        if (PREFILL.notes) document.getElementById('notesInput').value = PREFILL.notes;
+
+        // Add items
+        if (PREFILL.items && PREFILL.items.length) {
+            PREFILL.items.forEach(it => addRow(it));
+        }
+    } else {
+        addRow();
+    }
 </script>
 {% endblock %}

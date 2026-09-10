@@ -697,3 +697,65 @@ class ReceiptDocument(models.Model):
 
     def __str__(self):
         return f"{self.original_name} ({self.status})"
+
+
+# ============================================================
+# 11. Page Notes & Tutorial Video Guides
+# ============================================================
+
+class PageHelpGuide(models.Model):
+    page_key = models.CharField(max_length=100, unique=True, help_text="Unique key for the page")
+    title = models.CharField(max_length=255, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True, help_text="Notes/instructions for this page")
+    video_url = models.URLField(blank=True, null=True, help_text="YouTube or video link tutorial for this page")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Page Help Guide: {self.page_key}"
+
+    def get_youtube_embed_url(self):
+        if not self.video_url:
+            return ""
+        url = self.video_url.strip()
+        if "youtube.com/watch?v=" in url:
+            video_id = url.split("v=")[1].split("&")[0]
+            return f"https://www.youtube.com/embed/{video_id}"
+        elif "youtu.be/" in url:
+            video_id = url.split("youtu.be/")[1].split("?")[0]
+            return f"https://www.youtube.com/embed/{video_id}"
+        elif "youtube.com/embed/" in url:
+            return url
+        return url
+
+
+class PageNote(models.Model):
+    page_key = models.CharField(max_length=100, db_index=True)
+    title = models.CharField(max_length=255, default="General Note")
+    content = models.TextField(help_text="Content of the note")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"[{self.page_key}] {self.title}"
+
+
+class PageVideoTutorial(models.Model):
+    page_key = models.CharField(max_length=100, db_index=True)
+    title = models.CharField(max_length=255, default="Video Tutorial")
+    video_url = models.URLField(help_text="YouTube or video link tutorial")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"[{self.page_key}] {self.title}"
+
+    def get_youtube_embed_url(self):
+        if not self.video_url:
+            return ""
+        url = self.video_url.strip()
+        import re
+        match = re.search(r'(?:v=|\/embed\/|\/shorts\/|youtu\.be\/)([a-zA-Z0-9_-]{11})', url)
+        if match:
+            video_id = match.group(1)
+            return f"https://www.youtube.com/embed/{video_id}"
+        return url

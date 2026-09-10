@@ -14,8 +14,10 @@ from .models import (
     PurchaseBill, PurchaseBillItem, Expense, ExpenseCategory,
     SupplierPayment, SalesReturn, SalesReturnItem, UserProfile,
     ContactPerson, Quotation, QuotationItem, ReceiptDocument,
-    SalesOrder, SalesOrderItem
+    SalesOrder, SalesOrderItem, PageHelpGuide, PageNote, PageVideoTutorial
 )
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from .forms import ProductForm, ProductCategoryForm, ContactForm, ExpenseForm, ExpenseCategoryForm
 
 
@@ -1757,3 +1759,194 @@ class DocumentUnlinkView(View):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'status': 'success'})
         return redirect('document_manager')
+
+
+# ============================================================
+# Page Guide / Notes & Tutorial API
+# ============================================================
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PageGuideAPIView(View):
+    def get(self, request):
+        page_key = request.GET.get('page_key', '').strip()
+        if not page_key:
+            return JsonResponse({'error': 'page_key is required'}, status=400)
+        
+        guide, created = PageHelpGuide.objects.get_or_create(page_key=page_key)
+        return JsonResponse({
+            'page_key': guide.page_key,
+            'title': guide.title or page_key.replace('_', ' ').title(),
+            'notes': guide.notes or '',
+            'video_url': guide.video_url or '',
+            'embed_url': guide.get_youtube_embed_url(),
+        })
+
+    def post(self, request):
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except Exception:
+            data = request.POST
+
+        page_key = data.get('page_key', '').strip()
+        if not page_key:
+            return JsonResponse({'error': 'page_key is required'}, status=400)
+
+        title = data.get('title', '').strip()
+        notes = data.get('notes', '').strip()
+        video_url = data.get('video_url', '').strip()
+
+        guide, _ = PageHelpGuide.objects.get_or_create(page_key=page_key)
+        if title:
+            guide.title = title
+        guide.notes = notes
+        guide.video_url = video_url
+        guide.save()
+
+        return JsonResponse({
+            'success': True,
+            'page_key': guide.page_key,
+            'title': guide.title,
+            'notes': guide.notes,
+            'video_url': guide.video_url,
+            'embed_url': guide.get_youtube_embed_url(),
+        })
+
+
+# ============================================================
+# Multiple Page Notes API (CRUD)
+# ============================================================
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PageNotesAPIView(View):
+    def get(self, request):
+        page_key = request.GET.get('page_key', '').strip()
+        if not page_key:
+            return JsonResponse({'error': 'page_key is required'}, status=400)
+        
+        notes = PageNote.objects.filter(page_key=page_key).order_by('-created_at')
+        data = [{
+            'id': n.id,
+            'page_key': n.page_key,
+            'title': n.title,
+            'content': n.content,
+            'created_at': n.created_at.strftime('%Y-%m-%d %H:%M'),
+            'updated_at': n.updated_at.strftime('%Y-%m-%d %H:%M')
+        } for n in notes]
+        
+        return JsonResponse({'notes': data})
+
+    def post(self, request):
+        try:
+            payload = json.loads(request.body.decode('utf-8'))
+        except Exception:
+            payload = request.POST
+
+        action = payload.get('action', 'add')
+        note_id = payload.get('id')
+
+        if action == 'delete' and note_id:
+            PageNote.objects.filter(id=note_id).delete()
+            return JsonResponse({'success': True, 'action': 'deleted'})
+
+        page_key = payload.get('page_key', '').strip()
+        title = (payload.get('title') or '').strip()
+        content = payload.get('content', '').strip()
+
+        if not content:
+            return JsonResponse({'error': 'Content cannot be empty'}, status=400)
+
+        if note_id:
+            note = get_object_or_404(PageNote, id=note_id)
+            note.title = title or "Page Note"
+            note.content = content
+            note.save()
+        else:
+            if not page_key:
+                return JsonResponse({'error': 'page_key is required'}, status=400)
+            note = PageNote.objects.create(
+                page_key=page_key,
+                title=title or "Page Note",
+                content=content
+            )
+
+        return JsonResponse({
+            'success': True,
+            'note': {
+                'id': note.id,
+                'page_key': note.page_key,
+                'title': note.title,
+                'content': note.content,
+                'created_at': note.created_at.strftime('%Y-%m-%d %H:%M')
+            }
+        })
+
+
+# ============================================================
+# Multiple Page Video Tutorials API (CRUD)
+# ============================================================
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PageVideosAPIView(View):
+    def get(self, request):
+        page_key = request.GET.get('page_key', '').strip()
+        if not page_key:
+            return JsonResponse({'error': 'page_key is required'}, status=400)
+
+        videos = PageVideoTutorial.objects.filter(page_key=page_key).order_by('-created_at')
+        data = [{
+            'id': v.id,
+            'page_key': v.page_key,
+            'title': v.title,
+            'video_url': v.video_url,
+            'embed_url': v.get_youtube_embed_url(),
+            'created_at': v.created_at.strftime('%Y-%m-%d %H:%M'),
+            'updated_at': v.updated_at.strftime('%Y-%m-%d %H:%M')
+        } for v in videos]
+
+        return JsonResponse({'videos': data})
+
+    def post(self, request):
+        try:
+            payload = json.loads(request.body.decode('utf-8'))
+        except Exception:
+            payload = request.POST
+
+        action = payload.get('action', 'add')
+        video_id = payload.get('id')
+
+        if action == 'delete' and video_id:
+            PageVideoTutorial.objects.filter(id=video_id).delete()
+            return JsonResponse({'success': True, 'action': 'deleted'})
+
+        page_key = payload.get('page_key', '').strip()
+        title = (payload.get('title') or '').strip()
+        video_url = payload.get('video_url', '').strip()
+
+        if not video_url:
+            return JsonResponse({'error': 'video_url cannot be empty'}, status=400)
+
+        if video_id:
+            video = get_object_or_404(PageVideoTutorial, id=video_id)
+            video.title = title or "Tutorial Video"
+            video.video_url = video_url
+            video.save()
+        else:
+            if not page_key:
+                return JsonResponse({'error': 'page_key is required'}, status=400)
+            video = PageVideoTutorial.objects.create(
+                page_key=page_key,
+                title=title or "Tutorial Video",
+                video_url=video_url
+            )
+
+        return JsonResponse({
+            'success': True,
+            'video': {
+                'id': video.id,
+                'page_key': video.page_key,
+                'title': video.title,
+                'video_url': video.video_url,
+                'embed_url': video.get_youtube_embed_url(),
+                'created_at': video.created_at.strftime('%Y-%m-%d %H:%M')
+            }
+        })

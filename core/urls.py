@@ -106,4 +106,10 @@ urlpatterns = [
     path("documents/<int:pk>/delete/", views.DocumentDeleteView.as_view(), name="document_delete"),
     path("documents/<int:pk>/unlink/", views.DocumentUnlinkView.as_view(), name="document_unlink"),
     path("documents/<int:pk>/update-label/", views.DocumentUpdateLabelView.as_view(), name="document_update_label"),
+
+    # Page Guide / Notes & Tutorial Routes
+    path("api/page-guide/", views.PageGuideAPIView.as_view(), name="page_guide_api"),
+    path("api/page-guide/save/", views.PageGuideAPIView.as_view(), name="page_guide_save_api"),
+    path("api/page-notes/", views.PageNotesAPIView.as_view(), name="page_notes_api"),
+    path("api/page-videos/", views.PageVideosAPIView.as_view(), name="page_videos_api"),
 ]

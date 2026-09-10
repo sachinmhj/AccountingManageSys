@@ -16,112 +16,313 @@
         --text-gray: #64748b;
     }
 
-    .sh-page { padding: 20px; background: #f1f5f9; min-height: calc(100vh - 60px); }
+    .sh-page {
+        padding: 20px;
+        background: #f1f5f9;
+        min-height: calc(100vh - 60px);
+    }
 
     /* Top bar */
     .sh-topbar {
-        display: flex; align-items: center; justify-content: space-between;
-        margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
     }
-    .sh-topbar h1 { font-size: 22px; font-weight: 700; color: var(--text-dark); margin: 0; }
-    .sh-filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .sh-filters input, .sh-filters select {
-        height: 34px; padding: 4px 10px; border: 1px solid var(--border);
-        border-radius: 6px; font-size: 13px; background: white;
+
+    .sh-topbar h1 {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
     }
+
+    .sh-filters {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .sh-filters input,
+    .sh-filters select {
+        height: 34px;
+        padding: 4px 10px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 13px;
+        background: white;
+    }
+
     .btn-export {
-        background: #16a34a; color: white; border: none; border-radius: 6px;
-        padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
-        display: flex; align-items: center; gap: 6px;
+        background: #16a34a;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
+
     .btn-new {
-        background: var(--primary); color: white; border: none; border-radius: 6px;
-        padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
-        display: flex; align-items: center; gap: 6px; text-decoration: none;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
     }
 
     /* Summary Cards */
     .summary-cards {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 12px; margin-bottom: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
     }
+
     .summary-card {
-        background: white; border: 1px solid var(--border); border-radius: 8px;
-        padding: 12px 16px; display: flex; align-items: center; gap: 12px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
+
     .summary-card-icon {
-        width: 40px; height: 40px; border-radius: 8px;
-        display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
     }
-    .summary-card-icon.blue { background: #dbeafe; color: var(--primary); }
-    .summary-card-icon.green { background: #dcfce7; color: var(--success); }
-    .summary-card-icon.purple { background: #f3e8ff; color: #7c3aed; }
-    .summary-card-icon.orange { background: #fff7ed; color: var(--warning); }
-    .summary-card-icon.red { background: #fef2f2; color: var(--danger); }
-    .summary-card-label { font-size: 11px; color: var(--text-gray); margin-bottom: 2px; }
-    .summary-card-value { font-size: 14px; font-weight: 700; color: var(--text-dark); }
+
+    .summary-card-icon.blue {
+        background: #dbeafe;
+        color: var(--primary);
+    }
+
+    .summary-card-icon.green {
+        background: #dcfce7;
+        color: var(--success);
+    }
+
+    .summary-card-icon.purple {
+        background: #f3e8ff;
+        color: #7c3aed;
+    }
+
+    .summary-card-icon.orange {
+        background: #fff7ed;
+        color: var(--warning);
+    }
+
+    .summary-card-icon.red {
+        background: #fef2f2;
+        color: var(--danger);
+    }
+
+    .summary-card-label {
+        font-size: 11px;
+        color: var(--text-gray);
+        margin-bottom: 2px;
+    }
+
+    .summary-card-value {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
 
     /* Table */
     .sh-table-wrap {
-        background: white; border: 1px solid var(--border); border-radius: 8px;
-        overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
-    .sh-table { width: 100%; border-collapse: collapse; }
+
+    .sh-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
     .sh-table th {
-        background: var(--bg-light); padding: 10px 12px;
-        font-size: 12px; font-weight: 600; color: var(--text-gray);
-        border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap;
+        background: var(--bg-light);
+        padding: 10px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-gray);
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        white-space: nowrap;
     }
+
     .sh-table td {
-        padding: 10px 12px; font-size: 13px; border-bottom: 1px solid var(--border);
-        color: var(--text-dark); white-space: nowrap;
+        padding: 10px 12px;
+        font-size: 13px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-dark);
+        white-space: nowrap;
     }
-    .sh-table tr:hover { background: var(--bg-light); }
-    .sh-table tr:last-child td { border-bottom: none; }
+
+    .sh-table tr:hover {
+        background: var(--bg-light);
+    }
+
+    .sh-table tr:last-child td {
+        border-bottom: none;
+    }
 
     .status-badge {
-        display: inline-block; padding: 2px 8px; border-radius: 12px;
-        font-size: 11px; font-weight: 600;
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
     }
-    .status-paid { background: #dcfce7; color: var(--success); }
-    .status-unpaid { background: #fef2f2; color: var(--danger); }
-    .status-partial { background: #fff7ed; color: var(--warning); }
-    .status-draft { background: #f1f5f9; color: var(--text-gray); }
 
-    .action-btns { display: flex; gap: 6px; }
+    .status-paid {
+        background: #dcfce7;
+        color: var(--success);
+    }
+
+    .status-unpaid {
+        background: #fef2f2;
+        color: var(--danger);
+    }
+
+    .status-partial {
+        background: #fff7ed;
+        color: var(--warning);
+    }
+
+    .status-draft {
+        background: #f1f5f9;
+        color: var(--text-gray);
+    }
+
+    .action-btns {
+        display: flex;
+        gap: 6px;
+    }
+
     .action-btn {
-        width: 28px; height: 28px; border-radius: 4px; border: 1px solid var(--border);
-        background: white; display: inline-flex; align-items: center; justify-content: center;
-        cursor: pointer; font-size: 13px; color: var(--text-gray); text-decoration: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+        background: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 13px;
+        color: var(--text-gray);
+        text-decoration: none;
     }
-    .action-btn:hover { background: var(--bg-light); }
 
-    .amount-due { color: var(--danger); font-weight: 600; }
-    .amount-paid { color: var(--success); font-weight: 600; }
+    .action-btn:hover {
+        background: var(--bg-light);
+    }
+
+    .amount-due {
+        color: var(--danger);
+        font-weight: 600;
+    }
+
+    .amount-paid {
+        color: var(--success);
+        font-weight: 600;
+    }
 
     /* Pagination */
     .sh-pagination {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 12px 16px; border-top: 1px solid var(--border); font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        font-size: 13px;
     }
-    .pg-info { color: var(--text-gray); }
-    .pg-btns { display: flex; gap: 4px; }
+
+    .pg-info {
+        color: var(--text-gray);
+    }
+
+    .pg-btns {
+        display: flex;
+        gap: 4px;
+    }
+
     .pg-btn {
-        width: 30px; height: 30px; border: 1px solid var(--border); border-radius: 4px;
-        background: white; cursor: pointer; display: flex; align-items: center; justify-content: center;
-        font-size: 13px; font-weight: 500; text-decoration: none; color: var(--text-dark);
+        width: 30px;
+        height: 30px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        color: var(--text-dark);
     }
-    .pg-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-    .pg-btn:hover:not(.active) { background: var(--bg-light); }
+
+    .pg-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .pg-btn:hover:not(.active) {
+        background: var(--bg-light);
+    }
 
     /* Tab Filter */
-    .sh-tabs { display: flex; gap: 4px; margin-bottom: 16px; }
-    .sh-tab {
-        padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 500;
-        border: 1px solid var(--border); background: white; cursor: pointer; color: var(--text-gray);
+    .sh-tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 16px;
     }
-    .sh-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    .sh-tab {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid var(--border);
+        background: white;
+        cursor: pointer;
+        color: var(--text-gray);
+    }
+
+    .sh-tab.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -132,12 +333,28 @@
 
     <!-- Top Bar -->
     <div class="sh-topbar">
-        <h1>Sales History</h1>
+        <div class="d-flex align-items-center gap-2">
+            <h1 class="m-0 me-2">Sales History</h1>
+            <button type="button" class="btn btn-sm d-inline-flex align-items-center gap-1 shadow-xs rounded-pill"
+                onclick="openPageNotesModal('sales_invoices', 'Sales History & Invoices')"
+                style="font-size: 11.5px; font-weight: 600; background: #fffbe6; color: #d97706; border: 1px solid #fde68a;">
+                <i class="fa-solid fa-note-sticky text-warning"></i> Notes
+            </button>
+            <button type="button" class="btn btn-sm d-inline-flex align-items-center gap-1 shadow-xs rounded-pill"
+                onclick="openPageVideoModal('sales_invoices', 'Sales History & Invoices')"
+                style="font-size: 11.5px; font-weight: 600; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;">
+                <i class="fa-brands fa-youtube text-danger"></i> Video
+            </button>
+        </div>
         <div class="sh-filters">
             <!-- Date Mode Selector (AD / BS) -->
-            <div style="display:inline-flex; align-items:center; gap:6px; background:#f8fafc; border:1px solid var(--border); border-radius:6px; padding:3px 8px;">
-                <label for="filter_date_mode" style="font-size:12px; font-weight:600; color:var(--text-gray); margin:0;"><i class="fa-solid fa-calendar-days" style="margin-right:4px;"></i>Date Type:</label>
-                <select id="filter_date_mode" onchange="onDateModeChange()" style="font-size:12px; font-weight:700; border:none; background:transparent; cursor:pointer; color:var(--primary); outline:none;">
+            <div
+                style="display:inline-flex; align-items:center; gap:6px; background:#f8fafc; border:1px solid var(--border); border-radius:6px; padding:3px 8px;">
+                <label for="filter_date_mode"
+                    style="font-size:12px; font-weight:600; color:var(--text-gray); margin:0;"><i
+                        class="fa-solid fa-calendar-days" style="margin-right:4px;"></i>Date Type:</label>
+                <select id="filter_date_mode" onchange="onDateModeChange()"
+                    style="font-size:12px; font-weight:700; border:none; background:transparent; cursor:pointer; color:var(--primary); outline:none;">
                     <option value="">-- Select --</option>
                     <option value="AD">AD (Gregorian)</option>
                     <option value="BS">BS (Bikram Sambat)</option>
@@ -150,32 +367,45 @@
                 <option value="{{ c.name }}">{{ c.name }}</option>
                 {% endfor %}
             </select>
-            <input type="text" id="filter_search" oninput="applyFilters()" placeholder="🔍 Search Invoice / Customer / PAN..." style="width:230px;">
-            <button type="button" class="btn-export" style="background:#f1f5f9; color:#475569; border:1px solid var(--border);" onclick="resetFilters()"><i class="fa-solid fa-rotate-left"></i> Reset Filters</button>
-            <button type="button" class="btn-export" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
-            <button type="button" class="btn-export" style="background:#64748b;" onclick="toggleSettingsModal()"><i class="fa-solid fa-gear"></i> Settings</button>
+            <input type="text" id="filter_search" oninput="applyFilters()"
+                placeholder="🔍 Search Invoice / Customer / PAN..." style="width:230px;">
+            <button type="button" class="btn-export"
+                style="background:#f1f5f9; color:#475569; border:1px solid var(--border);" onclick="resetFilters()"><i
+                    class="fa-solid fa-rotate-left"></i> Reset Filters</button>
+            <button type="button" class="btn-export" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i>
+                Export Excel</button>
+            <button type="button" class="btn-export" style="background:#64748b;" onclick="toggleSettingsModal()"><i
+                    class="fa-solid fa-gear"></i> Settings</button>
         </div>
     </div>
 
     <!-- Date Range Row (shown only when a date type is selected) -->
-    <div id="date_range_row" style="display:none; align-items:center; gap:10px; margin-bottom:14px; padding:10px 14px; background:white; border:1px solid var(--border); border-radius:8px; flex-wrap:wrap;">
-        <span id="date_range_label" style="font-size:12px; font-weight:600; color:var(--text-gray);">Filter by Date Range:</span>
+    <div id="date_range_row"
+        style="display:none; align-items:center; gap:10px; margin-bottom:14px; padding:10px 14px; background:white; border:1px solid var(--border); border-radius:8px; flex-wrap:wrap;">
+        <span id="date_range_label" style="font-size:12px; font-weight:600; color:var(--text-gray);">Filter by Date
+            Range:</span>
 
         <!-- AD Date Inputs -->
         <div id="ad_date_container" style="display:none; align-items:center; gap:8px;">
-            <input type="date" id="filter_start_date_ad" onchange="applyFilters()" title="Start Date (AD)" placeholder="Start Date">
+            <input type="date" id="filter_start_date_ad" onchange="applyFilters()" title="Start Date (AD)"
+                placeholder="Start Date">
             <span style="color:var(--text-gray);">—</span>
-            <input type="date" id="filter_end_date_ad" onchange="applyFilters()" title="End Date (AD)" placeholder="End Date">
+            <input type="date" id="filter_end_date_ad" onchange="applyFilters()" title="End Date (AD)"
+                placeholder="End Date">
         </div>
 
         <!-- BS Date Inputs -->
         <div id="bs_date_container" style="display:none; align-items:center; gap:8px;">
-            <input type="text" id="filter_start_date_bs" title="Start Date (BS)" placeholder="📅 Start Date (BS)" style="width:140px; font-size:13px; padding:5px 10px; border-radius:6px; border:1px solid #f59e0b; background:#fffbf0; cursor:pointer;">
+            <input type="text" id="filter_start_date_bs" title="Start Date (BS)" placeholder="📅 Start Date (BS)"
+                style="width:140px; font-size:13px; padding:5px 10px; border-radius:6px; border:1px solid #f59e0b; background:#fffbf0; cursor:pointer;">
             <span style="color:var(--text-gray);">—</span>
-            <input type="text" id="filter_end_date_bs" title="End Date (BS)" placeholder="📅 End Date (BS)" style="width:140px; font-size:13px; padding:5px 10px; border-radius:6px; border:1px solid #f59e0b; background:#fffbf0; cursor:pointer;">
+            <input type="text" id="filter_end_date_bs" title="End Date (BS)" placeholder="📅 End Date (BS)"
+                style="width:140px; font-size:13px; padding:5px 10px; border-radius:6px; border:1px solid #f59e0b; background:#fffbf0; cursor:pointer;">
         </div>
 
-        <button type="button" onclick="clearDateRange()" style="font-size:12px; color:#dc2626; background:none; border:1px solid #fca5a5; border-radius:4px; padding:3px 10px; cursor:pointer;">✕ Clear</button>
+        <button type="button" onclick="clearDateRange()"
+            style="font-size:12px; color:#dc2626; background:none; border:1px solid #fca5a5; border-radius:4px; padding:3px 10px; cursor:pointer;">✕
+            Clear</button>
     </div>
 
     <!-- Summary Cards -->
@@ -246,66 +476,70 @@
             </thead>
             <tbody>
                 {% for invoice in invoices %}
-                <tr class="invoice-row"
-                    data-status="{{ invoice.status }}"
-                    data-customer="{{ invoice.customer.name|lower }}"
-                    data-invoice="{{ invoice.invoice_number|lower }}"
+                <tr class="invoice-row" data-status="{{ invoice.status }}"
+                    data-customer="{{ invoice.customer.name|lower }}" data-invoice="{{ invoice.invoice_number|lower }}"
                     data-pan="{{ invoice.customer.pan_vat_number|default:''|lower }}"
-                    data-date="{{ invoice.date|date:'Y-m-d' }}"
-                    data-total="{{ invoice.total_amount|default:0 }}"
-                    data-vat="{{ invoice.vat_amount|default:0 }}"
-                    data-paid="{{ invoice.paid_amount|default:0 }}"
+                    data-date="{{ invoice.date|date:'Y-m-d' }}" data-total="{{ invoice.total_amount|default:0 }}"
+                    data-vat="{{ invoice.vat_amount|default:0 }}" data-paid="{{ invoice.paid_amount|default:0 }}"
                     data-due="{{ invoice.balance_due|default:0 }}">
                     <td class="col-date">
                         <div class="ad-date-text">{{ invoice.date }}</div>
-                        <div class="bs-date-badge" style="display:none; font-size:13px; color:var(--text-dark); font-weight:400;"></div>
+                        <div class="bs-date-badge"
+                            style="display:none; font-size:13px; color:var(--text-dark); font-weight:400;"></div>
                     </td>
                     <td class="col-inv" style="color:var(--primary); font-weight:500;">{{ invoice.invoice_number }}</td>
                     <td class="col-customer">{{ invoice.customer.name }}</td>
                     <td class="col-pan" style="color:var(--text-gray);">{{ invoice.customer.pan_vat_number|default:"—" }}</td>
                     <td class="col-total" style="text-align:right;">{{ invoice.total_amount|floatformat:2 }}</td>
                     <td class="col-vat" style="text-align:right;">{{ invoice.vat_amount|floatformat:2 }}</td>
-                    <td class="col-paid amount-paid" style="text-align:right;">{{ invoice.paid_amount|floatformat:2 }}</td>
-                    <td class="col-due amount-due" style="text-align:right;">{{ invoice.balance_due|floatformat:2 }}</td>
+                    <td class="col-paid amount-paid" style="text-align:right;">{{ invoice.paid_amount|floatformat:2 }}
+                    </td>
+                    <td class="col-due amount-due" style="text-align:right;">{{ invoice.balance_due|floatformat:2 }}
+                    </td>
                     <td class="col-status">
                         {% if invoice.status == 'Paid' %}
-                            <span class="status-badge status-paid">Paid</span>
+                        <span class="status-badge status-paid">Paid</span>
                         {% elif invoice.status == 'Unpaid' %}
-                            <span class="status-badge status-unpaid">Due</span>
+                        <span class="status-badge status-unpaid">Due</span>
                         {% elif invoice.status == 'Partially Paid' %}
-                            <span class="status-badge status-partial">Partial</span>
+                        <span class="status-badge status-partial">Partial</span>
                         {% else %}
-                            <span class="status-badge status-draft">Draft</span>
+                        <span class="status-badge status-draft">Draft</span>
                         {% endif %}
                     </td>
                     <td style="text-align:center;">
                         {% if invoice.bill_attachment %}
-                            <a href="{{ invoice.bill_attachment.url }}" target="_blank" title="View Attachment"
-                               style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; background:#eff6ff; border-radius:6px; color:#2563eb; text-decoration:none; font-size:13px; transition:background 0.15s;">
-                                <i class="fa-solid fa-paperclip"></i>
-                            </a>
+                        <a href="{{ invoice.bill_attachment.url }}" target="_blank" title="View Attachment"
+                            style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; background:#eff6ff; border-radius:6px; color:#2563eb; text-decoration:none; font-size:13px; transition:background 0.15s;">
+                            <i class="fa-solid fa-paperclip"></i>
+                        </a>
                         {% else %}
-                            <span style="color:#94a3b8; font-size:12px;">N/A</span>
+                        <span style="color:#94a3b8; font-size:12px;">N/A</span>
                         {% endif %}
                     </td>
                     <td>
                         <div class="action-btns">
-                            <a href="{% url 'invoice_detail' invoice.pk %}" class="action-btn" title="View Details"><i class="fa-regular fa-eye"></i></a>
-                            <a href="{% url 'invoice_detail' invoice.pk %}?print=1" class="action-btn" title="Print Invoice"><i class="fa-solid fa-print"></i></a>
+                            <a href="{% url 'invoice_detail' invoice.pk %}" class="action-btn" title="View Details"><i
+                                    class="fa-regular fa-eye"></i></a>
+                            <a href="{% url 'invoice_detail' invoice.pk %}?print=1" class="action-btn"
+                                title="Print Invoice"><i class="fa-solid fa-print"></i></a>
                         </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr id="no_invoices_row">
                     <td colspan="10" style="text-align:center; padding:40px; color:var(--text-gray);">
-                        <i class="fa-solid fa-file-invoice" style="font-size:32px; margin-bottom:8px; display:block; opacity:0.3;"></i>
-                        No invoices found. <a href="{% url 'invoice_add' %}" style="color:var(--primary);">Create your first invoice</a>
+                        <i class="fa-solid fa-file-invoice"
+                            style="font-size:32px; margin-bottom:8px; display:block; opacity:0.3;"></i>
+                        No invoices found. <a href="{% url 'invoice_add' %}" style="color:var(--primary);">Create your
+                            first invoice</a>
                     </td>
                 </tr>
                 {% endfor %}
                 <tr id="no_filtered_row" style="display:none;">
                     <td colspan="10" style="text-align:center; padding:40px; color:var(--text-gray);">
-                        <i class="fa-solid fa-magnifying-glass" style="font-size:32px; margin-bottom:8px; display:block; opacity:0.3;"></i>
+                        <i class="fa-solid fa-magnifying-glass"
+                            style="font-size:32px; margin-bottom:8px; display:block; opacity:0.3;"></i>
                         No invoices match your filter criteria.
                     </td>
                 </tr>
@@ -314,7 +548,8 @@
 
         <!-- Pagination -->
         <div class="sh-pagination">
-            <div class="pg-info" id="showing_count_info">Showing 1 to {{ invoices.count }} of {{ invoices.count }} entries</div>
+            <div class="pg-info" id="showing_count_info">Showing 1 to {{ invoices.count }} of {{ invoices.count }}
+                entries</div>
             <div class="pg-btns">
                 <button class="pg-btn">&lt;</button>
                 <button class="pg-btn active">1</button>
@@ -324,22 +559,35 @@
     </div>
 
     <!-- Settings Modal -->
-    <div id="settingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
-        <div style="background:#fff; width:380px; border-radius:8px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
+    <div id="settingsModal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div
+            style="background:#fff; width:380px; border-radius:8px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
                 <h3 style="margin:0; font-size:16px; font-weight:700;">Sales History Settings</h3>
-                <button type="button" onclick="toggleSettingsModal()" style="background:transparent; border:none; cursor:pointer; font-size:18px; color:var(--text-gray);"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" onclick="toggleSettingsModal()"
+                    style="background:transparent; border:none; cursor:pointer; font-size:18px; color:var(--text-gray);"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
             <div style="padding:20px; display:flex; flex-direction:column; gap:12px;">
-                <p style="margin:0 0 8px 0; font-size:12px; color:var(--text-gray);">Select summary cards to display:</p>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input type="checkbox" id="chk_invoices" checked onchange="applyCardSettings()"> Total Invoices</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input type="checkbox" id="chk_sales" checked onchange="applyCardSettings()"> Total Sales</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input type="checkbox" id="chk_vat" checked onchange="applyCardSettings()"> Total VAT</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input type="checkbox" id="chk_received" checked onchange="applyCardSettings()"> Total Received</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input type="checkbox" id="chk_due" checked onchange="applyCardSettings()"> Total Due</label>
+                <p style="margin:0 0 8px 0; font-size:12px; color:var(--text-gray);">Select summary cards to display:
+                </p>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input
+                        type="checkbox" id="chk_invoices" checked onchange="applyCardSettings()"> Total Invoices</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input
+                        type="checkbox" id="chk_sales" checked onchange="applyCardSettings()"> Total Sales</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input
+                        type="checkbox" id="chk_vat" checked onchange="applyCardSettings()"> Total VAT</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input
+                        type="checkbox" id="chk_received" checked onchange="applyCardSettings()"> Total Received</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input
+                        type="checkbox" id="chk_due" checked onchange="applyCardSettings()"> Total Due</label>
             </div>
-            <div style="padding:14px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; background:var(--bg-light);">
-                <button type="button" onclick="toggleSettingsModal()" style="padding:6px 16px; background:var(--primary); color:#fff; border:none; border-radius:4px; font-size:13px; font-weight:600; cursor:pointer;">Done</button>
+            <div
+                style="padding:14px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; background:var(--bg-light);">
+                <button type="button" onclick="toggleSettingsModal()"
+                    style="padding:6px 16px; background:var(--primary); color:#fff; border:none; border-radius:4px; font-size:13px; font-weight:600; cursor:pointer;">Done</button>
             </div>
         </div>
     </div>
@@ -347,397 +595,397 @@
 </div>
 
 <script>
-let currentStatusFilter = 'All';
+    let currentStatusFilter = 'All';
 
-function filterByStatus(status, btn) {
-    currentStatusFilter = status;
-    document.querySelectorAll('.sh-tab').forEach(t => t.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    applyFilters();
-}
-
-function onDateModeChange() {
-    const mode = document.getElementById('filter_date_mode') ? document.getElementById('filter_date_mode').value : '';
-    const adContainer = document.getElementById('ad_date_container');
-    const bsContainer = document.getElementById('bs_date_container');
-    const dateRangeRow = document.getElementById('date_range_row');
-    const label = document.getElementById('date_range_label');
-
-    if (dateRangeRow) {
-        if (!mode) {
-            // No date type selected — hide the row entirely
-            dateRangeRow.style.display = 'none';
-            if (adContainer) adContainer.style.display = 'none';
-            if (bsContainer) bsContainer.style.display = 'none';
-        } else {
-            // Show the date range row
-            dateRangeRow.style.display = 'flex';
-            if (mode === 'BS') {
-                if (adContainer) adContainer.style.display = 'none';
-                if (bsContainer) bsContainer.style.display = 'flex';
-                if (label) label.textContent = 'Filter by Date Range (BS):';
-            } else {
-                if (adContainer) adContainer.style.display = 'flex';
-                if (bsContainer) bsContainer.style.display = 'none';
-                if (label) label.textContent = 'Filter by Date Range (AD):';
-            }
-        }
+    function filterByStatus(status, btn) {
+        currentStatusFilter = status;
+        document.querySelectorAll('.sh-tab').forEach(t => t.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        applyFilters();
     }
 
-    // Toggle date column: show AD or BS date in the table rows
-    document.querySelectorAll('#invoiceTable tbody tr.invoice-row').forEach(row => {
-        const adDiv = row.querySelector('.ad-date-text');
-        const bsDiv = row.querySelector('.bs-date-badge');
-        if (adDiv) adDiv.style.display = (mode === 'BS') ? 'none' : '';
-        if (bsDiv) bsDiv.style.display = (mode === 'BS') ? '' : 'none';
-    });
+    function onDateModeChange() {
+        const mode = document.getElementById('filter_date_mode') ? document.getElementById('filter_date_mode').value : '';
+        const adContainer = document.getElementById('ad_date_container');
+        const bsContainer = document.getElementById('bs_date_container');
+        const dateRangeRow = document.getElementById('date_range_row');
+        const label = document.getElementById('date_range_label');
 
-    applyFilters();
-}
-
-function initBsDates() {
-    const rows = document.querySelectorAll('#invoiceTable tbody tr.invoice-row');
-    rows.forEach(row => {
-        const adDateStr = row.dataset.date; // e.g. "2026-09-08"
-        if (adDateStr && typeof window.adToBS === 'function') {
-            const parts = adDateStr.split('-').map(Number);
-            if (parts.length === 3 && !isNaN(parts[0])) {
-                const bsObj = window.adToBS(new Date(parts[0], parts[1]-1, parts[2]));
-                const bsStr = window.fmtBS(bsObj); // e.g. "2083-05-23"
-                row.dataset.bsDate = bsStr;
-
-                const badge = row.querySelector('.bs-date-badge');
-                if (badge) {
-                    badge.textContent = bsStr;
+        if (dateRangeRow) {
+            if (!mode) {
+                // No date type selected — hide the row entirely
+                dateRangeRow.style.display = 'none';
+                if (adContainer) adContainer.style.display = 'none';
+                if (bsContainer) bsContainer.style.display = 'none';
+            } else {
+                // Show the date range row
+                dateRangeRow.style.display = 'flex';
+                if (mode === 'BS') {
+                    if (adContainer) adContainer.style.display = 'none';
+                    if (bsContainer) bsContainer.style.display = 'flex';
+                    if (label) label.textContent = 'Filter by Date Range (BS):';
+                } else {
+                    if (adContainer) adContainer.style.display = 'flex';
+                    if (bsContainer) bsContainer.style.display = 'none';
+                    if (label) label.textContent = 'Filter by Date Range (AD):';
                 }
             }
         }
-    });
-}
 
-function applyFilters() {
-    const dateMode = document.getElementById('filter_date_mode') ? document.getElementById('filter_date_mode').value : 'AD';
-    const startDateAD = document.getElementById('filter_start_date_ad') ? document.getElementById('filter_start_date_ad').value : '';
-    const endDateAD = document.getElementById('filter_end_date_ad') ? document.getElementById('filter_end_date_ad').value : '';
-    const startDateBS = document.getElementById('filter_start_date_bs') ? document.getElementById('filter_start_date_bs').value : '';
-    const endDateBS = document.getElementById('filter_end_date_bs') ? document.getElementById('filter_end_date_bs').value : '';
+        // Toggle date column: show AD or BS date in the table rows
+        document.querySelectorAll('#invoiceTable tbody tr.invoice-row').forEach(row => {
+            const adDiv = row.querySelector('.ad-date-text');
+            const bsDiv = row.querySelector('.bs-date-badge');
+            if (adDiv) adDiv.style.display = (mode === 'BS') ? 'none' : '';
+            if (bsDiv) bsDiv.style.display = (mode === 'BS') ? '' : 'none';
+        });
 
-    const selectedCustomer = (document.getElementById('filter_customer').value || '').toLowerCase().trim();
-    const searchVal = (document.getElementById('filter_search').value || '').toLowerCase().trim();
-
-    let visibleCount = 0;
-    let totalSales = 0;
-    let totalVat = 0;
-    let totalPaid = 0;
-    let totalDue = 0;
-
-    const rows = document.querySelectorAll('#invoiceTable tbody tr.invoice-row');
-    rows.forEach(row => {
-        const rowStatus = row.dataset.status || '';
-        const rowCustomer = (row.dataset.customer || '').toLowerCase();
-        const rowInvoice = (row.dataset.invoice || '').toLowerCase();
-        const rowPan = (row.dataset.pan || '').toLowerCase();
-        const rowDateAD = row.dataset.date || '';
-        const rowDateBS = row.dataset.bsDate || '';
-
-        // Status filter
-        let matchStatus = (currentStatusFilter === 'All' || rowStatus === currentStatusFilter);
-
-        // Customer dropdown filter
-        let matchCustomer = (!selectedCustomer || selectedCustomer === 'all' || rowCustomer === selectedCustomer);
-
-        // Date range filter based on active Date Type (AD or BS)
-        let matchDate = true;
-        if (dateMode === 'BS') {
-            if (startDateBS && rowDateBS && rowDateBS < startDateBS) matchDate = false;
-            if (endDateBS && rowDateBS && rowDateBS > endDateBS) matchDate = false;
-        } else {
-            if (startDateAD && rowDateAD && rowDateAD < startDateAD) matchDate = false;
-            if (endDateAD && rowDateAD && rowDateAD > endDateAD) matchDate = false;
-        }
-
-        // Search text filter
-        let matchSearch = true;
-        if (searchVal) {
-            matchSearch = rowInvoice.includes(searchVal) || rowCustomer.includes(searchVal) || rowPan.includes(searchVal) || rowDateBS.includes(searchVal);
-        }
-
-        if (matchStatus && matchCustomer && matchDate && matchSearch) {
-            row.style.display = '';
-            visibleCount++;
-            
-            const total = parseFloat(row.dataset.total) || 0;
-            const vat = parseFloat(row.dataset.vat) || 0;
-            const paid = parseFloat(row.dataset.paid) || 0;
-            const due = parseFloat(row.dataset.due) || 0;
-
-            totalSales += total;
-            totalVat += vat;
-            totalPaid += paid;
-            totalDue += due;
-        } else {
-            row.style.display = 'none';
-        }
-    });
-
-    // Update count info
-    const countInfo = document.getElementById('showing_count_info');
-    if (countInfo) {
-        countInfo.textContent = `Showing 1 to ${visibleCount} of ${visibleCount} entries`;
+        applyFilters();
     }
 
-    // Update summary card values live based on filtered rows
-    const cardInvoicesVal = document.querySelector('#card_invoices .summary-card-value');
-    const cardSalesVal = document.querySelector('#card_sales .summary-card-value');
-    const cardVatVal = document.querySelector('#card_vat .summary-card-value');
-    const cardReceivedVal = document.querySelector('#card_received .summary-card-value');
-    const cardDueVal = document.querySelector('#card_due .summary-card-value');
+    function initBsDates() {
+        const rows = document.querySelectorAll('#invoiceTable tbody tr.invoice-row');
+        rows.forEach(row => {
+            const adDateStr = row.dataset.date; // e.g. "2026-09-08"
+            if (adDateStr && typeof window.adToBS === 'function') {
+                const parts = adDateStr.split('-').map(Number);
+                if (parts.length === 3 && !isNaN(parts[0])) {
+                    const bsObj = window.adToBS(new Date(parts[0], parts[1] - 1, parts[2]));
+                    const bsStr = window.fmtBS(bsObj); // e.g. "2083-05-23"
+                    row.dataset.bsDate = bsStr;
 
-    if (cardInvoicesVal) cardInvoicesVal.textContent = visibleCount;
-    if (cardSalesVal) cardSalesVal.textContent = `Rs. ${totalSales.toLocaleString('en-NP', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-    if (cardVatVal) cardVatVal.textContent = `Rs. ${totalVat.toLocaleString('en-NP', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-    if (cardReceivedVal) cardReceivedVal.textContent = `Rs. ${totalPaid.toLocaleString('en-NP', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-    if (cardDueVal) cardDueVal.textContent = `Rs. ${totalDue.toLocaleString('en-NP', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-
-    // Show empty filter message if count === 0
-    const noFilterRow = document.getElementById('no_filtered_row');
-    if (noFilterRow) {
-        noFilterRow.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
+                    const badge = row.querySelector('.bs-date-badge');
+                    if (badge) {
+                        badge.textContent = bsStr;
+                    }
+                }
+            }
+        });
     }
-}
 
-// Reset / Clear all filters
-function resetFilters() {
-    if (document.getElementById('filter_date_mode')) document.getElementById('filter_date_mode').value = '';
-    if (document.getElementById('filter_start_date_ad')) document.getElementById('filter_start_date_ad').value = '';
-    if (document.getElementById('filter_end_date_ad')) document.getElementById('filter_end_date_ad').value = '';
-    if (document.getElementById('filter_start_date_bs')) document.getElementById('filter_start_date_bs').value = '';
-    if (document.getElementById('filter_end_date_bs')) document.getElementById('filter_end_date_bs').value = '';
-    if (document.getElementById('filter_customer')) document.getElementById('filter_customer').value = '';
-    if (document.getElementById('filter_search')) document.getElementById('filter_search').value = '';
+    function applyFilters() {
+        const dateMode = document.getElementById('filter_date_mode') ? document.getElementById('filter_date_mode').value : 'AD';
+        const startDateAD = document.getElementById('filter_start_date_ad') ? document.getElementById('filter_start_date_ad').value : '';
+        const endDateAD = document.getElementById('filter_end_date_ad') ? document.getElementById('filter_end_date_ad').value : '';
+        const startDateBS = document.getElementById('filter_start_date_bs') ? document.getElementById('filter_start_date_bs').value : '';
+        const endDateBS = document.getElementById('filter_end_date_bs') ? document.getElementById('filter_end_date_bs').value : '';
 
-    // Reset status tab to 'All'
-    currentStatusFilter = 'All';
-    document.querySelectorAll('.sh-tab').forEach((t, i) => {
-        if (i === 0) t.classList.add('active');
-        else t.classList.remove('active');
-    });
+        const selectedCustomer = (document.getElementById('filter_customer').value || '').toLowerCase().trim();
+        const searchVal = (document.getElementById('filter_search').value || '').toLowerCase().trim();
 
-    onDateModeChange();
-}
+        let visibleCount = 0;
+        let totalSales = 0;
+        let totalVat = 0;
+        let totalPaid = 0;
+        let totalDue = 0;
 
-// Clear only the date range inputs (keep other filters intact)
-function clearDateRange() {
-    if (document.getElementById('filter_start_date_ad')) document.getElementById('filter_start_date_ad').value = '';
-    if (document.getElementById('filter_end_date_ad')) document.getElementById('filter_end_date_ad').value = '';
-    if (document.getElementById('filter_start_date_bs')) document.getElementById('filter_start_date_bs').value = '';
-    if (document.getElementById('filter_end_date_bs')) document.getElementById('filter_end_date_bs').value = '';
-    applyFilters();
-}
+        const rows = document.querySelectorAll('#invoiceTable tbody tr.invoice-row');
+        rows.forEach(row => {
+            const rowStatus = row.dataset.status || '';
+            const rowCustomer = (row.dataset.customer || '').toLowerCase();
+            const rowInvoice = (row.dataset.invoice || '').toLowerCase();
+            const rowPan = (row.dataset.pan || '').toLowerCase();
+            const rowDateAD = row.dataset.date || '';
+            const rowDateBS = row.dataset.bsDate || '';
 
-// Excel (.xlsx) Export
-function exportToExcel() {
-    const rows = document.querySelectorAll('#invoiceTable tbody tr.invoice-row');
-    const data = [
-        ['Date', 'Invoice No.', 'Customer', 'PAN No.', 'Total Amount', 'VAT', 'Paid Amount', 'Due Amount', 'Status']
-    ];
+            // Status filter
+            let matchStatus = (currentStatusFilter === 'All' || rowStatus === currentStatusFilter);
 
-    rows.forEach(row => {
-        if (row.style.display !== 'none') {
-            const date = row.dataset.date || '';
-            const bsDate = row.dataset.bsDate || '';
-            const dateDisplay = bsDate ? `${date} (${bsDate} BS)` : date;
-            const inv = row.querySelector('.col-inv')?.textContent?.trim() || '';
-            const customer = row.querySelector('.col-customer')?.textContent?.trim() || '';
-            const pan = row.querySelector('.col-pan')?.textContent?.trim() || '';
-            const total = parseFloat(row.dataset.total) || 0;
-            const vat = parseFloat(row.dataset.vat) || 0;
-            const paid = parseFloat(row.dataset.paid) || 0;
-            const due = parseFloat(row.dataset.due) || 0;
-            const status = row.querySelector('.col-status')?.textContent?.trim() || '';
+            // Customer dropdown filter
+            let matchCustomer = (!selectedCustomer || selectedCustomer === 'all' || rowCustomer === selectedCustomer);
 
-            data.push([dateDisplay, inv, customer, pan, total, vat, paid, due, status]);
+            // Date range filter based on active Date Type (AD or BS)
+            let matchDate = true;
+            if (dateMode === 'BS') {
+                if (startDateBS && rowDateBS && rowDateBS < startDateBS) matchDate = false;
+                if (endDateBS && rowDateBS && rowDateBS > endDateBS) matchDate = false;
+            } else {
+                if (startDateAD && rowDateAD && rowDateAD < startDateAD) matchDate = false;
+                if (endDateAD && rowDateAD && rowDateAD > endDateAD) matchDate = false;
+            }
+
+            // Search text filter
+            let matchSearch = true;
+            if (searchVal) {
+                matchSearch = rowInvoice.includes(searchVal) || rowCustomer.includes(searchVal) || rowPan.includes(searchVal) || rowDateBS.includes(searchVal);
+            }
+
+            if (matchStatus && matchCustomer && matchDate && matchSearch) {
+                row.style.display = '';
+                visibleCount++;
+
+                const total = parseFloat(row.dataset.total) || 0;
+                const vat = parseFloat(row.dataset.vat) || 0;
+                const paid = parseFloat(row.dataset.paid) || 0;
+                const due = parseFloat(row.dataset.due) || 0;
+
+                totalSales += total;
+                totalVat += vat;
+                totalPaid += paid;
+                totalDue += due;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Update count info
+        const countInfo = document.getElementById('showing_count_info');
+        if (countInfo) {
+            countInfo.textContent = `Showing 1 to ${visibleCount} of ${visibleCount} entries`;
         }
-    });
 
-    if (typeof XLSX !== 'undefined') {
-        const ws = XLSX.utils.aoa_to_sheet(data);
-        
-        // Auto column widths
-        ws['!cols'] = [
-            { wch: 14 }, // Date
-            { wch: 16 }, // Invoice No
-            { wch: 24 }, // Customer
-            { wch: 14 }, // PAN No
-            { wch: 16 }, // Total Amount
-            { wch: 14 }, // VAT
-            { wch: 14 }, // Paid Amount
-            { wch: 14 }, // Due Amount
-            { wch: 14 }  // Status
+        // Update summary card values live based on filtered rows
+        const cardInvoicesVal = document.querySelector('#card_invoices .summary-card-value');
+        const cardSalesVal = document.querySelector('#card_sales .summary-card-value');
+        const cardVatVal = document.querySelector('#card_vat .summary-card-value');
+        const cardReceivedVal = document.querySelector('#card_received .summary-card-value');
+        const cardDueVal = document.querySelector('#card_due .summary-card-value');
+
+        if (cardInvoicesVal) cardInvoicesVal.textContent = visibleCount;
+        if (cardSalesVal) cardSalesVal.textContent = `Rs. ${totalSales.toLocaleString('en-NP', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (cardVatVal) cardVatVal.textContent = `Rs. ${totalVat.toLocaleString('en-NP', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (cardReceivedVal) cardReceivedVal.textContent = `Rs. ${totalPaid.toLocaleString('en-NP', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (cardDueVal) cardDueVal.textContent = `Rs. ${totalDue.toLocaleString('en-NP', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+        // Show empty filter message if count === 0
+        const noFilterRow = document.getElementById('no_filtered_row');
+        if (noFilterRow) {
+            noFilterRow.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
+        }
+    }
+
+    // Reset / Clear all filters
+    function resetFilters() {
+        if (document.getElementById('filter_date_mode')) document.getElementById('filter_date_mode').value = '';
+        if (document.getElementById('filter_start_date_ad')) document.getElementById('filter_start_date_ad').value = '';
+        if (document.getElementById('filter_end_date_ad')) document.getElementById('filter_end_date_ad').value = '';
+        if (document.getElementById('filter_start_date_bs')) document.getElementById('filter_start_date_bs').value = '';
+        if (document.getElementById('filter_end_date_bs')) document.getElementById('filter_end_date_bs').value = '';
+        if (document.getElementById('filter_customer')) document.getElementById('filter_customer').value = '';
+        if (document.getElementById('filter_search')) document.getElementById('filter_search').value = '';
+
+        // Reset status tab to 'All'
+        currentStatusFilter = 'All';
+        document.querySelectorAll('.sh-tab').forEach((t, i) => {
+            if (i === 0) t.classList.add('active');
+            else t.classList.remove('active');
+        });
+
+        onDateModeChange();
+    }
+
+    // Clear only the date range inputs (keep other filters intact)
+    function clearDateRange() {
+        if (document.getElementById('filter_start_date_ad')) document.getElementById('filter_start_date_ad').value = '';
+        if (document.getElementById('filter_end_date_ad')) document.getElementById('filter_end_date_ad').value = '';
+        if (document.getElementById('filter_start_date_bs')) document.getElementById('filter_start_date_bs').value = '';
+        if (document.getElementById('filter_end_date_bs')) document.getElementById('filter_end_date_bs').value = '';
+        applyFilters();
+    }
+
+    // Excel (.xlsx) Export
+    function exportToExcel() {
+        const rows = document.querySelectorAll('#invoiceTable tbody tr.invoice-row');
+        const data = [
+            ['Date', 'Invoice No.', 'Customer', 'PAN No.', 'Total Amount', 'VAT', 'Paid Amount', 'Due Amount', 'Status']
         ];
 
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sales History");
-        const filename = `Sales_History_${new Date().toISOString().slice(0,10)}.xlsx`;
-        XLSX.writeFile(wb, filename);
-    } else {
-        // Fallback to XML-based Excel file (.xls)
-        let xml = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
-        xml += '<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Sales History</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>';
-        xml += '<table border="1">';
-        data.forEach(r => {
-            xml += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>';
+        rows.forEach(row => {
+            if (row.style.display !== 'none') {
+                const date = row.dataset.date || '';
+                const bsDate = row.dataset.bsDate || '';
+                const dateDisplay = bsDate ? `${date} (${bsDate} BS)` : date;
+                const inv = row.querySelector('.col-inv')?.textContent?.trim() || '';
+                const customer = row.querySelector('.col-customer')?.textContent?.trim() || '';
+                const pan = row.querySelector('.col-pan')?.textContent?.trim() || '';
+                const total = parseFloat(row.dataset.total) || 0;
+                const vat = parseFloat(row.dataset.vat) || 0;
+                const paid = parseFloat(row.dataset.paid) || 0;
+                const due = parseFloat(row.dataset.due) || 0;
+                const status = row.querySelector('.col-status')?.textContent?.trim() || '';
+
+                data.push([dateDisplay, inv, customer, pan, total, vat, paid, due, status]);
+            }
         });
-        xml += '</table></body></html>';
-        const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `Sales_History_${new Date().toISOString().slice(0,10)}.xls`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-}
 
-// Settings Modal & Card Toggle Logic
-const cardKeys = ['invoices', 'sales', 'vat', 'received', 'due'];
+        if (typeof XLSX !== 'undefined') {
+            const ws = XLSX.utils.aoa_to_sheet(data);
 
-function toggleSettingsModal() {
-    const modal = document.getElementById('settingsModal');
-    modal.style.display = (modal.style.display === 'none' || modal.style.display === '') ? 'flex' : 'none';
-}
+            // Auto column widths
+            ws['!cols'] = [
+                { wch: 14 }, // Date
+                { wch: 16 }, // Invoice No
+                { wch: 24 }, // Customer
+                { wch: 14 }, // PAN No
+                { wch: 16 }, // Total Amount
+                { wch: 14 }, // VAT
+                { wch: 14 }, // Paid Amount
+                { wch: 14 }, // Due Amount
+                { wch: 14 }  // Status
+            ];
 
-function applyCardSettings() {
-    const settings = {};
-    let visibleCount = 0;
-    cardKeys.forEach(k => {
-        const chk = document.getElementById(`chk_${k}`);
-        const card = document.getElementById(`card_${k}`);
-        if (chk && card) {
-            settings[k] = chk.checked;
-            card.style.display = chk.checked ? 'flex' : 'none';
-            if (chk.checked) visibleCount++;
-        }
-    });
-
-    const container = document.getElementById('summary_cards_container');
-    if (container) {
-        container.style.display = visibleCount > 0 ? 'grid' : 'none';
-    }
-
-    localStorage.setItem('sales_history_card_settings', JSON.stringify(settings));
-}
-
-function loadCardSettings() {
-    const saved = localStorage.getItem('sales_history_card_settings');
-    if (saved) {
-        try {
-            const settings = JSON.parse(saved);
-            cardKeys.forEach(k => {
-                const chk = document.getElementById(`chk_${k}`);
-                if (chk && settings[k] !== undefined) {
-                    chk.checked = settings[k];
-                }
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Sales History");
+            const filename = `Sales_History_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            XLSX.writeFile(wb, filename);
+        } else {
+            // Fallback to XML-based Excel file (.xls)
+            let xml = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+            xml += '<head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Sales History</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>';
+            xml += '<table border="1">';
+            data.forEach(r => {
+                xml += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>';
             });
-        } catch(e){}
-    }
-    applyCardSettings();
-}
-
-/* ── Standalone BS Picker for filter inputs ────────────────────────────────
-   Appends the popup to document.body with fixed positioning so it is never
-   clipped by any parent container (flex bars, overflow:hidden wrappers, etc.)
-   ──────────────────────────────────────────────────────────────────────── */
-function attachFilterBSPicker(inputId, onChange) {
-    const inp = document.getElementById(inputId);
-    if (!inp || typeof window.adToBS !== 'function') return;
-
-    inp.readOnly = true;
-
-    let activePicker = null;
-
-    function closePicker() {
-        if (activePicker) { activePicker.remove(); activePicker = null; }
+            xml += '</table></body></html>';
+            const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Sales_History_${new Date().toISOString().slice(0, 10)}.xls`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     }
 
-    function buildFilterPopup(initY, initM, initD) {
-        const BS_DATA = window._bsData || null; // may not be exposed; rebuild inline
+    // Settings Modal & Card Toggle Logic
+    const cardKeys = ['invoices', 'sales', 'vat', 'received', 'due'];
 
-        /* ---------- lightweight BS data table (same as bs_date.js) ---------- */
-        const BD = {
-            2050:[30,32,31,32,31,30,30,30,29,30,29,31],2051:[31,31,32,31,31,31,30,29,30,29,30,30],
-            2052:[31,31,32,32,31,30,30,29,30,29,30,30],2053:[31,32,31,32,31,30,30,30,29,29,30,31],
-            2054:[30,32,31,32,31,30,30,30,29,30,29,31],2055:[31,31,32,31,31,32,30,29,30,29,30,30],
-            2056:[31,32,31,32,31,30,30,29,30,29,30,30],2057:[31,32,31,32,31,30,30,30,29,29,30,31],
-            2058:[30,32,31,32,31,30,30,30,29,30,29,31],2059:[31,31,32,31,31,31,30,29,30,29,30,30],
-            2060:[31,31,32,32,31,30,30,29,30,29,30,30],2061:[31,32,31,32,31,30,30,30,29,29,30,31],
-            2062:[30,32,31,32,31,30,30,30,29,30,29,31],2063:[31,31,32,31,31,32,30,29,30,29,30,30],
-            2064:[31,32,31,32,31,30,30,29,30,29,30,30],2065:[31,32,31,32,31,30,30,30,29,29,30,31],
-            2066:[31,31,31,32,31,31,30,29,30,29,30,30],2067:[31,31,32,31,31,31,30,29,30,29,30,30],
-            2068:[31,31,32,32,31,30,30,29,30,29,30,30],2069:[31,32,31,32,31,30,30,30,29,29,30,31],
-            2070:[30,32,31,32,31,30,30,30,29,30,29,31],2071:[31,31,32,31,31,31,30,29,30,29,30,30],
-            2072:[31,31,32,32,31,30,30,29,30,29,30,30],2073:[31,32,31,32,31,30,30,30,29,29,30,31],
-            2074:[30,32,31,32,31,30,30,30,29,30,29,31],2075:[31,31,32,31,31,31,30,29,30,29,30,30],
-            2076:[31,31,32,32,31,30,30,29,30,29,30,30],2077:[31,32,31,32,31,30,30,30,29,29,30,31],
-            2078:[31,31,31,32,31,31,29,30,30,29,29,31],2079:[31,31,32,31,31,31,30,29,30,29,30,30],
-            2080:[31,31,32,32,31,30,30,29,30,29,30,30],2081:[31,32,31,32,31,30,30,30,29,29,30,31],
-            2082:[30,32,31,32,31,30,30,30,29,30,29,31],2083:[31,31,32,31,31,31,30,29,30,29,30,30],
-            2084:[31,31,32,32,31,30,30,29,30,29,30,30],2085:[31,32,31,32,31,30,30,30,29,29,30,31],
-            2086:[30,32,31,32,31,30,30,30,29,30,29,31],2087:[31,31,32,31,31,31,30,29,30,29,30,30],
-            2088:[31,31,32,32,31,30,30,29,30,29,30,30],2089:[31,32,31,32,31,30,30,30,29,29,30,31],
-            2090:[30,32,31,32,31,30,30,30,29,30,29,31]
-        };
-        const AD_REF = new Date(1993, 3, 14);
-        const MONTHS = ['Baisakh','Jestha','Ashadh','Shrawan','Bhadra','Ashwin','Kartik','Mangsir','Poush','Magh','Falgun','Chaitra'];
-        const DAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    function toggleSettingsModal() {
+        const modal = document.getElementById('settingsModal');
+        modal.style.display = (modal.style.display === 'none' || modal.style.display === '') ? 'flex' : 'none';
+    }
 
-        function bsToADLocal(y,m,d) {
-            let days=0;
-            for(let iy=2050;iy<y;iy++){if(!BD[iy])return null;BD[iy].forEach(x=>days+=x);}
-            for(let im=1;im<m;im++)days+=(BD[y]||[])[im-1]||0;
-            days+=d-1;
-            let dt=new Date(AD_REF);dt.setDate(dt.getDate()+days);return dt;
-        }
-        function pad(n){return String(n).padStart(2,'0');}
-        function fmtB(y,m,d){return y+'-'+pad(m)+'-'+pad(d);}
-
-        let vy=initY, vm=initM, selD=initD;
-
-        const popup = document.createElement('div');
-        popup.style.cssText='position:fixed;z-index:999999;width:270px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.22);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px;overflow:hidden;';
-
-        function positionPopup() {
-            const rect = inp.getBoundingClientRect();
-            const spaceBelow = window.innerHeight - rect.bottom;
-            if (spaceBelow < 280) {
-                popup.style.top = (rect.top - 290) + 'px';
-            } else {
-                popup.style.top = (rect.bottom + 4) + 'px';
+    function applyCardSettings() {
+        const settings = {};
+        let visibleCount = 0;
+        cardKeys.forEach(k => {
+            const chk = document.getElementById(`chk_${k}`);
+            const card = document.getElementById(`card_${k}`);
+            if (chk && card) {
+                settings[k] = chk.checked;
+                card.style.display = chk.checked ? 'flex' : 'none';
+                if (chk.checked) visibleCount++;
             }
-            popup.style.left = Math.min(rect.left, window.innerWidth - 275) + 'px';
+        });
+
+        const container = document.getElementById('summary_cards_container');
+        if (container) {
+            container.style.display = visibleCount > 0 ? 'grid' : 'none';
         }
 
-        function render() {
-            const dim = (BD[vy]||[])[vm-1]||30;
-            const firstAD = bsToADLocal(vy,vm,1);
-            const dow = firstAD ? firstAD.getDay() : 0;
+        localStorage.setItem('sales_history_card_settings', JSON.stringify(settings));
+    }
 
-            let cells='';
-            for(let i=0;i<dow;i++) cells+='<div></div>';
-            for(let d=1;d<=dim;d++){
-                const isSel=(d===selD&&vm===initM&&vy===initY);
-                cells+=`<div class="fbsd" data-d="${d}" style="padding:5px 2px;text-align:center;border-radius:5px;cursor:pointer;${isSel?'background:#2563eb;color:#fff;font-weight:700;':'color:#1e293b;'}">${d}</div>`;
+    function loadCardSettings() {
+        const saved = localStorage.getItem('sales_history_card_settings');
+        if (saved) {
+            try {
+                const settings = JSON.parse(saved);
+                cardKeys.forEach(k => {
+                    const chk = document.getElementById(`chk_${k}`);
+                    if (chk && settings[k] !== undefined) {
+                        chk.checked = settings[k];
+                    }
+                });
+            } catch (e) { }
+        }
+        applyCardSettings();
+    }
+
+    /* ── Standalone BS Picker for filter inputs ────────────────────────────────
+       Appends the popup to document.body with fixed positioning so it is never
+       clipped by any parent container (flex bars, overflow:hidden wrappers, etc.)
+       ──────────────────────────────────────────────────────────────────────── */
+    function attachFilterBSPicker(inputId, onChange) {
+        const inp = document.getElementById(inputId);
+        if (!inp || typeof window.adToBS !== 'function') return;
+
+        inp.readOnly = true;
+
+        let activePicker = null;
+
+        function closePicker() {
+            if (activePicker) { activePicker.remove(); activePicker = null; }
+        }
+
+        function buildFilterPopup(initY, initM, initD) {
+            const BS_DATA = window._bsData || null; // may not be exposed; rebuild inline
+
+            /* ---------- lightweight BS data table (same as bs_date.js) ---------- */
+            const BD = {
+                2050: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2051: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2052: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2053: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2054: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2055: [31, 31, 32, 31, 31, 32, 30, 29, 30, 29, 30, 30],
+                2056: [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2057: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2058: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2059: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2060: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2061: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2062: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2063: [31, 31, 32, 31, 31, 32, 30, 29, 30, 29, 30, 30],
+                2064: [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2065: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2066: [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30], 2067: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2068: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2069: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2070: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2071: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2072: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2073: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2074: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2075: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2076: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2077: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2078: [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31], 2079: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2080: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2081: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2082: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2083: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2084: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2085: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2086: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2087: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2088: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2089: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2090: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31]
+            };
+            const AD_REF = new Date(1993, 3, 14);
+            const MONTHS = ['Baisakh', 'Jestha', 'Ashadh', 'Shrawan', 'Bhadra', 'Ashwin', 'Kartik', 'Mangsir', 'Poush', 'Magh', 'Falgun', 'Chaitra'];
+            const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+            function bsToADLocal(y, m, d) {
+                let days = 0;
+                for (let iy = 2050; iy < y; iy++) { if (!BD[iy]) return null; BD[iy].forEach(x => days += x); }
+                for (let im = 1; im < m; im++)days += (BD[y] || [])[im - 1] || 0;
+                days += d - 1;
+                let dt = new Date(AD_REF); dt.setDate(dt.getDate() + days); return dt;
+            }
+            function pad(n) { return String(n).padStart(2, '0'); }
+            function fmtB(y, m, d) { return y + '-' + pad(m) + '-' + pad(d); }
+
+            let vy = initY, vm = initM, selD = initD;
+
+            const popup = document.createElement('div');
+            popup.style.cssText = 'position:fixed;z-index:999999;width:270px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.22);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px;overflow:hidden;';
+
+            function positionPopup() {
+                const rect = inp.getBoundingClientRect();
+                const spaceBelow = window.innerHeight - rect.bottom;
+                if (spaceBelow < 280) {
+                    popup.style.top = (rect.top - 290) + 'px';
+                } else {
+                    popup.style.top = (rect.bottom + 4) + 'px';
+                }
+                popup.style.left = Math.min(rect.left, window.innerWidth - 275) + 'px';
             }
 
-            popup.innerHTML=`
+            function render() {
+                const dim = (BD[vy] || [])[vm - 1] || 30;
+                const firstAD = bsToADLocal(vy, vm, 1);
+                const dow = firstAD ? firstAD.getDay() : 0;
+
+                let cells = '';
+                for (let i = 0; i < dow; i++) cells += '<div></div>';
+                for (let d = 1; d <= dim; d++) {
+                    const isSel = (d === selD && vm === initM && vy === initY);
+                    cells += `<div class="fbsd" data-d="${d}" style="padding:5px 2px;text-align:center;border-radius:5px;cursor:pointer;${isSel ? 'background:#2563eb;color:#fff;font-weight:700;' : 'color:#1e293b;'}">${d}</div>`;
+                }
+
+                popup.innerHTML = `
 <div style="background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;">
   <button class="fbsp" data-dir="-1" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;">&#8249;</button>
-  <div style="font-weight:600;font-size:14px;">${MONTHS[vm-1]} ${vy}</div>
+  <div style="font-weight:600;font-size:14px;">${MONTHS[vm - 1]} ${vy}</div>
   <button class="fbsp" data-dir="1" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;">&#8250;</button>
 </div>
 <div style="padding:8px 10px;">
   <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;">
-    ${DAYS.map(d=>`<div style="text-align:center;font-size:11px;color:#94a3b8;font-weight:600;padding:3px 0;">${d}</div>`).join('')}
+    ${DAYS.map(d => `<div style="text-align:center;font-size:11px;color:#94a3b8;font-weight:600;padding:3px 0;">${d}</div>`).join('')}
   </div>
   <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;">${cells}</div>
 </div>
@@ -746,70 +994,70 @@ function attachFilterBSPicker(inputId, onChange) {
   <button id="fpClear" style="font-size:11px;color:#dc2626;background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px;border:1px solid #fca5a5;">✕ Clear</button>
 </div>`;
 
-            popup.querySelectorAll('.fbsp').forEach(btn=>{
-                btn.addEventListener('click',e=>{
-                    e.stopPropagation();
-                    vm+=parseInt(btn.dataset.dir);
-                    if(vm<1){vm=12;vy--;}
-                    if(vm>12){vm=1;vy++;}
-                    render();
+                popup.querySelectorAll('.fbsp').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        vm += parseInt(btn.dataset.dir);
+                        if (vm < 1) { vm = 12; vy--; }
+                        if (vm > 12) { vm = 1; vy++; }
+                        render();
+                    });
                 });
-            });
-            popup.querySelectorAll('.fbsd').forEach(cell=>{
-                cell.addEventListener('mouseenter',()=>{if(!cell.style.background||cell.style.background==='')cell.style.background='#eff6ff';});
-                cell.addEventListener('mouseleave',()=>{if(cell.style.background==='rgb(239, 246, 255)')cell.style.background='';});
-                cell.addEventListener('click',e=>{
-                    e.stopPropagation();
-                    const d=parseInt(cell.dataset.d);
-                    inp.value=fmtB(vy,vm,d);
-                    closePicker();
-                    if(typeof onChange==='function') onChange();
+                popup.querySelectorAll('.fbsd').forEach(cell => {
+                    cell.addEventListener('mouseenter', () => { if (!cell.style.background || cell.style.background === '') cell.style.background = '#eff6ff'; });
+                    cell.addEventListener('mouseleave', () => { if (cell.style.background === 'rgb(239, 246, 255)') cell.style.background = ''; });
+                    cell.addEventListener('click', e => {
+                        e.stopPropagation();
+                        const d = parseInt(cell.dataset.d);
+                        inp.value = fmtB(vy, vm, d);
+                        closePicker();
+                        if (typeof onChange === 'function') onChange();
+                    });
                 });
-            });
-            const clrBtn=popup.querySelector('#fpClear');
-            if(clrBtn){
-                clrBtn.addEventListener('click',e=>{
-                    e.stopPropagation();
-                    inp.value='';
-                    closePicker();
-                    if(typeof onChange==='function') onChange();
-                });
+                const clrBtn = popup.querySelector('#fpClear');
+                if (clrBtn) {
+                    clrBtn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        inp.value = '';
+                        closePicker();
+                        if (typeof onChange === 'function') onChange();
+                    });
+                }
+                popup.addEventListener('click', e => e.stopPropagation());
             }
-            popup.addEventListener('click',e=>e.stopPropagation());
+
+            render();
+            positionPopup();
+            return popup;
         }
 
-        render();
-        positionPopup();
-        return popup;
+        inp.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (activePicker) { closePicker(); return; }
+
+            let y, m, d;
+            if (inp.value) {
+                const p = inp.value.split('-').map(Number);
+                if (p.length === 3 && !isNaN(p[0])) { y = p[0]; m = p[1]; d = p[2]; }
+            }
+            if (!y) {
+                const today = typeof window.adToBS === 'function' ? window.adToBS(new Date()) : { year: 2081, month: 5, day: 1 };
+                y = today.year; m = today.month; d = today.day;
+            }
+
+            activePicker = buildFilterPopup(y, m, d);
+            document.body.appendChild(activePicker);
+        });
+
+        document.addEventListener('click', closePicker, false);
     }
 
-    inp.addEventListener('click', function(e) {
-        e.stopPropagation();
-        if (activePicker) { closePicker(); return; }
-
-        let y, m, d;
-        if (inp.value) {
-            const p = inp.value.split('-').map(Number);
-            if (p.length === 3 && !isNaN(p[0])) { y=p[0]; m=p[1]; d=p[2]; }
-        }
-        if (!y) {
-            const today = typeof window.adToBS === 'function' ? window.adToBS(new Date()) : {year:2081,month:5,day:1};
-            y=today.year; m=today.month; d=today.day;
-        }
-
-        activePicker = buildFilterPopup(y, m, d);
-        document.body.appendChild(activePicker);
+    document.addEventListener('DOMContentLoaded', () => {
+        initBsDates();
+        attachFilterBSPicker('filter_start_date_bs', applyFilters);
+        attachFilterBSPicker('filter_end_date_bs', applyFilters);
+        loadCardSettings();
+        applyFilters();
     });
-
-    document.addEventListener('click', closePicker, false);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    initBsDates();
-    attachFilterBSPicker('filter_start_date_bs', applyFilters);
-    attachFilterBSPicker('filter_end_date_bs', applyFilters);
-    loadCardSettings();
-    applyFilters();
-});
 </script>
 {% endblock %}

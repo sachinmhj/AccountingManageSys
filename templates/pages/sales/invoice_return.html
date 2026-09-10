@@ -6,49 +6,219 @@
 {% block extra_css %}
 <style>
     :root {
-        --primary: #2563eb; --success: #16a34a; --danger: #dc2626;
-        --warning: #f59e0b; --border: #e2e8f0; --bg-light: #f8fafc;
-        --text-gray: #64748b; --text-dark: #1e293b;
+        --primary: #2563eb;
+        --success: #16a34a;
+        --danger: #dc2626;
+        --warning: #f59e0b;
+        --border: #e2e8f0;
+        --bg-light: #f8fafc;
+        --text-gray: #64748b;
+        --text-dark: #1e293b;
     }
-    body { background: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size:13px; }
 
-    .sr-page { margin: 20px; padding-bottom: 40px; }
+    body {
+        background: #f1f5f9;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 13px;
+    }
 
-    .sr-topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-    .sr-topbar h1 { margin:0; font-size:22px; font-weight:700; }
+    .sr-page {
+        margin: 20px;
+        padding-bottom: 40px;
+    }
 
-    .panel { background:#fff; border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:20px; box-shadow:0 1px 2px rgba(0,0,0,0.05); }
-    .panel-header { font-size:13px; font-weight:600; color:var(--primary); margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+    .sr-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
 
-    label { font-size:12px; font-weight:500; color:var(--text-dark); margin-bottom:4px; display:block; }
-    label span { color:var(--danger); }
-    .form-control, .form-select { width:100%; padding:6px 10px; border:1px solid var(--border); border-radius:4px; font-size:13px; height:32px; }
-    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+    .sr-topbar h1 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+    }
 
-    .btn { padding:6px 14px; border:1px solid var(--border); border-radius:4px; background:#fff; font-size:12px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
-    .btn:hover { background:var(--bg-light); }
-    .btn-primary { background:var(--primary); color:#fff; border-color:var(--primary); }
-    .btn-primary:hover { background:#1d4ed8; }
-    .btn-success { background:var(--success); color:#fff; border-color:var(--success); }
+    .panel {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
 
-    .data-table { width:100%; border-collapse:collapse; margin-bottom:12px; }
-    .data-table th, .data-table td { padding:8px; border:1px solid var(--border); font-size:12px; }
-    .data-table th { background:var(--bg-light); font-weight:600; }
-    .data-table td input, .data-table td select { width:100%; border:1px solid var(--border); border-radius:4px; padding:4px 6px; font-size:12px; }
+    .panel-header {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
 
-    .summary-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dotted var(--border); font-size:13px; }
-    .summary-row.total { font-weight:700; background:#fef3c7; padding:8px; border:1px solid #fde68a; border-radius:4px; margin-top:4px; font-size:14px; }
+    label {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    label span {
+        color: var(--danger);
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-size: 13px;
+        height: 32px;
+    }
+
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+    .btn {
+        padding: 6px 14px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: #fff;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn:hover {
+        background: var(--bg-light);
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+        background: #1d4ed8;
+    }
+
+    .btn-success {
+        background: var(--success);
+        color: #fff;
+        border-color: var(--success);
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 12px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 8px;
+        border: 1px solid var(--border);
+        font-size: 12px;
+    }
+
+    .data-table th {
+        background: var(--bg-light);
+        font-weight: 600;
+    }
+
+    .data-table td input,
+    .data-table td select {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 4px 6px;
+        font-size: 12px;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px dotted var(--border);
+        font-size: 13px;
+    }
+
+    .summary-row.total {
+        font-weight: 700;
+        background: #fef3c7;
+        padding: 8px;
+        border: 1px solid #fde68a;
+        border-radius: 4px;
+        margin-top: 4px;
+        font-size: 14px;
+    }
 
     /* Recent Returns Table */
-    .hist-table { width:100%; border-collapse:collapse; }
-    .hist-table th { background:var(--bg-light); padding:9px 12px; font-size:11px; font-weight:600; color:var(--text-gray); border-bottom:1px solid var(--border); text-align:left; }
-    .hist-table td { padding:9px 12px; font-size:12px; border-bottom:1px solid var(--border); }
-    .hist-table tr:last-child td { border-bottom:none; }
-    .status-badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; }
-    .status-pending { background:#fff7ed; color:var(--warning); }
-    .status-adjusted { background:#f0fdf4; color:var(--success); }
-    .status-refunded { background:#eff6ff; color:var(--primary); }
+    .hist-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .hist-table th {
+        background: var(--bg-light);
+        padding: 9px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-gray);
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+    }
+
+    .hist-table td {
+        padding: 9px 12px;
+        font-size: 12px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .hist-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .status-pending {
+        background: #fff7ed;
+        color: var(--warning);
+    }
+
+    .status-adjusted {
+        background: #f0fdf4;
+        color: var(--success);
+    }
+
+    .status-refunded {
+        background: #eff6ff;
+        color: var(--primary);
+    }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
@@ -58,11 +228,28 @@
 
     <!-- Top Bar -->
     <div class="sr-topbar">
-        <h1><i class="fa-solid fa-rotate-left" style="color:var(--danger); margin-right:8px;"></i>Sales Return</h1>
+        <div class="d-flex align-items-center gap-2">
+            <h1 class="m-0 me-2"><i class="fa-solid fa-rotate-left"
+                    style="color:var(--danger); margin-right:8px;"></i>Sales Return</h1>
+            <button type="button" class="btn btn-sm d-inline-flex align-items-center gap-1 shadow-xs rounded-pill"
+                onclick="openPageNotesModal('sales_returns', 'Sales Return')"
+                style="font-size: 11.5px; font-weight: 600; background: #fffbe6; color: #d97706; border: 1px solid #fde68a;">
+                <i class="fa-solid fa-note-sticky text-warning"></i> Notes
+            </button>
+            <button type="button" class="btn btn-sm d-inline-flex align-items-center gap-1 shadow-xs rounded-pill"
+                onclick="openPageVideoModal('sales_returns', 'Sales Return')"
+                style="font-size: 11.5px; font-weight: 600; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;">
+                <i class="fa-brands fa-youtube text-danger"></i> Video
+            </button>
+        </div>
         <div style="display:flex; gap:8px;">
-            <button type="button" class="btn" onclick="document.getElementById('returnForm').reset(); window.location.reload();"><i class="fa-solid fa-rotate-right"></i> Clear</button>
-            <button type="submit" form="returnForm" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save Return</button>
-            <button type="button" class="btn" onclick="toggleSettingsModal()"><i class="fa-solid fa-gear"></i> Settings</button>
+            <button type="button" class="btn"
+                onclick="document.getElementById('returnForm').reset(); window.location.reload();"><i
+                    class="fa-solid fa-rotate-right"></i> Clear</button>
+            <button type="submit" form="returnForm" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save
+                Return</button>
+            <button type="button" class="btn" onclick="toggleSettingsModal()"><i class="fa-solid fa-gear"></i>
+                Settings</button>
         </div>
     </div>
 
@@ -76,10 +263,11 @@
             <div class="grid-4">
                 <div>
                     <label>Customer <span>*</span></label>
-                    <select class="form-select" name="customer" id="return_customer" onchange="onCustomerChange()" required>
+                    <select class="form-select" name="customer" id="return_customer" onchange="onCustomerChange()"
+                        required>
                         <option value="">Select Customer</option>
                         {% for c in customers %}
-                            <option value="{{ c.id }}">{{ c.name }}</option>
+                        <option value="{{ c.id }}">{{ c.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -88,7 +276,8 @@
                     <div class="dual-date-stack">
                         <div class="date-row">
                             <span class="date-label">AD</span>
-                            <input type="date" class="form-control" name="return_date" id="return_date_ad" value="{{ today|date:'Y-m-d' }}" required>
+                            <input type="date" class="form-control" name="return_date" id="return_date_ad"
+                                value="{{ today|date:'Y-m-d' }}" required>
                         </div>
                         <div class="date-row" style="position:relative;">
                             <span class="date-label bs-label">BS</span>
@@ -98,7 +287,8 @@
                 </div>
                 <div>
                     <label>Contact Person</label>
-                    <input type="text" class="form-control" name="contact_person" placeholder="Name of person returning">
+                    <input type="text" class="form-control" name="contact_person"
+                        placeholder="Name of person returning">
                 </div>
                 <div>
                     <label>Mobile</label>
@@ -110,7 +300,7 @@
                     <select class="form-select" name="original_invoice">
                         <option value="">Select Invoice (if applicable)</option>
                         {% for inv in invoices %}
-                            <option value="{{ inv.id }}">{{ inv.invoice_number }} — {{ inv.customer.name }}</option>
+                        <option value="{{ inv.id }}">{{ inv.invoice_number }} — {{ inv.customer.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -122,18 +312,21 @@
                     </select>
                 </div>
                 <div>
-                    <label><i class="fa-solid fa-paperclip" style="color:var(--primary); margin-right:4px;"></i> Bill Image / Memo</label>
-                    <input type="file" name="bill_attachment" id="return_attachment_input" accept="image/*,.pdf" style="display:none;" onchange="handleReturnFileSelect(this.files[0])">
-                    
+                    <label><i class="fa-solid fa-paperclip" style="color:var(--primary); margin-right:4px;"></i> Bill
+                        Image / Memo</label>
+                    <input type="file" name="bill_attachment" id="return_attachment_input" accept="image/*,.pdf"
+                        style="display:none;" onchange="handleReturnFileSelect(this.files[0])">
+
                     <!-- Drop Zone -->
-                    <div id="return_attach_dropzone" 
+                    <div id="return_attach_dropzone"
                         style="border:2px dashed #cbd5e1; border-radius:8px; padding:6px 12px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:#f8fafc; transition:all 0.2s;"
                         onclick="document.getElementById('return_attachment_input').click();"
                         ondragover="event.preventDefault(); this.style.borderColor='#2563eb'; this.style.background='#eff6ff';"
                         ondragleave="this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc';"
                         ondrop="handleReturnFileDrop(event);">
                         <div style="display:flex; align-items:center; gap:8px;">
-                            <div style="width:30px; height:30px; background:#eff6ff; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#2563eb;">
+                            <div
+                                style="width:30px; height:30px; background:#eff6ff; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#2563eb;">
                                 <i class="fa-solid fa-cloud-arrow-up" style="font-size:13px;"></i>
                             </div>
                             <div>
@@ -141,29 +334,41 @@
                                 <div style="font-size:10px; color:#94a3b8;">PNG, JPG, PDF</div>
                             </div>
                         </div>
-                        <span style="font-size:10.5px; font-weight:600; color:#2563eb; background:#dbeafe; padding:3px 8px; border-radius:5px;">Browse</span>
+                        <span
+                            style="font-size:10.5px; font-weight:600; color:#2563eb; background:#dbeafe; padding:3px 8px; border-radius:5px;">Browse</span>
                     </div>
 
                     <!-- Attachment Summary Pill (shown after file selected) -->
-                    <div id="return_attach_preview_pill" 
+                    <div id="return_attach_preview_pill"
                         style="display:none; border:1px solid #bfdbfe; background:#eff6ff; border-radius:8px; padding:6px 10px; align-items:center; justify-content:space-between;">
                         <div style="display:flex; align-items:center; gap:8px; min-width:0;">
-                            <div style="width:30px; height:30px; background:#2563eb; color:#fff; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <div
+                                style="width:30px; height:30px; background:#2563eb; color:#fff; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
                                 <i id="return_preview_icon" class="fa-solid fa-file-image"></i>
                             </div>
                             <div style="min-width:0; overflow:hidden;">
-                                <div id="return_preview_filename" style="font-size:11.5px; font-weight:600; color:#1e293b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:90px;"></div>
-                                <div style="font-size:10px; color:#16a34a; font-weight:600;"><i class="fa-solid fa-circle-check"></i> Attached</div>
+                                <div id="return_preview_filename"
+                                    style="font-size:11.5px; font-weight:600; color:#1e293b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:90px;">
+                                </div>
+                                <div style="font-size:10px; color:#16a34a; font-weight:600;"><i
+                                        class="fa-solid fa-circle-check"></i> Attached</div>
                             </div>
                         </div>
                         <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
-                            <button type="button" class="btn" style="padding:4px 7px; font-size:10.5px; background:#2563eb; color:#fff; border:none;" onclick="openAttachmentPreviewModal()" title="Preview File">
+                            <button type="button" class="btn"
+                                style="padding:4px 7px; font-size:10.5px; background:#2563eb; color:#fff; border:none;"
+                                onclick="openAttachmentPreviewModal()" title="Preview File">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
-                            <button type="button" class="btn" style="padding:4px 7px; font-size:10.5px; background:#fff; color:#475569; border:1px solid #cbd5e1;" onclick="document.getElementById('return_attachment_input').click()" title="Change File">
+                            <button type="button" class="btn"
+                                style="padding:4px 7px; font-size:10.5px; background:#fff; color:#475569; border:1px solid #cbd5e1;"
+                                onclick="document.getElementById('return_attachment_input').click()"
+                                title="Change File">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            <button type="button" class="btn" style="padding:4px 7px; font-size:10.5px; background:#fee2e2; color:#dc2626; border:none;" onclick="clearReturnAttachment()" title="Remove File">
+                            <button type="button" class="btn"
+                                style="padding:4px 7px; font-size:10.5px; background:#fee2e2; color:#dc2626; border:none;"
+                                onclick="clearReturnAttachment()" title="Remove File">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -171,7 +376,8 @@
                 </div>
                 <div>
                     <label>Reason for Return</label>
-                    <input type="text" class="form-control" name="notes" placeholder="e.g. Defective item, Wrong product delivered...">
+                    <input type="text" class="form-control" name="notes"
+                        placeholder="e.g. Defective item, Wrong product delivered...">
                 </div>
             </div>
         </div>
@@ -223,7 +429,8 @@
 
         <!-- Empty state -->
         <div id="cust_inv_empty" style="text-align:center; padding:40px; color:var(--text-gray);">
-            <i class="fa-solid fa-user-clock" style="font-size:32px; display:block; margin-bottom:8px; opacity:0.25;"></i>
+            <i class="fa-solid fa-user-clock"
+                style="font-size:32px; display:block; margin-bottom:8px; opacity:0.25;"></i>
             Select a customer above to view their invoices.
         </div>
 
@@ -248,29 +455,46 @@
                 </thead>
                 <tbody id="cust_inv_tbody"></tbody>
             </table>
-            <div id="cust_inv_no_match" style="display:none; text-align:center; padding:24px; color:var(--text-gray); font-size:13px;">
-                <i class="fa-solid fa-magnifying-glass" style="font-size:24px; display:block; margin-bottom:8px; opacity:0.3;"></i>
+            <div id="cust_inv_no_match"
+                style="display:none; text-align:center; padding:24px; color:var(--text-gray); font-size:13px;">
+                <i class="fa-solid fa-magnifying-glass"
+                    style="font-size:24px; display:block; margin-bottom:8px; opacity:0.3;"></i>
                 No invoices contain the selected products.
             </div>
         </div>
     </div>
 
     <!-- Settings Modal -->
-    <div id="settingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
-        <div style="background:#fff; width:380px; border-radius:8px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
+    <div id="settingsModal"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div
+            style="background:#fff; width:380px; border-radius:8px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
                 <h3 style="margin:0; font-size:16px; font-weight:700;">Sales Return Settings</h3>
-                <button type="button" onclick="toggleSettingsModal()" style="background:transparent; border:none; cursor:pointer; font-size:18px; color:var(--text-gray);"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" onclick="toggleSettingsModal()"
+                    style="background:transparent; border:none; cursor:pointer; font-size:18px; color:var(--text-gray);"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
             <div style="padding:20px; display:flex; flex-direction:column; gap:12px;">
                 <p style="margin:0 0 8px 0; font-size:12px; color:var(--text-gray);">Select panels to display:</p>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input type="checkbox" id="chk_return_info" checked onchange="applySettings()"> Return Information</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input type="checkbox" id="chk_return_items" checked onchange="applySettings()"> Items Being Returned</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input type="checkbox" id="chk_return_summary" checked onchange="applySettings()"> Return Summary</label>
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input type="checkbox" id="chk_return_history" checked onchange="applySettings()"> Recent Returns History</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input
+                        type="checkbox" id="chk_return_info" checked onchange="applySettings()"> Return
+                    Information</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input
+                        type="checkbox" id="chk_return_items" checked onchange="applySettings()"> Items Being
+                    Returned</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input
+                        type="checkbox" id="chk_return_summary" checked onchange="applySettings()"> Return
+                    Summary</label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px;"><input
+                        type="checkbox" id="chk_return_history" checked onchange="applySettings()"> Recent Returns
+                    History</label>
             </div>
-            <div style="padding:14px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; background:var(--bg-light);">
-                <button type="button" onclick="toggleSettingsModal()" style="padding:6px 16px; background:var(--primary); color:#fff; border:none; border-radius:4px; font-size:13px; font-weight:600; cursor:pointer;">Done</button>
+            <div
+                style="padding:14px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; background:var(--bg-light);">
+                <button type="button" onclick="toggleSettingsModal()"
+                    style="padding:6px 16px; background:var(--primary); color:#fff; border:none; border-radius:4px; font-size:13px; font-weight:600; cursor:pointer;">Done</button>
             </div>
         </div>
     </div>
@@ -284,7 +508,7 @@
     let returnGrandTotal = 0;
 
     // Add first row on load
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         addReturnRow();
         if (typeof initDualDate === 'function') {
             initDualDate('return_date_ad', 'return_date_bs');
@@ -355,17 +579,17 @@
 
     function calcReturnRow(elem) {
         const tr = elem.closest("tr");
-        const qty  = parseFloat(tr.querySelector(".row-qty").value)  || 0;
+        const qty = parseFloat(tr.querySelector(".row-qty").value) || 0;
         const rate = parseFloat(tr.querySelector(".row-rate").value) || 0;
         const taxType = tr.querySelector(".row-tax").value;
 
         const lineAmt = qty * rate;
-        const vatAmt  = taxType === 'Taxable' ? lineAmt * 0.13 : 0;
-        const total   = lineAmt + vatAmt;
+        const vatAmt = taxType === 'Taxable' ? lineAmt * 0.13 : 0;
+        const total = lineAmt + vatAmt;
 
         tr.querySelector(".row-amount").value = total.toFixed(2);
         tr.dataset.lineAmt = lineAmt;
-        tr.dataset.vatAmt  = vatAmt;
+        tr.dataset.vatAmt = vatAmt;
 
         calcReturnTotals();
     }
@@ -374,13 +598,13 @@
         let subtotal = 0, vat = 0;
         document.querySelectorAll("#returnItemsBody tr").forEach(tr => {
             subtotal += parseFloat(tr.dataset.lineAmt) || 0;
-            vat      += parseFloat(tr.dataset.vatAmt)  || 0;
+            vat += parseFloat(tr.dataset.vatAmt) || 0;
         });
         returnGrandTotal = subtotal + vat;
 
         document.getElementById("lbl_subtotal").textContent = subtotal.toFixed(2);
-        document.getElementById("lbl_vat").textContent      = vat.toFixed(2);
-        document.getElementById("lbl_total").textContent    = returnGrandTotal.toFixed(2);
+        document.getElementById("lbl_vat").textContent = vat.toFixed(2);
+        document.getElementById("lbl_total").textContent = returnGrandTotal.toFixed(2);
     }
 
     /* ── Customer Invoices Panel ─────────────────────────────────── */
@@ -472,15 +696,15 @@
 
             const due = parseFloat(inv.balance_due);
             const dueStr = due > 0
-                ? `<span style="color:#dc2626; font-weight:600;">Rs. ${parseFloat(inv.balance_due).toLocaleString('en-NP', {minimumFractionDigits:2})}</span>`
-                : `<span style="color:#16a34a;">Rs. ${parseFloat(inv.balance_due).toLocaleString('en-NP', {minimumFractionDigits:2})}</span>`;
+                ? `<span style="color:#dc2626; font-weight:600;">Rs. ${parseFloat(inv.balance_due).toLocaleString('en-NP', { minimumFractionDigits: 2 })}</span>`
+                : `<span style="color:#16a34a;">Rs. ${parseFloat(inv.balance_due).toLocaleString('en-NP', { minimumFractionDigits: 2 })}</span>`;
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td style="color:#2563eb; font-weight:500;">${inv.invoice_number}</td>
                 <td>${inv.date_display}</td>
-                <td style="text-align:right;">Rs. ${parseFloat(inv.total_amount).toLocaleString('en-NP', {minimumFractionDigits:2})}</td>
-                <td style="text-align:right; color:#16a34a;">Rs. ${parseFloat(inv.paid_amount).toLocaleString('en-NP', {minimumFractionDigits:2})}</td>
+                <td style="text-align:right;">Rs. ${parseFloat(inv.total_amount).toLocaleString('en-NP', { minimumFractionDigits: 2 })}</td>
+                <td style="text-align:right; color:#16a34a;">Rs. ${parseFloat(inv.paid_amount).toLocaleString('en-NP', { minimumFractionDigits: 2 })}</td>
                 <td style="text-align:right;">${dueStr}</td>
                 <td><span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;background:${sc.bg};color:${sc.color};">${inv.status}</span></td>
             `;
@@ -528,7 +752,7 @@
                         chk.checked = settings[k];
                     }
                 });
-            } catch(e){}
+            } catch (e) { }
         }
         applySettings();
     }
@@ -635,18 +859,26 @@
 </script>
 
 <!-- Attachment Preview Modal -->
-<div id="attachmentPreviewModal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.65); backdrop-filter:blur(3px); z-index:99999; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:#fff; border-radius:12px; width:100%; max-width:850px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
-        <div style="padding:14px 20px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between;">
+<div id="attachmentPreviewModal"
+    style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.65); backdrop-filter:blur(3px); z-index:99999; align-items:center; justify-content:center; padding:20px;">
+    <div
+        style="background:#fff; border-radius:12px; width:100%; max-width:850px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
+        <div
+            style="padding:14px 20px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between;">
             <div style="display:flex; align-items:center; gap:8px;">
                 <i class="fa-solid fa-paperclip" style="color:#2563eb;"></i>
-                <span id="modal_preview_filename" style="font-weight:600; color:#1e293b; font-size:14px;">Bill Preview</span>
+                <span id="modal_preview_filename" style="font-weight:600; color:#1e293b; font-size:14px;">Bill
+                    Preview</span>
             </div>
-            <button type="button" onclick="closeAttachmentPreviewModal()" style="background:none; border:none; font-size:20px; color:#64748b; cursor:pointer; line-height:1;">&times;</button>
+            <button type="button" onclick="closeAttachmentPreviewModal()"
+                style="background:none; border:none; font-size:20px; color:#64748b; cursor:pointer; line-height:1;">&times;</button>
         </div>
-        <div style="padding:20px; flex:1; overflow:auto; display:flex; align-items:center; justify-content:center; background:#f1f5f9;">
-            <img id="modal_preview_image" src="" style="max-width:100%; max-height:70vh; object-fit:contain; border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,0.15); display:none;">
-            <iframe id="modal_preview_pdf" src="" style="width:100%; height:70vh; border:none; border-radius:6px; display:none;"></iframe>
+        <div
+            style="padding:20px; flex:1; overflow:auto; display:flex; align-items:center; justify-content:center; background:#f1f5f9;">
+            <img id="modal_preview_image" src=""
+                style="max-width:100%; max-height:70vh; object-fit:contain; border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,0.15); display:none;">
+            <iframe id="modal_preview_pdf" src=""
+                style="width:100%; height:70vh; border:none; border-radius:6px; display:none;"></iframe>
             <div id="modal_preview_fallback" style="display:none; text-align:center; padding:40px; color:#64748b;">
                 <i class="fa-solid fa-file-arrow-down" style="font-size:48px; color:#94a3b8; margin-bottom:12px;"></i>
                 <p style="margin:0;">Preview not available for this file type.</p>

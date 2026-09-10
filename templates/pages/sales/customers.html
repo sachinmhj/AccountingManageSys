@@ -86,11 +86,23 @@
     }
 
     .cust-list-header {
-        padding: 14px 16px;
+        padding: 12px 16px;
         border-bottom: 1px solid var(--border);
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .cust-list-header-row1 {
+        display: flex;
         align-items: center;
+        justify-content: space-between;
+    }
+
+    .cust-list-header-row2 {
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .cust-list-header h2 {
@@ -634,8 +646,24 @@
     <!-- LEFT: Customer List -->
     <div class="cust-list-panel">
         <div class="cust-list-header">
-            <h2>Customers</h2>
-            <button class="btn-new" onclick="openModal()"><i class="fa-solid fa-plus"></i> New Customer</button>
+            <!-- Row 1: Title + New Customer -->
+            <div class="cust-list-header-row1">
+                <h2 class="m-0">Customers</h2>
+                <button class="btn-new" onclick="openModal()"><i class="fa-solid fa-plus"></i> New</button>
+            </div>
+            <!-- Row 2: Notes + Video buttons -->
+            <div class="cust-list-header-row2">
+                <button type="button" class="btn btn-sm d-inline-flex align-items-center gap-1 rounded-pill"
+                    onclick="openPageNotesModal('sales_customers', 'Customers Dashboard')"
+                    style="font-size: 11px; font-weight: 600; padding: 3px 10px; background: #fffbe6; color: #d97706; border: 1px solid #fde68a;">
+                    <i class="fa-solid fa-note-sticky"></i> Notes
+                </button>
+                <button type="button" class="btn btn-sm d-inline-flex align-items-center gap-1 rounded-pill"
+                    onclick="openPageVideoModal('sales_customers', 'Customers Dashboard')"
+                    style="font-size: 11px; font-weight: 600; padding: 3px 10px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;">
+                    <i class="fa-brands fa-youtube"></i> Video
+                </button>
+            </div>
         </div>
         <div class="cust-search">
             <input type="text" id="customerSearch" placeholder="&#128269; Search Customer..."
@@ -648,7 +676,8 @@
                 <div class="cust-avatar">{{ c.name|slice:":2"|upper }}</div>
                 <div class="cust-item-info">
                     <div class="cust-item-name">{{ c.name }}</div>
-                    <div class="cust-item-pan">{{ c.pan_type|default:"PAN" }}: {{ c.pan_vat_number|default:"N/A" }}</div>
+                    <div class="cust-item-pan">{{ c.pan_type|default:"PAN" }}: {{ c.pan_vat_number|default:"N/A" }}
+                    </div>
                 </div>
                 <i class="fa-solid fa-chevron-right" style="color:#cbd5e1; font-size:11px; flex-shrink:0;"></i>
             </div>
@@ -724,9 +753,13 @@
                     </div>
 
                     <!-- Date Type Selector (AD / BS) -->
-                    <div style="display:inline-flex; align-items:center; gap:6px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:3px 8px;">
-                        <label for="hist_date_mode" style="font-size:12px; font-weight:600; color:var(--text-gray); margin:0;"><i class="fa-solid fa-calendar-days" style="margin-right:4px;"></i>Date Type:</label>
-                        <select id="hist_date_mode" onchange="onHistDateModeChange()" style="font-size:12px; font-weight:700; border:none; background:transparent; cursor:pointer; color:var(--primary); outline:none;">
+                    <div
+                        style="display:inline-flex; align-items:center; gap:6px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:3px 8px;">
+                        <label for="hist_date_mode"
+                            style="font-size:12px; font-weight:600; color:var(--text-gray); margin:0;"><i
+                                class="fa-solid fa-calendar-days" style="margin-right:4px;"></i>Date Type:</label>
+                        <select id="hist_date_mode" onchange="onHistDateModeChange()"
+                            style="font-size:12px; font-weight:700; border:none; background:transparent; cursor:pointer; color:var(--primary); outline:none;">
                             <option value="">-- Select --</option>
                             <option value="AD">AD (Gregorian)</option>
                             <option value="BS">BS (Bikram Sambat)</option>
@@ -739,24 +772,32 @@
                 </div>
 
                 <!-- Date Range Row (shown only when Date Type is selected) -->
-                <div id="hist_date_range_row" style="display:none; align-items:center; gap:10px; margin:8px 0 12px; padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; flex-wrap:wrap;">
-                    <span id="hist_date_range_label" style="font-size:12px; font-weight:600; color:var(--text-gray);">Filter by Date Range:</span>
+                <div id="hist_date_range_row"
+                    style="display:none; align-items:center; gap:10px; margin:8px 0 12px; padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; flex-wrap:wrap;">
+                    <span id="hist_date_range_label"
+                        style="font-size:12px; font-weight:600; color:var(--text-gray);">Filter by Date Range:</span>
 
                     <!-- AD Date Inputs -->
                     <div id="hist_ad_date_container" style="display:none; align-items:center; gap:8px;">
-                        <input type="date" id="hist_from_ad" class="hist-date-input" onchange="filterHistory()" title="Start Date (AD)">
+                        <input type="date" id="hist_from_ad" class="hist-date-input" onchange="filterHistory()"
+                            title="Start Date (AD)">
                         <span style="color:var(--text-gray);">—</span>
-                        <input type="date" id="hist_to_ad" class="hist-date-input" onchange="filterHistory()" title="End Date (AD)">
+                        <input type="date" id="hist_to_ad" class="hist-date-input" onchange="filterHistory()"
+                            title="End Date (AD)">
                     </div>
 
                     <!-- BS Date Inputs -->
                     <div id="hist_bs_date_container" style="display:none; align-items:center; gap:8px;">
-                        <input type="text" id="hist_from_bs" title="Start Date (BS)" placeholder="📅 Start Date (BS)" style="width:130px; font-size:12px; padding:4px 8px; border-radius:6px; border:1px solid #f59e0b; background:#fffbf0; cursor:pointer;">
+                        <input type="text" id="hist_from_bs" title="Start Date (BS)" placeholder="📅 Start Date (BS)"
+                            style="width:130px; font-size:12px; padding:4px 8px; border-radius:6px; border:1px solid #f59e0b; background:#fffbf0; cursor:pointer;">
                         <span style="color:var(--text-gray);">—</span>
-                        <input type="text" id="hist_to_bs" title="End Date (BS)" placeholder="📅 End Date (BS)" style="width:130px; font-size:12px; padding:4px 8px; border-radius:6px; border:1px solid #f59e0b; background:#fffbf0; cursor:pointer;">
+                        <input type="text" id="hist_to_bs" title="End Date (BS)" placeholder="📅 End Date (BS)"
+                            style="width:130px; font-size:12px; padding:4px 8px; border-radius:6px; border:1px solid #f59e0b; background:#fffbf0; cursor:pointer;">
                     </div>
 
-                    <button type="button" onclick="clearHistDateRange()" style="font-size:11px; color:#dc2626; background:none; border:1px solid #fca5a5; border-radius:4px; padding:2px 8px; cursor:pointer;">✕ Clear</button>
+                    <button type="button" onclick="clearHistDateRange()"
+                        style="font-size:11px; color:#dc2626; background:none; border:1px solid #fca5a5; border-radius:4px; padding:2px 8px; cursor:pointer;">✕
+                        Clear</button>
                 </div>
                 <div class="cd-table-wrap">
                     <table class="hist-table">
@@ -876,7 +917,7 @@
                     if (t.date && typeof window.adToBS === 'function') {
                         const parts = t.date.split('-').map(Number);
                         if (parts.length === 3 && !isNaN(parts[0])) {
-                            const bsObj = window.adToBS(new Date(parts[0], parts[1]-1, parts[2]));
+                            const bsObj = window.adToBS(new Date(parts[0], parts[1] - 1, parts[2]));
                             bsDateStr = window.fmtBS(bsObj);
                         }
                     }
@@ -961,7 +1002,7 @@
 
         const filtered = allTransactions.filter(t => {
             const matchTab = activeTab === 'all' || t.type.toLowerCase().includes(activeTab.toLowerCase());
-            
+
             let matchDate = true;
             if (mode === 'BS') {
                 if (fromBS && t.bsDate && t.bsDate < fromBS) matchDate = false;
@@ -1012,7 +1053,7 @@
     }
 
     // ─── Modal Integration ───
-    window.onCustomerSaved = function(id, name) {
+    window.onCustomerSaved = function (id, name) {
         window.location.reload();
     };
     function openModal() {
@@ -1029,45 +1070,45 @@
 
         function buildPopup(initY, initM, initD) {
             const BD = {
-                2050:[30,32,31,32,31,30,30,30,29,30,29,31],2051:[31,31,32,31,31,31,30,29,30,29,30,30],
-                2052:[31,31,32,32,31,30,30,29,30,29,30,30],2053:[31,32,31,32,31,30,30,30,29,29,30,31],
-                2054:[30,32,31,32,31,30,30,30,29,30,29,31],2055:[31,31,32,31,31,32,30,29,30,29,30,30],
-                2056:[31,32,31,32,31,30,30,29,30,29,30,30],2057:[31,32,31,32,31,30,30,30,29,29,30,31],
-                2058:[30,32,31,32,31,30,30,30,29,30,29,31],2059:[31,31,32,31,31,31,30,29,30,29,30,30],
-                2060:[31,31,32,32,31,30,30,29,30,29,30,30],2061:[31,32,31,32,31,30,30,30,29,29,30,31],
-                2062:[30,32,31,32,31,30,30,30,29,30,29,31],2063:[31,31,32,31,31,32,30,29,30,29,30,30],
-                2064:[31,32,31,32,31,30,30,29,30,29,30,30],2065:[31,32,31,32,31,30,30,30,29,29,30,31],
-                2066:[31,31,31,32,31,31,30,29,30,29,30,30],2067:[31,31,32,31,31,31,30,29,30,29,30,30],
-                2068:[31,31,32,32,31,30,30,29,30,29,30,30],2069:[31,32,31,32,31,30,30,30,29,29,30,31],
-                2070:[30,32,31,32,31,30,30,30,29,30,29,31],2071:[31,31,32,31,31,31,30,29,30,29,30,30],
-                2072:[31,31,32,32,31,30,30,29,30,29,30,30],2073:[31,32,31,32,31,30,30,30,29,29,30,31],
-                2074:[30,32,31,32,31,30,30,30,29,30,29,31],2075:[31,31,32,31,31,31,30,29,30,29,30,30],
-                2076:[31,31,32,32,31,30,30,29,30,29,30,30],2077:[31,32,31,32,31,30,30,30,29,29,30,31],
-                2078:[31,31,31,32,31,31,29,30,30,29,29,31],2079:[31,31,32,31,31,31,30,29,30,29,30,30],
-                2080:[31,31,32,32,31,30,30,29,30,29,30,30],2081:[31,32,31,32,31,30,30,30,29,29,30,31],
-                2082:[30,32,31,32,31,30,30,30,29,30,29,31],2083:[31,31,32,31,31,31,30,29,30,29,30,30],
-                2084:[31,31,32,32,31,30,30,29,30,29,30,30],2085:[31,32,31,32,31,30,30,30,29,29,30,31],
-                2086:[30,32,31,32,31,30,30,30,29,30,29,31],2087:[31,31,32,31,31,31,30,29,30,29,30,30],
-                2088:[31,31,32,32,31,30,30,29,30,29,30,30],2089:[31,32,31,32,31,30,30,30,29,29,30,31],
-                2090:[30,32,31,32,31,30,30,30,29,30,29,31]
+                2050: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2051: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2052: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2053: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2054: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2055: [31, 31, 32, 31, 31, 32, 30, 29, 30, 29, 30, 30],
+                2056: [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2057: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2058: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2059: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2060: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2061: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2062: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2063: [31, 31, 32, 31, 31, 32, 30, 29, 30, 29, 30, 30],
+                2064: [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2065: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2066: [31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30], 2067: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2068: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2069: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2070: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2071: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2072: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2073: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2074: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2075: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2076: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2077: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2078: [31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31], 2079: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2080: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2081: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2082: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2083: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2084: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2085: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2086: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31], 2087: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+                2088: [31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30], 2089: [31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31],
+                2090: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31]
             };
             const AD_REF = new Date(1993, 3, 14);
-            const MONTHS = ['Baisakh','Jestha','Ashadh','Shrawan','Bhadra','Ashwin','Kartik','Mangsir','Poush','Magh','Falgun','Chaitra'];
-            const DAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+            const MONTHS = ['Baisakh', 'Jestha', 'Ashadh', 'Shrawan', 'Bhadra', 'Ashwin', 'Kartik', 'Mangsir', 'Poush', 'Magh', 'Falgun', 'Chaitra'];
+            const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
-            function bsToADLocal(y,m,d) {
-                let days=0;
-                for(let iy=2050;iy<y;iy++){if(!BD[iy])return null;BD[iy].forEach(x=>days+=x);}
-                for(let im=1;im<m;im++)days+=(BD[y]||[])[im-1]||0;
-                days+=d-1;
-                let dt=new Date(AD_REF);dt.setDate(dt.getDate()+days);return dt;
+            function bsToADLocal(y, m, d) {
+                let days = 0;
+                for (let iy = 2050; iy < y; iy++) { if (!BD[iy]) return null; BD[iy].forEach(x => days += x); }
+                for (let im = 1; im < m; im++)days += (BD[y] || [])[im - 1] || 0;
+                days += d - 1;
+                let dt = new Date(AD_REF); dt.setDate(dt.getDate() + days); return dt;
             }
-            function pad(n){return String(n).padStart(2,'0');}
-            function fmtB(y,m,d){return y+'-'+pad(m)+'-'+pad(d);}
+            function pad(n) { return String(n).padStart(2, '0'); }
+            function fmtB(y, m, d) { return y + '-' + pad(m) + '-' + pad(d); }
 
-            let vy=initY, vm=initM, selD=initD;
+            let vy = initY, vm = initM, selD = initD;
             const popup = document.createElement('div');
-            popup.style.cssText='position:fixed;z-index:999999;width:270px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.22);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px;overflow:hidden;';
+            popup.style.cssText = 'position:fixed;z-index:999999;width:270px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.22);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px;overflow:hidden;';
 
             function positionPopup() {
                 const rect = inp.getBoundingClientRect();
@@ -1081,26 +1122,26 @@
             }
 
             function render() {
-                const dim = (BD[vy]||[])[vm-1]||30;
-                const firstAD = bsToADLocal(vy,vm,1);
+                const dim = (BD[vy] || [])[vm - 1] || 30;
+                const firstAD = bsToADLocal(vy, vm, 1);
                 const dow = firstAD ? firstAD.getDay() : 0;
 
-                let cells='';
-                for(let i=0;i<dow;i++) cells+='<div></div>';
-                for(let d=1;d<=dim;d++){
-                    const isSel=(d===selD&&vm===initM&&vy===initY);
-                    cells+=`<div class="fbsd" data-d="${d}" style="padding:5px 2px;text-align:center;border-radius:5px;cursor:pointer;${isSel?'background:#2563eb;color:#fff;font-weight:700;':'color:#1e293b;'}">${d}</div>`;
+                let cells = '';
+                for (let i = 0; i < dow; i++) cells += '<div></div>';
+                for (let d = 1; d <= dim; d++) {
+                    const isSel = (d === selD && vm === initM && vy === initY);
+                    cells += `<div class="fbsd" data-d="${d}" style="padding:5px 2px;text-align:center;border-radius:5px;cursor:pointer;${isSel ? 'background:#2563eb;color:#fff;font-weight:700;' : 'color:#1e293b;'}">${d}</div>`;
                 }
 
-                popup.innerHTML=`
+                popup.innerHTML = `
 <div style="background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;">
   <button class="fbsp" data-dir="-1" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;">&#8249;</button>
-  <div style="font-weight:600;font-size:14px;">${MONTHS[vm-1]} ${vy}</div>
+  <div style="font-weight:600;font-size:14px;">${MONTHS[vm - 1]} ${vy}</div>
   <button class="fbsp" data-dir="1" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;">&#8250;</button>
 </div>
 <div style="padding:8px 10px;">
   <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;">
-    ${DAYS.map(d=>`<div style="text-align:center;font-size:11px;color:#94a3b8;font-weight:600;padding:3px 0;">${d}</div>`).join('')}
+    ${DAYS.map(d => `<div style="text-align:center;font-size:11px;color:#94a3b8;font-weight:600;padding:3px 0;">${d}</div>`).join('')}
   </div>
   <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;">${cells}</div>
 </div>
@@ -1109,36 +1150,36 @@
   <button id="fpClear" style="font-size:11px;color:#dc2626;background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px;border:1px solid #fca5a5;">✕ Clear</button>
 </div>`;
 
-                popup.querySelectorAll('.fbsp').forEach(btn=>{
-                    btn.addEventListener('click',e=>{
+                popup.querySelectorAll('.fbsp').forEach(btn => {
+                    btn.addEventListener('click', e => {
                         e.stopPropagation();
-                        vm+=parseInt(btn.dataset.dir);
-                        if(vm<1){vm=12;vy--;}
-                        if(vm>12){vm=1;vy++;}
+                        vm += parseInt(btn.dataset.dir);
+                        if (vm < 1) { vm = 12; vy--; }
+                        if (vm > 12) { vm = 1; vy++; }
                         render();
                     });
                 });
-                popup.querySelectorAll('.fbsd').forEach(cell=>{
-                    cell.addEventListener('mouseenter',()=>{if(!cell.style.background||cell.style.background==='')cell.style.background='#eff6ff';});
-                    cell.addEventListener('mouseleave',()=>{if(cell.style.background==='rgb(239, 246, 255)')cell.style.background='';});
-                    cell.addEventListener('click',e=>{
+                popup.querySelectorAll('.fbsd').forEach(cell => {
+                    cell.addEventListener('mouseenter', () => { if (!cell.style.background || cell.style.background === '') cell.style.background = '#eff6ff'; });
+                    cell.addEventListener('mouseleave', () => { if (cell.style.background === 'rgb(239, 246, 255)') cell.style.background = ''; });
+                    cell.addEventListener('click', e => {
                         e.stopPropagation();
-                        const d=parseInt(cell.dataset.d);
-                        inp.value=fmtB(vy,vm,d);
+                        const d = parseInt(cell.dataset.d);
+                        inp.value = fmtB(vy, vm, d);
                         closePicker();
-                        if(typeof onChange==='function') onChange();
+                        if (typeof onChange === 'function') onChange();
                     });
                 });
-                const clrBtn=popup.querySelector('#fpClear');
-                if(clrBtn){
-                    clrBtn.addEventListener('click',e=>{
+                const clrBtn = popup.querySelector('#fpClear');
+                if (clrBtn) {
+                    clrBtn.addEventListener('click', e => {
                         e.stopPropagation();
-                        inp.value='';
+                        inp.value = '';
                         closePicker();
-                        if(typeof onChange==='function') onChange();
+                        if (typeof onChange === 'function') onChange();
                     });
                 }
-                popup.addEventListener('click',e=>e.stopPropagation());
+                popup.addEventListener('click', e => e.stopPropagation());
             }
 
             render();
@@ -1146,18 +1187,18 @@
             return popup;
         }
 
-        inp.addEventListener('click', function(e) {
+        inp.addEventListener('click', function (e) {
             e.stopPropagation();
             if (activePicker) { closePicker(); return; }
 
             let y, m, d;
             if (inp.value) {
                 const p = inp.value.split('-').map(Number);
-                if (p.length === 3 && !isNaN(p[0])) { y=p[0]; m=p[1]; d=p[2]; }
+                if (p.length === 3 && !isNaN(p[0])) { y = p[0]; m = p[1]; d = p[2]; }
             }
             if (!y) {
-                const today = typeof window.adToBS === 'function' ? window.adToBS(new Date()) : {year:2083,month:5,day:14};
-                y=today.year; m=today.month; d=today.day;
+                const today = typeof window.adToBS === 'function' ? window.adToBS(new Date()) : { year: 2083, month: 5, day: 14 };
+                y = today.year; m = today.month; d = today.day;
             }
 
             activePicker = buildPopup(y, m, d);
