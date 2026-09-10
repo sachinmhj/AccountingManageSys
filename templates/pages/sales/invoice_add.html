@@ -699,6 +699,51 @@
     }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Quill Rich Text Editor -->
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<style>
+    /* Quill editor custom sizing inside panel */
+    #panel_terms {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        box-sizing: border-box;
+    }
+    #panel_terms .panel-header {
+        margin-bottom: 12px;
+        flex: 0 0 auto;
+    }
+    #panel_terms .ql-toolbar.ql-snow {
+        flex: 0 0 auto;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        border-color: #e2e8f0;
+        background: #f8fafc;
+        padding: 6px 8px;
+    }
+    #quill_terms_editor.ql-container.ql-snow {
+        flex: 1 1 0px;
+        display: flex;
+        flex-direction: column;
+        height: 220px;
+        max-height: 230px;
+        min-height: 160px;
+        border-color: #e2e8f0;
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
+        background: #fff;
+        overflow: hidden;
+    }
+    #quill_terms_editor .ql-editor {
+        flex: 1 1 0px;
+        min-height: 0;
+        height: 100%;
+        font-size: 12px;
+        font-family: inherit;
+        overflow-y: auto;
+        padding: 10px 12px;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -1134,14 +1179,25 @@
                     </div>
                 </div>
 
-                <!-- Row A: Summary | Payment & Settlement -->
+                <!-- Row A: Terms & Conditions | Summary -->
                 <div id="row_a" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+                    <!-- Terms -->
+                    <div class="panel" id="panel_terms" style="margin-bottom:0;">
+                        <div class="panel-header" id="header_terms">Terms &amp; Conditions</div>
+                        <!-- Quill editor container -->
+                        <div id="quill_terms_editor"></div>
+                        <!-- Hidden input synced with Quill content (submitted with form) -->
+                        <input type="hidden" name="terms_conditions" id="terms_conditions_input">
+                    </div>
 
                     <!-- Summary -->
                     <div class="panel" id="panel_summary" style="margin-bottom:0;">
                         <div class="panel-header" id="header_summary">Summary</div>
                         <div class="summary-row"><span>Sub Total</span><span id="lbl_subtotal">0.00</span></div>
                         <div class="summary-row"><span>Discount</span><span id="lbl_discount">0.00</span></div>
+                        <div class="summary-row"><span>Non Taxable Amount</span><span id="lbl_non_taxable">0.00</span></div>
+                        <div class="summary-row"><span>Taxable Amount</span><span id="lbl_taxable">0.00</span></div>
                         <div class="summary-row"><span>VAT (13%)</span><span id="lbl_vat">0.00</span></div>
                         <div class="summary-row">
                             <span>Round Off</span>
@@ -1164,6 +1220,39 @@
                         <div class="summary-row" style="border:none; padding:3px 0;"><span
                                 style="color:#7c3aed; font-weight:600;">Profit Margin</span><span id="lbl_profit_margin"
                                 style="color:#7c3aed; font-weight:600;">0.00%</span></div>
+                    </div>
+                </div>
+
+                <!-- Row B: Allocation (Profit Sharing) | Payment & Settlement -->
+                <div id="row_b" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+                    <!-- Allocation (Profit Sharing) -->
+                    <div class="panel" id="panel_profit" style="margin-bottom:0;">
+                        <div class="panel-header" id="header_profit">Allocation <span
+                                style="font-size:10px; font-weight:400; color:var(--text-gray);">(Profit Sharing)</span>
+                        </div>
+                        <div class="table-responsive-wrap profit-table-wrap">
+                            <table class="data-table" id="profitAllocTable" style="font-size:11px; margin-bottom:8px;">
+                                <thead>
+                                    <tr>
+                                        <th>Role</th>
+                                        <th>Party Name</th>
+                                        <th>Basis</th>
+                                        <th>Value</th>
+                                        <th>Amount</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="profitAllocBody"></tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn" onclick="addAllocRow()" style="width:100%;"><i
+                                class="fa-solid fa-plus"></i> Add Allocation</button>
+                        <div
+                            style="display:flex; justify-content:space-between; font-size:12px; padding-top:8px; border-top:1px solid var(--border); margin-top:8px;">
+                            <span>Total Allocation</span><span style="font-weight:600;"
+                                id="alloc_profit_total">0.00</span>
+                        </div>
                     </div>
 
                     <!-- Payment & Settlement -->
@@ -1314,8 +1403,8 @@
                     </div>
                 </div>
 
-                <!-- Row B: Allocate Payment | Return / Exchange -->
-                <div id="row_b"
+                <!-- Row C: Allocate Payment | Return / Exchange -->
+                <div id="row_c"
                     style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
 
                     <!-- Allocate Payment (Pending Invoices) -->
@@ -1409,51 +1498,6 @@
                             added.</p>
                     </div>
                 </div>
-
-                <!-- Row C: Profit Sharing | Terms & Notes -->
-                <div id="row_c"
-                    style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
-
-                    <!-- Allocation (Profit Sharing) -->
-                    <div class="panel" id="panel_profit" style="margin-bottom:0;">
-                        <div class="panel-header" id="header_profit">Allocation <span
-                                style="font-size:10px; font-weight:400; color:var(--text-gray);">(Profit Sharing)</span>
-                        </div>
-                        <div class="table-responsive-wrap profit-table-wrap">
-                            <table class="data-table" id="profitAllocTable" style="font-size:11px; margin-bottom:8px;">
-                                <thead>
-                                    <tr>
-                                        <th>Role</th>
-                                        <th>Party Name</th>
-                                        <th>Basis</th>
-                                        <th>Value</th>
-                                        <th>Amount</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="profitAllocBody"></tbody>
-                            </table>
-                        </div>
-                        <button type="button" class="btn" onclick="addAllocRow()" style="width:100%;"><i
-                                class="fa-solid fa-plus"></i> Add Allocation</button>
-                        <div
-                            style="display:flex; justify-content:space-between; font-size:12px; padding-top:8px; border-top:1px solid var(--border); margin-top:8px;">
-                            <span>Total Allocation</span><span style="font-weight:600;"
-                                id="alloc_profit_total">0.00</span>
-                        </div>
-                    </div>
-
-                    <!-- Terms & Notes -->
-                    <div class="panel" id="panel_terms" style="margin-bottom:0;">
-                        <div class="panel-header" id="header_terms">Terms &amp; Conditions</div>
-                        <textarea class="form-control" name="terms_conditions" rows="3"
-                            style="height:auto; font-size:11px; resize:none; margin-bottom:12px;">Thank you for your business.</textarea>
-                        <div class="panel-header" style="margin-bottom:8px;">Notes</div>
-                        <input type="text" class="form-control" name="notes" placeholder="Add note..."
-                            style="font-size:11px;">
-                    </div>
-                </div>
-
 
 
             </div> <!-- End full-width sections -->
@@ -1574,7 +1618,7 @@
                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox"
                         id="chk_profit" checked onchange="applySettings()"> Allocation (Profit Sharing)</label>
                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox"
-                        id="chk_terms" checked onchange="applySettings()"> Terms & Conditions / Notes</label>
+                        id="chk_terms" checked onchange="applySettings()"> Terms & Conditions</label>
             </div>
             <div
                 style="padding:16px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; background:var(--bg-light);">
@@ -1618,6 +1662,8 @@
         }
     }
 </style>
+<!-- Quill JS -->
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script>
     // 1. Load Products from backend JSON
     const products = JSON.parse('{{ products_json|safe|escapejs }}');
@@ -1779,6 +1825,8 @@
     function calculateTotals() {
         let subTotal = 0;
         let totalDiscount = 0;
+        let taxableAmount = 0;
+        let nonTaxableAmount = 0;
         let vat = 0;
         let totalCost = 0;
         const overallVt = document.getElementById("vt_hidden_input")?.value || "Standard";
@@ -1803,7 +1851,12 @@
             totalDiscount += lineDisc;
 
             const isTaxable = (overallVt === 'Standard') && (taxType === 'Standard' || taxType === 'Taxable');
-            if (isTaxable) vat += lineSub * 0.13;
+            if (isTaxable) {
+                taxableAmount += lineSub;
+                vat += lineSub * 0.13;
+            } else {
+                nonTaxableAmount += lineSub;
+            }
 
             // Cost from dataset
             totalCost += parseFloat(tr.dataset.cost) || 0;
@@ -1822,6 +1875,8 @@
 
         setVal("lbl_subtotal", subTotal.toFixed(2));
         setVal("lbl_discount", totalDiscount.toFixed(2));
+        setVal("lbl_non_taxable", nonTaxableAmount.toFixed(2));
+        setVal("lbl_taxable", taxableAmount.toFixed(2));
         setVal("lbl_vat", vat.toFixed(2));
         setVal("lbl_grand_total", grandTotal.toFixed(2));
         setVal("lbl_total_cost", totalCost.toFixed(2));
@@ -2714,9 +2769,9 @@
         }
 
         // Update 2-column row layouts dynamically
-        updateRowLayout('row_a', 'summary', 'payment');
-        updateRowLayout('row_b', 'allocate', 'return');
-        updateRowLayout('row_c', 'profit', 'terms');
+        updateRowLayout('row_a', 'terms', 'summary');
+        updateRowLayout('row_b', 'profit', 'payment');
+        updateRowLayout('row_c', 'allocate', 'return');
 
         // Update panel titles
         updatePanelHeaders();
@@ -2843,6 +2898,32 @@
                 });
                 updateTotals();
             }
+        });
+    }
+
+    // Initialize Quill Editor for Terms & Conditions
+    if (document.getElementById('quill_terms_editor')) {
+        var quill = new Quill('#quill_terms_editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['clean']
+                ]
+            }
+        });
+        
+        // Sync Quill content to hidden input
+        var termsInput = document.getElementById('terms_conditions_input');
+        
+        // Set initial value
+        quill.root.innerHTML = 'Thank you for your business.';
+        termsInput.value = 'Thank you for your business.';
+        
+        // Update input on text change
+        quill.on('text-change', function() {
+            termsInput.value = quill.root.innerHTML;
         });
     }
 </script>
