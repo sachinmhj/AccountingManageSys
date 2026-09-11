@@ -1,0 +1,735 @@
+<!-- Print Templates Component & Modal Engine -->
+
+<!-- Hidden print-only area: shown ONLY on @media print, so actual printing works -->
+<div id="print-only-area" style="display:none;">
+    <div id="print-paper-content"></div>
+</div>
+
+<style>
+    /* ── Screen styles for modal ── */
+    .print-modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(3px);
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .print-modal-card {
+        background: #fff;
+        width: 1100px;
+        max-width: 96vw;
+        height: 90vh;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .print-modal-header {
+        padding: 14px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8fafc;
+        flex-shrink: 0;
+    }
+    .print-modal-body {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+    }
+    .print-modal-sidebar {
+        width: 240px;
+        border-right: 1px solid #e2e8f0;
+        background: #f1f5f9;
+        padding: 16px;
+        overflow-y: auto;
+        flex-shrink: 0;
+    }
+    .print-modal-preview {
+        flex: 1;
+        background: #525659;
+        padding: 24px;
+        overflow-y: auto;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+    .paper-sheet {
+        background: #fff;
+        width: 210mm;
+        min-height: 297mm;
+        padding: 14mm 12mm;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+        color: #000;
+        font-size: 11px;
+        flex-shrink: 0;
+    }
+    .tmpl-opt-btn {
+        width: 100%;
+        text-align: left;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        background: #fff;
+        font-weight: 600;
+        font-size: 13px;
+        color: #334155;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .tmpl-opt-btn:hover { border-color: #2563eb; background: #eff6ff; }
+    .tmpl-opt-btn.active { border-color: #2563eb; background: #2563eb; color: #fff; }
+
+    /* ── Shared bill element styles (used inside both modal preview & print area) ── */
+    .pt-trad-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 6px;
+    }
+    .pt-trad-table th, .pt-trad-table td {
+        border: 1px solid #000;
+        padding: 4px 6px;
+        font-size: 11px;
+    }
+    .pt-trad-table th {
+        background: #f1f5f9;
+        text-align: center;
+    }
+    .pt-pan-box {
+        display: inline-block;
+        width: 16px; height: 18px;
+        border: 1px solid #000;
+        text-align: center;
+        line-height: 18px;
+        font-weight: bold;
+        font-size: 11px;
+        margin-right: 1px;
+    }
+
+    /* ── @media print: show ONLY print-only-area ── */
+    @media print {
+        /* Hide all top-level elements except #print-only-area */
+        body > *:not(#print-only-area) { display: none !important; }
+        #printModalOverlay { display: none !important; }
+
+        /* Show print-only-area */
+        #print-only-area {
+            display: block !important;
+            visibility: visible !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
+        }
+        #print-only-area * {
+            visibility: visible !important;
+        }
+        #print-paper-content {
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            color: #000;
+            padding: 5mm 8mm;
+            box-sizing: border-box;
+        }
+        .pt-trad-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+        .pt-trad-table th, .pt-trad-table td { border: 1px solid #000; padding: 4px 6px; font-size: 11px; }
+        .pt-trad-table th { background: #f1f5f9; text-align: center; }
+        .pt-pan-box { display: inline-block; width: 16px; height: 18px; border: 1px solid #000; text-align: center; line-height: 18px; font-weight: bold; font-size: 11px; margin-right: 1px; }
+    }
+</style>
+
+<!-- Print Modal Overlay -->
+<div id="printModalOverlay" class="print-modal-overlay">
+    <div class="print-modal-card">
+        <!-- Header -->
+        <div class="print-modal-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <i class="fa-solid fa-print" style="color:#2563eb; font-size:18px;"></i>
+                <div>
+                    <h3 style="margin:0; font-size:15px; font-weight:700; color:#1e293b;">Sales Invoice Print Preview</h3>
+                    <p style="margin:0; font-size:11px; color:#64748b;">Select a template then click Print Now</p>
+                </div>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button type="button" class="btn" style="background:#2563eb; color:#fff; font-weight:700;" onclick="triggerActualPrint()">
+                    <i class="fa-solid fa-print"></i> Print Now
+                </button>
+                <button type="button" class="btn" style="background:#64748b; color:#fff;" onclick="closePrintModal()">
+                    <i class="fa-solid fa-xmark"></i> Close
+                </button>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="print-modal-body">
+            <!-- Sidebar Template Chooser -->
+            <div class="print-modal-sidebar">
+                <h4 style="margin:0 0 12px 0; font-size:13px; color:#475569; font-weight:700;">Select Template</h4>
+
+                <button type="button" class="tmpl-opt-btn" id="btn_tmpl_traditional" onclick="switchPreviewTemplate('traditional')">
+                    <span><i class="fa-solid fa-file-invoice"></i> Traditional Tax</span>
+                    <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
+                </button>
+                <button type="button" class="tmpl-opt-btn" id="btn_tmpl_retail" onclick="switchPreviewTemplate('retail')">
+                    <span><i class="fa-solid fa-receipt"></i> Retail Tax Invoice</span>
+                    <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
+                </button>
+                <button type="button" class="tmpl-opt-btn" id="btn_tmpl_standard" onclick="switchPreviewTemplate('standard')">
+                    <span><i class="fa-solid fa-file-lines"></i> Invoice Standard</span>
+                    <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
+                </button>
+                <button type="button" class="tmpl-opt-btn" id="btn_tmpl_minimal" onclick="switchPreviewTemplate('minimal')">
+                    <span><i class="fa-solid fa-align-left"></i> Invoice Minimal</span>
+                    <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
+                </button>
+
+                <hr style="border:none; border-top:1px solid #cbd5e1; margin:16px 0;">
+                <div id="company_info_hint" style="padding:10px; background:#fff7ed; border:1px solid #fed7aa; border-radius:6px; font-size:11px; color:#c2410c; display:none;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> <strong>Company info not set.</strong><br>
+                    <a href="/configurations/printing-templates/" style="color:#c2410c;">Go to Printing Templates</a> to add your company name, address, and PAN.
+                </div>
+                <div style="margin-top:12px; padding:10px; background:#e0f2fe; border-radius:6px; font-size:11px; color:#0369a1;">
+                    <i class="fa-solid fa-info-circle"></i> Set your default template & company info in <a href="/configurations/printing-templates/" style="color:#0369a1; font-weight:700;">Configurations &gt; Printing Templates</a>.
+                </div>
+            </div>
+
+            <!-- Preview Sheet Area -->
+            <div class="print-modal-preview">
+                <div class="paper-sheet" id="printable_paper_area">
+                    <!-- Dynamic Template HTML Injected Here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── Number to Words ──────────────────────────────────────────────
+    function numToWords(amount) {
+        if (!amount || isNaN(amount) || parseFloat(amount) === 0) return "ZERO ONLY";
+        const val = Math.abs(parseFloat(amount));
+        const whole = Math.floor(val);
+        const fraction = Math.round((val - whole) * 100);
+        const a = ['','ONE ','TWO ','THREE ','FOUR ','FIVE ','SIX ','SEVEN ','EIGHT ','NINE ','TEN ',
+                   'ELEVEN ','TWELVE ','THIRTEEN ','FOURTEEN ','FIFTEEN ','SIXTEEN ','SEVENTEEN ','EIGHTEEN ','NINETEEN '];
+        const b = ['','','TWENTY ','THIRTY ','FORTY ','FIFTY ','SIXTY ','SEVENTY ','EIGHTY ','NINETY '];
+        function inWords(num) {
+            if ((num = num.toString()).length > 9) return 'overflow';
+            let n = ('000000000' + num).substr(-9);
+            let str = '';
+            str += (n[0] != 0) ? (a[Number(n[0])] || b[n[0][0]] + a[n[0][1]]) + 'CRORE ' : '';
+            str += (n[1] != 0 || n[2] != 0) ? (inWords(Number(n[1] + n[2])) || '') + 'LAKH ' : '';
+            str += (n[3] != 0 || n[4] != 0) ? (inWords(Number(n[3] + n[4])) || '') + 'THOUSAND ' : '';
+            str += (n[5] != 0) ? (a[Number(n[5])] || b[n[5][0]] + a[n[5][1]]) + 'HUNDRED ' : '';
+            str += (n[6] != 0 || n[7] != 0 || n[8] != 0) ? ((str !== '') ? 'AND ' : '') : '';
+            if (n[6] != 0 || n[7] != 0 || n[8] != 0) {
+                const lt = Number(n[7] + n[8]);
+                str += lt < 20 ? a[lt] : b[n[7]] + a[n[8]];
+            }
+            return str;
+        }
+        let result = "RS. " + inWords(whole).trim();
+        if (fraction > 0) result += " AND " + inWords(fraction).trim() + " PAISA";
+        return result + " ONLY";
+    }
+
+    // ── BS Date approximation ──────────────────────────────────────────
+    function getBSDateStr(adDateStr) {
+        if (!adDateStr) return '';
+        try {
+            const d = new Date(adDateStr);
+            return `${d.getFullYear() + 57}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+        } catch(e) { return ''; }
+    }
+
+    // ── Boxed PAN digits ─────────────────────────────────────────────
+    function formatPanBoxed(panStr) {
+        if (!panStr) return '—';
+        const clean = panStr.replace(/\D/g,'').substring(0, 9);
+        return clean.split('').map(d => `<span class="pt-pan-box">${d}</span>`).join('');
+    }
+
+    // ── Load company info from localStorage ──────────────────────────
+    function getCompanyInfo() {
+        try {
+            return JSON.parse(localStorage.getItem('company_print_info') || '{}');
+        } catch(e) { return {}; }
+    }
+
+    let currentPrintInvoiceData = null;
+    let selectedTemplateKey = 'traditional';
+
+    function openPrintModalWithData(invData) {
+        currentPrintInvoiceData = invData;
+        selectedTemplateKey = localStorage.getItem('active_sales_print_template') || 'traditional';
+        document.getElementById('printModalOverlay').style.display = 'flex';
+
+        // Show company info warning if not set
+        const co = getCompanyInfo();
+        const hint = document.getElementById('company_info_hint');
+        if (hint) hint.style.display = (!co.name) ? 'block' : 'none';
+
+        renderSelectedTemplate();
+    }
+
+    function closePrintModal() {
+        document.getElementById('printModalOverlay').style.display = 'none';
+    }
+
+    function switchPreviewTemplate(tmplKey) {
+        selectedTemplateKey = tmplKey;
+        renderSelectedTemplate();
+    }
+
+    function renderSelectedTemplate() {
+        const tmpls = ['traditional', 'retail', 'standard', 'minimal'];
+        tmpls.forEach(t => {
+            const btn = document.getElementById(`btn_tmpl_${t}`);
+            if (btn) btn.classList.toggle('active', t === selectedTemplateKey);
+        });
+
+        const inv = currentPrintInvoiceData || {};
+        const co = getCompanyInfo();
+        const paper = document.getElementById('printable_paper_area');
+        if (!paper) return;
+
+        const html = buildTemplateHtml(selectedTemplateKey, inv, co);
+        paper.innerHTML = html;
+    }
+
+    function buildTemplateHtml(key, inv, co) {
+        if (key === 'traditional') return renderTraditionalTemplate(inv, co);
+        if (key === 'retail')      return renderRetailTemplate(inv, co);
+        if (key === 'standard')    return renderStandardTemplate(inv, co);
+        if (key === 'minimal')     return renderMinimalTemplate(inv, co);
+        return '';
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // TEMPLATE 1: Traditional Tax Invoice
+    // ══════════════════════════════════════════════════════════════════
+    function renderTraditionalTemplate(inv, co) {
+        const items = inv.items || [];
+        let itemRows = '';
+        let totalQtyMain = 0;
+
+        items.forEach((it, idx) => {
+            const qty = parseFloat(it.quantity || 0);
+            const rate = parseFloat(it.rate || 0);
+            const amount = parseFloat(it.amount || (qty * rate));
+            totalQtyMain += qty;
+            itemRows += `
+                <tr>
+                    <td style="text-align:center;">${idx + 1}</td>
+                    <td style="text-align:center;">${it.hscode || ''}</td>
+                    <td>${it.product_name || ''}</td>
+                    <td style="text-align:right;">${qty.toFixed(2)}</td>
+                    <td style="text-align:right;">${qty.toFixed(2)}</td>
+                    <td style="text-align:center;">${it.unit || 'Pcs'}</td>
+                    <td style="text-align:right;">${rate.toFixed(2)}</td>
+                    <td style="text-align:right;">${amount.toFixed(2)}</td>
+                </tr>`;
+        });
+        // Pad empty rows to fixed height
+        for (let i = items.length; i < 8; i++) {
+            itemRows += `<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
+        }
+
+        const totalAmt    = parseFloat(inv.total_amount   || 0);
+        const grossAmt    = parseFloat(inv.subtotal        || totalAmt);
+        const discAmt     = parseFloat(inv.discount_amount || 0);
+        const taxableAmt  = parseFloat(inv.taxable_amount  || grossAmt - discAmt);
+        const vatAmt      = parseFloat(inv.vat_amount      || 0);
+        const roundOff    = parseFloat(inv.round_off       || 0);
+        const nonTaxAmt   = parseFloat(inv.subtotal_non_taxable || 0);
+
+        return `
+            <div style="text-align:center;">
+                <h2 style="margin:0; font-size:17px; font-weight:bold; text-transform:uppercase;">${co.name || 'Your Company Name'}</h2>
+                <div style="font-size:11px; margin-top:2px;">${co.address || 'Company Address'}</div>
+                <div style="font-size:11px;">Phone No. : ${co.phone || ''}</div>
+                ${co.email ? `<div style="font-size:11px;">Email: ${co.email}</div>` : ''}
+            </div>
+
+            <div style="margin-top:6px; font-size:11px;">
+                <strong>PAN/VAT NO.</strong> ${formatPanBoxed(co.pan)}
+            </div>
+
+            <div style="border:1px solid #000; text-align:center; padding:4px; font-weight:bold; font-size:13px; margin:6px 0;">
+                Tax Invoice
+            </div>
+
+            <table class="pt-trad-table" style="margin-top:0;">
+                <tr>
+                    <td style="width:55%; vertical-align:top; border-right:1px solid #000;">
+                        <div><strong>M/S</strong> : ${inv.customer_name || ''}</div>
+                        <div><strong>Address</strong> : ${inv.customer_address || ''}</div>
+                        <div><strong>Phone No.</strong> : ${inv.customer_phone || ''}</div>
+                        <div><strong>PAN/VAT No.</strong> : ${inv.customer_pan || ''}</div>
+                    </td>
+                    <td style="width:45%; vertical-align:top;">
+                        <div style="display:flex; justify-content:space-between;"><span><strong>Invoice No.</strong></span><span>: ${inv.invoice_number || ''}</span></div>
+                        <div style="display:flex; justify-content:space-between;"><span><strong>Ref Bill No</strong></span><span>: ${inv.ref_no || ''}</span></div>
+                        <div style="display:flex; justify-content:space-between;"><span><strong>Invoice Date</strong></span><span>: ${inv.date || ''}</span></div>
+                        <div style="display:flex; justify-content:space-between;"><span><strong>Invoice Miti</strong></span><span>: ${getBSDateStr(inv.date)}</span></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="font-weight:bold;">
+                        Mode of Payment : ${inv.payment_terms || ''}
+                    </td>
+                </tr>
+            </table>
+
+            <table class="pt-trad-table">
+                <thead>
+                    <tr>
+                        <th style="width:30px;">S.N.</th>
+                        <th style="width:55px;">HSCODE</th>
+                        <th>Description</th>
+                        <th style="width:55px;">Qty (Pcs)</th>
+                        <th style="width:55px;">Quantity</th>
+                        <th style="width:40px;">Unit</th>
+                        <th style="width:60px;">Rate</th>
+                        <th style="width:75px;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>${itemRows}</tbody>
+            </table>
+
+            <table class="pt-trad-table" style="margin-top:-1px;">
+                <tr>
+                    <td style="width:55%; vertical-align:top; padding:6px;">
+                        <div style="font-size:10px; margin-bottom:12px;">
+                            <strong>Remarks:-</strong> ${inv.remarks || ''}
+                        </div>
+                        <div style="font-size:10.5px; font-weight:bold; border-top:1px solid #000; border-bottom:1px solid #000; padding:4px 0; margin-bottom:8px;">
+                            Amount Payable In Words:<br>
+                            <span style="font-size:10px;">${numToWords(totalAmt)}</span>
+                        </div>
+                        <div style="font-size:9.5px; line-height:1.4;">
+                            <strong>Note:</strong><br>
+                            ${co.note1 || '1. Goods once sold will not be returned.'}<br>
+                            ${co.note2 || '2. Interest will be charged @ bank rule if payment is not made within due date.'}
+                        </div>
+                        <div style="margin-top:36px; font-size:10px;">________________________<br>Authorized By</div>
+                    </td>
+                    <td style="width:45%; vertical-align:top; padding:0;">
+                        <table class="pt-trad-table" style="margin:0; border:none;">
+                            <tr><td>Total Quantity</td><td style="text-align:right;"></td><td style="text-align:right;">${totalQtyMain.toFixed(2)}</td></tr>
+                            <tr><td>Gross Amount</td><td colspan="2" style="text-align:right;">${grossAmt.toFixed(2)}</td></tr>
+                            <tr><td>Discount</td><td colspan="2" style="text-align:right;">${discAmt.toFixed(2)}</td></tr>
+                            <tr><td><strong>Taxable Amount</strong></td><td colspan="2" style="text-align:right;"><strong>${taxableAmt.toFixed(2)}</strong></td></tr>
+                            <tr><td>VAT 13%</td><td colspan="2" style="text-align:right;">${vatAmt.toFixed(2)}</td></tr>
+                            <tr><td>Rounded Off</td><td colspan="2" style="text-align:right;">${roundOff.toFixed(2)}</td></tr>
+                            <tr><td>Non-Taxable Amount</td><td colspan="2" style="text-align:right;">${nonTaxAmt.toFixed(2)}</td></tr>
+                            <tr style="background:#f1f5f9;"><td><strong>Net Amount</strong></td><td colspan="2" style="text-align:right; font-size:12px;"><strong>${totalAmt.toFixed(2)}</strong></td></tr>
+                        </table>
+                        <div style="text-align:center; font-weight:bold; margin-top:20px; font-size:10px;">
+                            For ${co.name || 'Your Company'}<br><br><br>
+                            ___________________________________<br>Authorized Signatory
+                        </div>
+                    </td>
+                </tr>
+            </table>`;
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // TEMPLATE 2: Retail Tax Invoice
+    // ══════════════════════════════════════════════════════════════════
+    function renderRetailTemplate(inv, co) {
+        const items = inv.items || [];
+        let itemRows = '';
+        items.forEach((it, idx) => {
+            const qty = parseFloat(it.quantity || 1);
+            const rate = parseFloat(it.rate || 0);
+            const amount = parseFloat(it.amount || (qty * rate));
+            itemRows += `
+                <tr>
+                    <td style="text-align:center;">${idx + 1}</td>
+                    <td style="text-align:center;">${it.hscode || ''}</td>
+                    <td>${it.product_name || ''}</td>
+                    <td style="text-align:center;">${it.unit || 'Pcs'}</td>
+                    <td style="text-align:right;">${qty.toFixed(2)}</td>
+                    <td style="text-align:right;">${rate.toFixed(2)}</td>
+                    <td style="text-align:right;">${amount.toFixed(2)}</td>
+                </tr>`;
+        });
+        for (let i = items.length; i < 6; i++) {
+            itemRows += `<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
+        }
+
+        const totalAmt   = parseFloat(inv.total_amount   || 0);
+        const grossAmt   = parseFloat(inv.subtotal        || totalAmt);
+        const discAmt    = parseFloat(inv.discount_amount || 0);
+        const taxableAmt = parseFloat(inv.taxable_amount  || grossAmt - discAmt);
+        const vatAmt     = parseFloat(inv.vat_amount      || 0);
+
+        return `
+            <div style="border-bottom:2px solid #000; padding-bottom:8px;">
+                <div>
+                    <h2 style="margin:0; font-size:16px; font-weight:bold;">${co.name || 'Your Company Name'}</h2>
+                    <div style="font-size:10px;">${co.address || 'Company Address'}</div>
+                    ${co.phone ? `<div style="font-size:10px;">Tel: ${co.phone}</div>` : ''}
+                    ${co.email ? `<div style="font-size:10px;">E-mail: ${co.email}</div>` : ''}
+                    ${co.pan   ? `<div style="font-size:10px; font-weight:bold; margin-top:2px;">PAN: ${co.pan}</div>` : ''}
+                </div>
+            </div>
+
+            <div style="text-align:center; font-weight:bold; font-size:14px; margin:8px 0;">Tax Invoice</div>
+
+            <table class="pt-trad-table" style="margin-bottom:8px;">
+                <tr>
+                    <td style="width:50%; vertical-align:top;">
+                        <strong>Customer Information:</strong><br>
+                        Name M/S: <strong>${inv.customer_name || ''}</strong><br>
+                        Address: ${inv.customer_address || ''}<br>
+                        Pan No: ${inv.customer_pan || ''}<br>
+                        Party Contact: ${inv.customer_phone || ''}<br>
+                        Mode/Terms of Payment: ${inv.payment_terms || ''}
+                    </td>
+                    <td style="width:50%; vertical-align:top;">
+                        Invoice No: <strong>${inv.invoice_number || ''}</strong><br>
+                        Invoice Date: ${inv.date || ''}<br>
+                        Invoice Miti: ${getBSDateStr(inv.date)}<br>
+                        Invoice Status: ${inv.status || ''}
+                    </td>
+                </tr>
+            </table>
+
+            <table class="pt-trad-table">
+                <thead>
+                    <tr>
+                        <th style="width:35px;">Sr.No</th>
+                        <th style="width:60px;">H.S. Code</th>
+                        <th>Particulars</th>
+                        <th style="width:40px;">Unit</th>
+                        <th style="width:55px;">Quantity</th>
+                        <th style="width:75px;">Rate (NPR)</th>
+                        <th style="width:85px;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>${itemRows}</tbody>
+            </table>
+
+            <table class="pt-trad-table" style="margin-top:-1px;">
+                <tr>
+                    <td style="width:55%; vertical-align:top; padding:8px;">
+                        <div><strong>Amount In Words:</strong> ${numToWords(totalAmt)}</div>
+                        <div style="margin-top:8px; font-size:9.5px;">Remarks: ${inv.remarks || ''}</div>
+                        <div style="margin-top:4px; font-size:9px; font-style:italic;">E. &amp; O.E.</div>
+                        <div style="margin-top:6px; font-size:9.5px; border-top:1px dashed #000; padding-top:4px;">
+                            <strong>Declaration:</strong> We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.
+                        </div>
+                    </td>
+                    <td style="width:45%; vertical-align:top; padding:0;">
+                        <table class="pt-trad-table" style="margin:0;">
+                            <tr><td>Sub Total</td><td style="text-align:right;">${grossAmt.toFixed(2)}</td></tr>
+                            <tr><td>Discount</td><td style="text-align:right;">${discAmt.toFixed(2)}</td></tr>
+                            <tr><td>Taxable Amount</td><td style="text-align:right;">${taxableAmt.toFixed(2)}</td></tr>
+                            <tr><td>VAT 13%</td><td style="text-align:right;">${vatAmt.toFixed(2)}</td></tr>
+                            <tr style="font-weight:bold;"><td>GRAND TOTAL</td><td style="text-align:right; font-size:12px;">${totalAmt.toFixed(2)}</td></tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <div style="display:flex; justify-content:space-between; margin-top:40px; text-align:center; font-size:10px;">
+                <div>___________________<br>Created By</div>
+                <div>___________________<br>Receiver's Signature and Seal</div>
+                <div>___________________<br>Authorized Signatory</div>
+            </div>`;
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // TEMPLATE 3: Standard Invoice
+    // ══════════════════════════════════════════════════════════════════
+    function renderStandardTemplate(inv, co) {
+        const totalAmt  = parseFloat(inv.total_amount   || 0);
+        const taxAmt    = parseFloat(inv.taxable_amount  || totalAmt);
+        const vatAmt    = parseFloat(inv.vat_amount      || 0);
+        const discAmt   = parseFloat(inv.discount_amount || 0);
+        const items     = inv.items || [];
+
+        const itemRows = items.map((it, idx) => `
+            <tr>
+                <td style="text-align:center;">${idx+1}</td>
+                <td>${it.product_name || ''}</td>
+                <td style="text-align:center;">${it.unit || 'Pcs'}</td>
+                <td style="text-align:right;">${parseFloat(it.quantity||0).toFixed(2)}</td>
+                <td style="text-align:right;">${parseFloat(it.rate||0).toFixed(2)}</td>
+                <td style="text-align:right;">${parseFloat(it.amount||0).toFixed(2)}</td>
+            </tr>`).join('') || `<tr><td colspan="6" style="text-align:center;">No items</td></tr>`;
+
+        return `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #2563eb; padding-bottom:12px; margin-bottom:16px;">
+                <div>
+                    <h2 style="margin:0; font-size:18px; font-weight:bold; color:#2563eb;">${co.name || 'Your Company Name'}</h2>
+                    <div style="font-size:11px; color:#475569;">${co.address || ''}</div>
+                    ${co.phone ? `<div style="font-size:11px; color:#475569;">Tel: ${co.phone}</div>` : ''}
+                    ${co.email ? `<div style="font-size:11px; color:#475569;">${co.email}</div>` : ''}
+                    ${co.pan   ? `<div style="font-size:11px; font-weight:bold;">PAN: ${co.pan}</div>` : ''}
+                </div>
+                <div style="text-align:right;">
+                    <h2 style="margin:0; font-size:20px; font-weight:900; color:#1e293b; letter-spacing:2px;">INVOICE</h2>
+                    <div style="font-size:13px; font-weight:bold; color:#2563eb;">#${inv.invoice_number || ''}</div>
+                    <div style="font-size:11px; margin-top:4px;">Date: ${inv.date || ''}</div>
+                    <div style="font-size:11px;">BS: ${getBSDateStr(inv.date)}</div>
+                    ${inv.due_date ? `<div style="font-size:11px;">Due: ${inv.due_date}</div>` : ''}
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; margin-bottom:16px; gap:20px;">
+                <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px;">
+                    <div style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:6px;">Billed To</div>
+                    <div style="font-weight:700;">${inv.customer_name || ''}</div>
+                    <div style="font-size:11px;">${inv.customer_address || ''}</div>
+                    <div style="font-size:11px;">Phone: ${inv.customer_phone || ''}</div>
+                    <div style="font-size:11px;">PAN: ${inv.customer_pan || ''}</div>
+                </div>
+                <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px;">
+                    <div style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:6px;">Invoice Details</div>
+                    <div style="font-size:11px;">Payment Terms: ${inv.payment_terms || ''}</div>
+                    <div style="font-size:11px;">Status: ${inv.status || ''}</div>
+                </div>
+            </div>
+
+            <table class="pt-trad-table">
+                <thead>
+                    <tr style="background:#2563eb; color:#fff;">
+                        <th style="width:30px; background:#2563eb;">#</th>
+                        <th style="background:#2563eb;">Description</th>
+                        <th style="width:40px; background:#2563eb;">Unit</th>
+                        <th style="width:55px; background:#2563eb;">Qty</th>
+                        <th style="width:65px; background:#2563eb;">Rate</th>
+                        <th style="width:75px; background:#2563eb;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>${itemRows}</tbody>
+            </table>
+
+            <div style="display:flex; justify-content:space-between; margin-top:16px; gap:20px; align-items:flex-start;">
+                <div style="flex:1;">
+                    <strong style="font-size:11px;">Amount in Words:</strong><br>
+                    <span style="font-size:10px;">${numToWords(totalAmt)}</span>
+                    ${inv.remarks ? `<div style="margin-top:8px; font-size:10px; color:#475569;"><strong>Remarks:</strong> ${inv.remarks}</div>` : ''}
+                    ${co.terms_text ? `<div style="margin-top:12px; font-size:9.5px;">${co.terms_text}</div>` : ''}
+                </div>
+                <div style="min-width:200px; border:1px solid #e2e8f0; border-radius:6px; overflow:hidden;">
+                    <table style="width:100%; border-collapse:collapse; font-size:11px;">
+                        <tr style="background:#f1f5f9;"><td style="padding:5px 8px;">Discount</td><td style="padding:5px 8px; text-align:right;">${discAmt.toFixed(2)}</td></tr>
+                        <tr><td style="padding:5px 8px;">Taxable Amount</td><td style="padding:5px 8px; text-align:right;">${taxAmt.toFixed(2)}</td></tr>
+                        <tr><td style="padding:5px 8px;">VAT (13%)</td><td style="padding:5px 8px; text-align:right;">${vatAmt.toFixed(2)}</td></tr>
+                        <tr style="background:#2563eb; color:#fff; font-weight:bold;">
+                            <td style="padding:8px;">Grand Total</td>
+                            <td style="padding:8px; text-align:right; font-size:13px;">${totalAmt.toFixed(2)}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; margin-top:50px; font-size:10px; text-align:center;">
+                <div style="border-top:1px solid #000; padding-top:4px; min-width:120px;">Prepared By</div>
+                <div style="border-top:1px solid #000; padding-top:4px; min-width:120px;">Received By</div>
+                <div style="border-top:1px solid #000; padding-top:4px; min-width:120px; font-weight:bold;">For ${co.name || 'Company'}<br>Authorized Signatory</div>
+            </div>`;
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // TEMPLATE 4: Minimal / Thermal
+    // ══════════════════════════════════════════════════════════════════
+    function renderMinimalTemplate(inv, co) {
+        const totalAmt = parseFloat(inv.total_amount || 0);
+        const vatAmt   = parseFloat(inv.vat_amount   || 0);
+        const items    = inv.items || [];
+
+        const itemRows = items.map(it => `
+            <tr>
+                <td>${it.product_name || ''}</td>
+                <td style="text-align:right;">${parseFloat(it.quantity||0).toFixed(2)}</td>
+                <td style="text-align:right;">${parseFloat(it.rate||0).toFixed(2)}</td>
+                <td style="text-align:right;">${parseFloat(it.amount||0).toFixed(2)}</td>
+            </tr>`).join('');
+
+        return `
+            <div style="text-align:center; border-bottom:2px solid #000; padding-bottom:6px; margin-bottom:8px;">
+                <strong style="font-size:14px;">${co.name || 'Your Company Name'}</strong><br>
+                <span style="font-size:10px;">${co.address || ''}</span>
+                ${co.phone ? `<br><span style="font-size:10px;">Tel: ${co.phone}</span>` : ''}
+                ${co.pan   ? `<br><span style="font-size:10px;">PAN: ${co.pan}</span>` : ''}
+            </div>
+
+            <div style="text-align:center; font-size:13px; font-weight:bold; margin-bottom:8px;">TAX INVOICE</div>
+
+            <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:6px;">
+                <div><strong>Bill To:</strong> ${inv.customer_name || ''}</div>
+                <div><strong>No:</strong> ${inv.invoice_number || ''}</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; margin-bottom:8px;">
+                <div>PAN: ${inv.customer_pan || ''}</div>
+                <div><strong>Date:</strong> ${inv.date || ''}</div>
+            </div>
+
+            <table style="width:100%; border-collapse:collapse; font-size:10px; border-top:1px solid #000;">
+                <thead>
+                    <tr style="border-bottom:1px solid #000;">
+                        <th style="text-align:left; padding:3px 4px;">Item</th>
+                        <th style="text-align:right; padding:3px 4px;">Qty</th>
+                        <th style="text-align:right; padding:3px 4px;">Rate</th>
+                        <th style="text-align:right; padding:3px 4px;">Amt</th>
+                    </tr>
+                </thead>
+                <tbody style="border-bottom:1px solid #000;">${itemRows}</tbody>
+            </table>
+
+            <div style="text-align:right; margin-top:6px; font-size:10px;">
+                <div>VAT (13%): <strong>${vatAmt.toFixed(2)}</strong></div>
+                <div style="font-size:13px; font-weight:bold; border-top:1px solid #000; margin-top:4px; padding-top:4px;">
+                    Total: Rs. ${totalAmt.toFixed(2)}
+                </div>
+            </div>
+
+            <div style="font-size:9px; margin-top:8px;">${numToWords(totalAmt)}</div>
+            ${inv.remarks ? `<div style="font-size:9px; margin-top:4px;">Remarks: ${inv.remarks}</div>` : ''}
+
+            <div style="text-align:center; font-size:9px; margin-top:20px; border-top:1px dashed #000; padding-top:6px;">
+                Thank you for your business!<br>${co.name || ''}
+            </div>`;
+    }
+
+    // ── Trigger actual window.print() ───────────────────────────────
+    function triggerActualPrint() {
+        const inv = currentPrintInvoiceData || {};
+        const co = getCompanyInfo();
+        const html = buildTemplateHtml(selectedTemplateKey, inv, co);
+
+        // Ensure #print-only-area is a direct child of <body> so parent display:none doesn't hide it
+        let printArea = document.getElementById('print-only-area');
+        if (!printArea) {
+            printArea = document.createElement('div');
+            printArea.id = 'print-only-area';
+            document.body.appendChild(printArea);
+        } else if (printArea.parentElement !== document.body) {
+            document.body.appendChild(printArea);
+        }
+
+        printArea.innerHTML = `<div id="print-paper-content">${html}</div>`;
+
+        // Trigger print dialog
+        setTimeout(() => {
+            window.print();
+        }, 150);
+    }
+</script>

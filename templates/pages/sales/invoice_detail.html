@@ -310,19 +310,8 @@
     }
 
     @media print {
-        body {
-            background: #fff;
-        }
-
-        .breadcrumb,
-        .header-actions {
-            display: none;
-        }
-
-        .panel {
-            box-shadow: none;
-            border: 1px solid #ddd;
-        }
+        body > *:not(#print-only-area) { display: none !important; }
+        #print-only-area { display: block !important; }
     }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -371,7 +360,7 @@
         </div>
         <div class="header-actions">
             <a href="{% url 'invoice' %}" class="btn"><i class="fa-solid fa-arrow-left"></i> Back to List</a>
-            <button class="btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+            <button class="btn" onclick="openInvoicePrintModal()"><i class="fa-solid fa-print"></i> Print</button>
             <button class="btn"><i class="fa-solid fa-download"></i> Download PDF</button>
             <button class="btn"><i class="fa-solid fa-paper-plane"></i> Send</button>
             <button class="btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
@@ -400,8 +389,7 @@
                 </div>
                 <div class="info-row">
                     <span class="info-label">Address</span>
-                    <span class="info-val" style="max-width:60%; text-align:right;">{{
-                        invoice.customer.address|default:"—" }}</span>
+                    <span class="info-val" style="max-width:60%; text-align:right;">{{ invoice.customer.address|default:"—" }}</span>
                 </div>
 
                 <div class="contact-icons">
@@ -451,8 +439,7 @@
                 <div class="info-row">
                     <span class="info-label">VAT Treatment</span>
                     <span class="info-val"><span
-                            style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:4px; font-size:11px;">{{
-                            invoice.vat_treatment|default:"Included" }}</span></span>
+                            style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:4px; font-size:11px;">{{ invoice.vat_treatment|default:"Included" }}</span></span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Notes</span>
@@ -471,13 +458,11 @@
                 </div>
                 <div class="info-row">
                     <span class="info-label">Paid Amount</span>
-                    <span class="info-val" style="color:var(--success);">Rs. {{ invoice.paid_amount|floatformat:2
-                        }}</span>
+                    <span class="info-val" style="color:var(--success);">Rs. {{ invoice.paid_amount|floatformat:2 }}</span>
                 </div>
                 <div class="info-row" style="margin-top:12px; border-top:1px dashed var(--border); padding-top:12px;">
                     <span class="info-label" style="font-weight:600; color:#000;">Due Amount</span>
-                    <span class="info-val" style="color:var(--danger); font-size:16px;">Rs. {{
-                        invoice.balance_due|floatformat:2 }}</span>
+                    <span class="info-val" style="color:var(--danger); font-size:16px;">Rs. {{ invoice.balance_due|floatformat:2 }}</span>
                 </div>
 
                 <div class="progress-wrap">
@@ -612,8 +597,7 @@
                         <tr>
                             <td>{{ r.return_date|date:"Y-m-d" }}</td>
                             <td><a href="#" style="color:var(--primary);">{{ r.return_number }}</a></td>
-                            <td class="num" style="color:var(--danger); font-weight:500;">{{
-                                r.total_amount|floatformat:2 }}</td>
+                            <td class="num" style="color:var(--danger); font-weight:500;">{{ r.total_amount|floatformat:2 }}</td>
                         </tr>
                         {% empty %}
                         <tr>
@@ -643,8 +627,7 @@
                 </div>
                 <div class="info-row" style="margin-top:16px; border-top:1px solid var(--border); padding-top:16px;">
                     <span class="info-label">Credit Limit</span>
-                    <span class="info-val">Rs. {{ invoice.customer.credit_limit|floatformat:2|default:"No Limit"
-                        }}</span>
+                    <span class="info-val">Rs. {{ invoice.customer.credit_limit|floatformat:2|default:"No Limit" }}</span>
                 </div>
             </div>
         </div>
@@ -653,11 +636,53 @@
 
 </div>
 
-<!-- Print specific JS -->
+{% include 'pages/sales/invoice_print_templates.html' %}
+
+<!-- Print Modal Trigger JS -->
 <script>
-    // If URL has ?print=1, automatically trigger print dialog on load
+    const currentDetailInvoiceData = {
+        invoice_number: "{{ invoice.invoice_number|escapejs }}",
+        date: "{{ invoice.date|date:'Y-m-d' }}",
+        due_date: "{{ invoice.due_date|date:'Y-m-d' }}",
+        payment_terms: "{{ invoice.payment_terms|escapejs }}",
+        status: "{{ invoice.status|escapejs }}",
+        ref_no: "{{ invoice.reference_number|default:''|escapejs }}",
+        customer_name: "{{ invoice.customer.name|escapejs }}",
+        customer_address: "{{ invoice.customer.address|default:''|escapejs }}",
+        customer_phone: "{{ invoice.customer.phone|default:''|escapejs }}",
+        customer_pan: "{{ invoice.customer.pan_vat_number|default:''|escapejs }}",
+        subtotal: {{ invoice.subtotal|default:0 }},
+        subtotal_non_taxable: {{ invoice.subtotal_non_taxable|default:0 }},
+        discount_amount: {{ invoice.discount_amount|default:0 }},
+        taxable_amount: {{ invoice.taxable_amount|default:0 }},
+        vat_amount: {{ invoice.vat_amount|default:0 }},
+        round_off: {{ invoice.round_off|default:0 }},
+        total_amount: {{ invoice.total_amount|default:0 }},
+        remarks: "{{ invoice.notes|default:''|escapejs }}",
+        items: [
+            {% for item in items %}
+            {
+                product_name: "{{ item.product.name|escapejs }}",
+                code: "{{ item.product.code|default:''|escapejs }}",
+                hscode: "{{ item.product.hscode|default:''|escapejs }}",
+                unit: "{{ item.product.unit|default:'Pcs'|escapejs }}",
+                quantity: {{ item.quantity|default:1 }},
+                rate: {{ item.unit_price|default:0 }},
+                amount: {{ item.total_price|default:0 }}
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    };
+
+    function openInvoicePrintModal() {
+        openPrintModalWithData(currentDetailInvoiceData);
+    }
+
+    // Auto trigger print modal if URL has ?print=1
     if (window.location.search.includes('print=1')) {
-        window.onload = function () { window.print(); }
+        window.addEventListener('DOMContentLoaded', function () {
+            openInvoicePrintModal();
+        });
     }
 </script>
 {% endblock %}

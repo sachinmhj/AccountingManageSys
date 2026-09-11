@@ -118,6 +118,13 @@ class InvoiceDetailView(View):
         return render(request, self.template_name, context)
 
 
+class PrintingTemplatesView(View):
+    template_name = "pages/configurations/printing_templates.html"
+
+    def get(self, request):
+        return render(request, self.template_name)
+
+
 class CustomerPaymentDetailView(View):
     template_name = "pages/sales/customer_payment_detail.html"
 

@@ -49,9 +49,11 @@ from .views import (
     SalesOrderAddView,
     ConvertQuotationToSOView,
     ConvertSOToInvoiceView,
+    PrintingTemplatesView,
 )
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
+    path("configurations/printing-templates/", PrintingTemplatesView.as_view(), name="printing_templates"),
     path("sales/", SalesView.as_view(), name="sales"),
     path("sales/customers/", CustomersView.as_view(), name="customers"),
     path("api/customers/<int:pk>/", CustomerDetailAPIView.as_view(), name="api_customer_detail"),

@@ -186,7 +186,12 @@
     }
 
     .sh-table tr:hover {
-        background: var(--bg-light);
+        background: #eff6ff;
+    }
+
+    .invoice-row {
+        cursor: pointer;
+        transition: background 0.12s;
     }
 
     .sh-table tr:last-child td {
@@ -481,7 +486,8 @@
                     data-pan="{{ invoice.customer.pan_vat_number|default:''|lower }}"
                     data-date="{{ invoice.date|date:'Y-m-d' }}" data-total="{{ invoice.total_amount|default:0 }}"
                     data-vat="{{ invoice.vat_amount|default:0 }}" data-paid="{{ invoice.paid_amount|default:0 }}"
-                    data-due="{{ invoice.balance_due|default:0 }}">
+                    data-due="{{ invoice.balance_due|default:0 }}"
+                    onclick="window.location.href='{% url 'invoice_detail' invoice.pk %}'">
                     <td class="col-date">
                         <div class="ad-date-text">{{ invoice.date }}</div>
                         <div class="bs-date-badge"
@@ -507,7 +513,7 @@
                         <span class="status-badge status-draft">Draft</span>
                         {% endif %}
                     </td>
-                    <td style="text-align:center;">
+                    <td style="text-align:center;" onclick="event.stopPropagation()">
                         {% if invoice.bill_attachment %}
                         <a href="{{ invoice.bill_attachment.url }}" target="_blank" title="View Attachment"
                             style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; background:#eff6ff; border-radius:6px; color:#2563eb; text-decoration:none; font-size:13px; transition:background 0.15s;">
@@ -517,10 +523,8 @@
                         <span style="color:#94a3b8; font-size:12px;">N/A</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td onclick="event.stopPropagation()">
                         <div class="action-btns">
-                            <a href="{% url 'invoice_detail' invoice.pk %}" class="action-btn" title="View Details"><i
-                                    class="fa-regular fa-eye"></i></a>
                             <a href="{% url 'invoice_detail' invoice.pk %}?print=1" class="action-btn"
                                 title="Print Invoice"><i class="fa-solid fa-print"></i></a>
                         </div>

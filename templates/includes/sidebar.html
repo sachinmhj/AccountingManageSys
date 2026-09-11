@@ -321,6 +321,33 @@
 
         </li>
 
+
+        <!-- ================= Configurations ================= -->
+
+        {% with config_urls="printing_templates" %}
+        <li class="menu-item has-submenu {% if request.resolver_match.url_name in config_urls.split %}open{% endif %}">
+        {% endwith %}
+
+            <div class="menu-link submenu-toggle">
+                <div class="menu-left">
+                    <i class='bx bx-cog'></i>
+                    <span>Configurations</span>
+                </div>
+                <i class='bx bx-chevron-right submenu-arrow'></i>
+            </div>
+
+            <ul class="submenu">
+                <li>
+                    <div class="submenu-item-wrapper">
+                        <a href="{% url 'printing_templates' %}" class="{% if request.resolver_match.url_name == 'printing_templates' %}submenu-active{% endif %}">
+                            Printing Templates
+                        </a>
+                    </div>
+                </li>
+            </ul>
+
+        </li>
+
     </ul>
 
 </aside>
