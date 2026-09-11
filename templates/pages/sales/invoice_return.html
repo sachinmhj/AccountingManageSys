@@ -409,12 +409,25 @@
 
         <!-- Section 3: Summary -->
         <div id="row_summary_actions" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-            <!-- Summary -->
+            <!-- Detailed Return Summary -->
             <div class="panel" id="panel_return_summary" style="grid-column: span 2;">
                 <div class="panel-header"><i class="fa-solid fa-calculator"></i> Return Summary</div>
                 <div class="summary-row"><span>Sub Total</span><span id="lbl_subtotal">0.00</span></div>
+                <div class="summary-row"><span>Discount</span><span id="lbl_discount">0.00</span></div>
+                <div class="summary-row"><span>Non Taxable Amount</span><span id="lbl_non_taxable">0.00</span></div>
+                <div class="summary-row"><span>Taxable Amount</span><span id="lbl_taxable">0.00</span></div>
                 <div class="summary-row"><span>VAT (13%)</span><span id="lbl_vat">0.00</span></div>
-                <div class="summary-row total"><span>Total Return Amount</span><span id="lbl_total">0.00</span></div>
+                <div class="summary-row" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>Round Off</span>
+                    <span><input type="number" step="0.01" name="round_off" id="inp_round_off"
+                            style="width:70px; text-align:right; border:1px solid var(--border); border-radius:4px; padding:2px 6px; font-size:12px;"
+                            value="0.00" oninput="calcReturnTotals()"></span>
+                </div>
+                <div class="summary-row total"
+                    style="margin-top:8px; padding:10px 14px; background:linear-gradient(135deg,#eff6ff,#dbeafe); border-radius:6px; border:1px solid #bfdbfe; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:14px; font-weight:700; color:#1e293b;">Total Return Amount</span>
+                    <span id="lbl_total" style="font-size:16px; font-weight:800; color:#2563eb;">0.00</span>
+                </div>
             </div>
         </div>
 
@@ -590,21 +603,37 @@
         tr.querySelector(".row-amount").value = total.toFixed(2);
         tr.dataset.lineAmt = lineAmt;
         tr.dataset.vatAmt = vatAmt;
+        tr.dataset.taxType = taxType;
 
         calcReturnTotals();
     }
 
     function calcReturnTotals() {
-        let subtotal = 0, vat = 0;
+        let subtotal = 0, nonTaxable = 0, taxable = 0, vat = 0, discount = 0;
         document.querySelectorAll("#returnItemsBody tr").forEach(tr => {
-            subtotal += parseFloat(tr.dataset.lineAmt) || 0;
-            vat += parseFloat(tr.dataset.vatAmt) || 0;
-        });
-        returnGrandTotal = subtotal + vat;
+            const lineAmt = parseFloat(tr.dataset.lineAmt) || 0;
+            const vatAmt = parseFloat(tr.dataset.vatAmt) || 0;
+            const taxType = tr.dataset.taxType || (tr.querySelector(".row-tax") ? tr.querySelector(".row-tax").value : 'Taxable');
 
-        document.getElementById("lbl_subtotal").textContent = subtotal.toFixed(2);
-        document.getElementById("lbl_vat").textContent = vat.toFixed(2);
-        document.getElementById("lbl_total").textContent = returnGrandTotal.toFixed(2);
+            subtotal += lineAmt;
+            if (taxType === 'Non-Tax') {
+                nonTaxable += lineAmt;
+            } else {
+                taxable += lineAmt;
+                vat += vatAmt;
+            }
+        });
+
+        const roundOffInput = document.getElementById("inp_round_off");
+        const roundOff = roundOffInput ? (parseFloat(roundOffInput.value) || 0) : 0;
+        returnGrandTotal = subtotal + vat + roundOff;
+
+        if (document.getElementById("lbl_subtotal")) document.getElementById("lbl_subtotal").textContent = subtotal.toFixed(2);
+        if (document.getElementById("lbl_discount")) document.getElementById("lbl_discount").textContent = discount.toFixed(2);
+        if (document.getElementById("lbl_non_taxable")) document.getElementById("lbl_non_taxable").textContent = nonTaxable.toFixed(2);
+        if (document.getElementById("lbl_taxable")) document.getElementById("lbl_taxable").textContent = taxable.toFixed(2);
+        if (document.getElementById("lbl_vat")) document.getElementById("lbl_vat").textContent = vat.toFixed(2);
+        if (document.getElementById("lbl_total")) document.getElementById("lbl_total").textContent = returnGrandTotal.toFixed(2);
     }
 
     /* ── Customer Invoices Panel ─────────────────────────────────── */

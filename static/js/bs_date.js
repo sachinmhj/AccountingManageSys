@@ -67,17 +67,22 @@
         let vy = initYear, vm = initMonth;
 
         const popup = document.createElement('div');
+        popup.className = 'bs-datepicker-popup';
         popup.style.cssText = [
-            'position:absolute','top:calc(100% + 6px)','left:0',
-            'z-index:99999','width:260px',
-            'background:#fff','border:1px solid #e2e8f0',
-            'border-radius:10px','box-shadow:0 8px 30px rgba(0,0,0,.18)',
+            'position:fixed',
+            'z-index:999999',
+            'width:260px',
+            'background:#fff',
+            'border:1px solid #cbd5e1',
+            'border-radius:10px',
+            'box-shadow:0 12px 36px rgba(0,0,0,.22)',
             'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif',
-            'font-size:13px','overflow:hidden'
+            'font-size:13px',
+            'overflow:hidden'
         ].join(';');
 
         function render() {
-            const dim = (BS_DATA[vy]||[])[vm-1] || 30;
+            const dim = (BS_DATA[vy] || [])[vm - 1] || 30;
             const firstAD = bsToAD(vy, vm, 1);
             const dow = firstAD ? firstAD.getDay() : 0;
 
@@ -92,33 +97,33 @@
 
             popup.innerHTML = `
 <div style="background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;">
-  <button class="bsp" data-dir="-1" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;">&#8249;</button>
-  <div style="font-weight:600;font-size:14px;">${MONTHS[vm-1]} ${vy}</div>
-  <button class="bsp" data-dir="1"  style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;">&#8250;</button>
+  <button type="button" class="bsp" data-dir="-1" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;">&#8249;</button>
+  <div style="font-weight:600;font-size:14px;">${MONTHS[vm - 1]} ${vy}</div>
+  <button type="button" class="bsp" data-dir="1"  style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;">&#8250;</button>
 </div>
 <div style="padding:8px 10px;">
   <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;">
-    ${DAYS.map(d=>`<div style="text-align:center;font-size:11px;color:#94a3b8;font-weight:600;padding:3px 0;">${d}</div>`).join('')}
+    ${DAYS.map(d => `<div style="text-align:center;font-size:11px;color:#94a3b8;font-weight:600;padding:3px 0;">${d}</div>`).join('')}
   </div>
   <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;">${dayCells}</div>
 </div>
 <div style="padding:6px 12px 8px;font-size:11px;color:#94a3b8;border-top:1px solid #f1f5f9;display:flex;justify-content:space-between;">
   <span>BS ${vy}-${pad(vm)}</span>
-  <span>${firstAD ? firstAD.toLocaleDateString('en-US',{month:'short',year:'numeric'}) : ''} (AD)</span>
+  <span>${firstAD ? firstAD.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : ''} (AD)</span>
 </div>`;
 
             popup.querySelectorAll('.bsp').forEach(btn => {
                 btn.addEventListener('click', e => {
                     e.stopPropagation();
                     vm += parseInt(btn.dataset.dir);
-                    if (vm < 1){ vm=12; vy--; }
-                    if (vm > 12){ vm=1; vy++; }
+                    if (vm < 1) { vm = 12; vy--; }
+                    if (vm > 12) { vm = 1; vy++; }
                     render();
                 });
             });
             popup.querySelectorAll('.bsd').forEach(cell => {
-                cell.addEventListener('mouseenter', () => { if (!cell.style.background) cell.style.background='#eff6ff'; });
-                cell.addEventListener('mouseleave', () => { if (cell.style.background==='rgb(239, 246, 255)') cell.style.background=''; });
+                cell.addEventListener('mouseenter', () => { if (!cell.style.background) cell.style.background = '#eff6ff'; });
+                cell.addEventListener('mouseleave', () => { if (cell.style.background === 'rgb(239, 246, 255)') cell.style.background = ''; });
                 cell.addEventListener('click', e => {
                     e.stopPropagation();
                     onSelect(vy, vm, parseInt(cell.dataset.d));
@@ -127,20 +132,18 @@
         }
 
         render();
-        
-        // Prevent clicks inside popup from bubbling up and closing it
+
         popup.addEventListener('click', e => e.stopPropagation());
-        
         return popup;
     }
 
     /* ── Public API ───────────────────────────────────────────────── */
     window.adToBS = adToBS;
     window.bsToAD = bsToAD;
-    window.fmtBS  = fmtBS;
-    window.fmtAD  = fmtAD;
+    window.fmtBS = fmtBS;
+    window.fmtAD = fmtAD;
 
-    window.initBSPicker = function(bsId, onChangeCallback) {
+    window.initBSPicker = function (bsId, onChangeCallback) {
         const bsInput = document.getElementById(bsId);
         if (!bsInput) return;
 
@@ -152,23 +155,23 @@
 
         let picker = null;
 
-        function closePicker() { if (picker){ picker.remove(); picker=null; } }
+        function closePicker() { if (picker) { picker.remove(); picker = null; } }
 
-        bsInput.addEventListener('click', function(e) {
-            e.stopPropagation();
+        function openPicker(e) {
+            if (e) e.stopPropagation();
             if (picker) { closePicker(); return; }
 
             let selBS = null;
             if (bsInput.value) {
                 const p = bsInput.value.split('-').map(Number);
                 if (p.length === 3 && !isNaN(p[0])) {
-                    selBS = {year: p[0], month: p[1], day: p[2]};
+                    selBS = { year: p[0], month: p[1], day: p[2] };
                 }
             }
             let sbs = selBS || adToBS(new Date());
 
-            picker = buildPopup(sbs.year, sbs.month, sbs.day, function(y, m, d) {
-                bsInput.value = fmtBS({year:y, month:m, day:d});
+            picker = buildPopup(sbs.year, sbs.month, sbs.day, function (y, m, d) {
+                bsInput.value = fmtBS({ year: y, month: m, day: d });
                 if (typeof onChangeCallback === 'function') {
                     onChangeCallback(bsInput.value);
                 } else {
@@ -177,71 +180,106 @@
                 closePicker();
             });
 
-            bsInput.parentElement.style.position = 'relative';
-            bsInput.parentElement.appendChild(picker);
-        });
+            const rect = bsInput.getBoundingClientRect();
+            picker.style.position = 'fixed';
+            picker.style.top = (rect.bottom + 4) + 'px';
+            picker.style.left = rect.left + 'px';
+            picker.style.zIndex = '999999';
+
+            document.body.appendChild(picker);
+        }
+
+        bsInput.addEventListener('click', openPicker);
+
+        const parentRow = bsInput.closest('.date-row') || bsInput.parentElement;
+        if (parentRow) {
+            parentRow.addEventListener('click', openPicker);
+            const labelSpan = parentRow.querySelector('.date-label, .bs-label');
+            if (labelSpan) labelSpan.style.pointerEvents = 'none';
+        }
 
         document.addEventListener('click', closePicker, false);
     };
 
-    window.initDualDate = function(adId, bsId) {
+    window.initDualDate = function (adId, bsId) {
         const adInput = document.getElementById(adId);
         const bsInput = document.getElementById(bsId);
         if (!adInput || !bsInput) return;
 
-        // ── Style the BS field as a clickable button ──────────────
         bsInput.readOnly = true;
         bsInput.style.cssText += ';cursor:pointer;background:#fffbf0;border-color:#f59e0b;';
-        bsInput.setAttribute('placeholder', '📅 Click to pick BS date');
+        if (!bsInput.getAttribute('placeholder')) {
+            bsInput.setAttribute('placeholder', '📅 Click to pick BS date');
+        }
 
+        const parentRow = bsInput.closest('.date-row') || bsInput.parentElement;
 
-        // ── Picker state ──────────────────────────────────────────
         let picker = null;
-        let selBS  = null;
+        let selBS = null;
 
         if (adInput.value) {
             const p = adInput.value.split('-').map(Number);
-            selBS = adToBS(new Date(p[0], p[1]-1, p[2]));
-            bsInput.value = fmtBS(selBS);
+            if (p.length === 3 && !isNaN(p[0]) && !isNaN(p[1]) && !isNaN(p[2])) {
+                selBS = adToBS(new Date(p[0], p[1] - 1, p[2]));
+                bsInput.value = fmtBS(selBS);
+            }
         }
 
-        function closePicker() { if (picker){ picker.remove(); picker=null; } }
+        function closePicker() { if (picker) { picker.remove(); picker = null; } }
 
-        bsInput.addEventListener('click', function(e) {
-            e.stopPropagation();
+        function openPicker(e) {
+            if (e) e.stopPropagation();
             if (picker) { closePicker(); return; }
 
-            // Use current AD value as starting point
             let sbs = selBS || adToBS(new Date());
             if (adInput.value) {
                 const p = adInput.value.split('-').map(Number);
-                sbs = adToBS(new Date(p[0], p[1]-1, p[2]));
+                if (p.length === 3 && !isNaN(p[0]) && !isNaN(p[1]) && !isNaN(p[2])) {
+                    sbs = adToBS(new Date(p[0], p[1] - 1, p[2]));
+                }
             }
 
-            picker = buildPopup(sbs.year, sbs.month, sbs.day, function(y, m, d) {
-                selBS = {year:y, month:m, day:d};
+            picker = buildPopup(sbs.year, sbs.month, sbs.day, function (y, m, d) {
+                selBS = { year: y, month: m, day: d };
                 bsInput.value = fmtBS(selBS);
                 const ad = bsToAD(y, m, d);
                 if (ad) {
                     adInput.value = fmtAD(ad);
                     adInput.dispatchEvent(new Event('change'));
+                    adInput.dispatchEvent(new Event('input'));
                 }
                 closePicker();
             });
 
-            bsInput.parentElement.style.position = 'relative';
-            bsInput.parentElement.appendChild(picker);
-        });
+            const rect = bsInput.getBoundingClientRect();
+            picker.style.position = 'fixed';
+            picker.style.top = (rect.bottom + 4) + 'px';
+            picker.style.left = rect.left + 'px';
+            picker.style.zIndex = '999999';
 
-        // ── AD → BS sync ─────────────────────────────────────────
-        adInput.addEventListener('change', function() {
-            if (!this.value) { bsInput.value=''; selBS=null; return; }
-            const p = this.value.split('-').map(Number);
-            selBS = adToBS(new Date(p[0], p[1]-1, p[2]));
-            bsInput.value = fmtBS(selBS);
-        });
+            document.body.appendChild(picker);
+        }
 
-        // ── Close on outside click ────────────────────────────────
+        bsInput.addEventListener('click', openPicker);
+
+        if (parentRow) {
+            parentRow.addEventListener('click', openPicker);
+            const labelSpan = parentRow.querySelector('.date-label, .bs-label');
+            if (labelSpan) labelSpan.style.pointerEvents = 'none';
+        }
+
+        function syncAdToBs() {
+            if (!adInput.value) { bsInput.value = ''; selBS = null; return; }
+            const p = adInput.value.split('-').map(Number);
+            if (p.length === 3 && !isNaN(p[0]) && !isNaN(p[1]) && !isNaN(p[2])) {
+                selBS = adToBS(new Date(p[0], p[1] - 1, p[2]));
+                bsInput.value = fmtBS(selBS);
+            }
+        }
+
+        adInput.addEventListener('change', syncAdToBs);
+        adInput.addEventListener('input', syncAdToBs);
+
         document.addEventListener('click', closePicker, false);
     };
 })();

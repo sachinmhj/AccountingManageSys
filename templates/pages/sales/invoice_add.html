@@ -876,12 +876,12 @@
                                 <label>Invoice Date <span>*</span></label>
                                 <div class="dual-date-stack">
                                     <div class="date-row">
-                                        <span class="date-label">AD</span>
+                                        <span class="date-label" style="pointer-events:none;">AD</span>
                                         <input type="date" class="form-control" name="invoice_date" id="invoice_date_ad"
                                             value="{{ today|date:'Y-m-d' }}" required>
                                     </div>
-                                    <div class="date-row" style="position:relative;">
-                                        <span class="date-label bs-label">BS</span>
+                                    <div class="date-row" style="position:relative; cursor:pointer;" onclick="if(typeof initDualDate==='function') initDualDate('invoice_date_ad','invoice_date_bs');">
+                                        <span class="date-label bs-label" style="pointer-events:none;">BS</span>
                                         <input type="text" class="form-control" id="invoice_date_bs"
                                             placeholder="Pick BS date">
                                     </div>
@@ -1046,11 +1046,11 @@
                                 <label>Due Date</label>
                                 <div class="dual-date-stack">
                                     <div class="date-row">
-                                        <span class="date-label">AD</span>
+                                        <span class="date-label" style="pointer-events:none;">AD</span>
                                         <input type="date" class="form-control" name="due_date" id="due_date_ad">
                                     </div>
-                                    <div class="date-row" style="position:relative;">
-                                        <span class="date-label bs-label">BS</span>
+                                    <div class="date-row" style="position:relative; cursor:pointer;" onclick="if(typeof initDualDate==='function') initDualDate('due_date_ad','due_date_bs');">
+                                        <span class="date-label bs-label" style="pointer-events:none;">BS</span>
                                         <input type="text" class="form-control" id="due_date_bs"
                                             placeholder="Pick BS date">
                                     </div>
