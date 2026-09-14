@@ -103,7 +103,58 @@ class Product(models.Model):
 
 
 # ============================================================
-# 3. Sales — Invoice
+# 3. Projects (Customer Job / Site Tracking)
+# ============================================================
+
+class Project(models.Model):
+    STATUS_CHOICES = (
+        ('Active', 'Active'),
+        ('Completed', 'Completed'),
+        ('On Hold', 'On Hold'),
+        ('Cancelled', 'Cancelled'),
+    )
+
+    customer    = models.ForeignKey(
+        'Contact', on_delete=models.CASCADE,
+        related_name='projects',
+        limit_choices_to={'contact_type__in': ['Customer', 'Both']}
+    )
+    name        = models.CharField(max_length=255)
+    code        = models.CharField(max_length=50, blank=True, null=True, help_text="Short identifier e.g. PRJ-001")
+    description = models.TextField(blank=True, null=True)
+    location    = models.CharField(max_length=255, blank=True, null=True)
+    start_date  = models.DateField(blank=True, null=True)
+    end_date    = models.DateField(blank=True, null=True)
+    status      = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Active')
+    created_at  = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.name} ({self.customer.name})"
+
+    @property
+    def total_invoiced(self):
+        from django.db.models import Sum
+        return self.invoices.aggregate(t=Sum('total_amount'))['t'] or 0
+
+    @property
+    def total_paid(self):
+        from django.db.models import Sum
+        return self.invoices.aggregate(t=Sum('paid_amount'))['t'] or 0
+
+    @property
+    def total_due(self):
+        return self.total_invoiced - self.total_paid
+
+    @property
+    def invoice_count(self):
+        return self.invoices.count()
+
+
+# ============================================================
+# 4. Sales — Invoice
 # ============================================================
 
 def generate_invoice_number():
@@ -191,6 +242,12 @@ class Invoice(models.Model):
     # Linked Sales Documents
     quotation = models.ForeignKey('Quotation', on_delete=models.SET_NULL, null=True, blank=True, related_name='invoices')
     sales_order = models.ForeignKey('SalesOrder', on_delete=models.SET_NULL, null=True, blank=True, related_name='invoices')
+
+    # Project Tracking (M2M — one invoice can belong to multiple projects)
+    projects = models.ManyToManyField(
+        'Project', blank=True, related_name='invoices',
+        help_text="Tag this invoice to one or more customer projects."
+    )
 
     # Notes & Misc
     terms_conditions = models.TextField(blank=True, null=True, default="Thank you for your business.")

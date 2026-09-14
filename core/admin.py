@@ -1,17 +1,28 @@
 from django.contrib import admin
 from .models import (
-    Contact, ProductCategory, Product, 
-    Invoice, InvoiceItem, InvoiceAllocation, 
+    Contact, ProductCategory, Product,
+    Project,
+    Invoice, InvoiceItem, InvoiceAllocation,
     CustomerPayment, PaymentAllocation,
     SalesReturn, SalesReturnItem, UserProfile,
     PurchaseBill, PurchaseBillItem, SupplierPayment,
     ExpenseCategory, Expense
 )
 
-admin.site.register(Contact)
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    search_fields = ('name', 'email', 'phone')
+    list_display  = ('name', 'email', 'phone', 'contact_type')
 admin.site.register(ProductCategory)
 admin.site.register(Product)
 admin.site.register(UserProfile)
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display  = ('name', 'code', 'customer', 'status', 'start_date', 'end_date', 'created_at')
+    list_filter   = ('status', 'customer')
+    search_fields = ('name', 'code', 'customer__name', 'location')
+    autocomplete_fields = ['customer']
 
 class InvoiceItemInline(admin.TabularInline):
     model = InvoiceItem

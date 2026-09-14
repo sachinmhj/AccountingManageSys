@@ -146,11 +146,8 @@
 
     .cust-combo-menu {
         display: none;
-        position: absolute;
-        top: calc(100% + 4px);
-        left: 0;
-        right: 0;
-        z-index: 1200;
+        position: fixed;
+        z-index: 99999;
         background: #ffffff;
         border: 1px solid #cbd5e1;
         border-radius: 10px;
@@ -824,15 +821,6 @@
                                                     style="border:none; background:transparent; outline:none; width:100%; font-size:12.5px; color:#1e293b;">
                                             </div>
 
-                                            <!-- "+ Add New Customer" Action Button -->
-                                            <div class="cust-combo-add-btn" onclick="triggerAddNewCustFromDropdown()">
-                                                <div
-                                                    style="width:22px; height:22px; background:linear-gradient(135deg,#2563eb,#1d4ed8); color:white; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;">
-                                                    <i class="fa-solid fa-plus"></i>
-                                                </div>
-                                                <span>Add New Customer</span>
-                                            </div>
-
                                             <!-- Scrollable Customer Options List -->
                                             <div id="cust_combo_list" style="max-height:220px; overflow-y:auto;">
                                                 <!-- Dynamically Populated -->
@@ -844,6 +832,16 @@
                                                 <i class="fa-solid fa-user-slash"
                                                     style="font-size:18px; margin-bottom:4px; display:block; opacity:0.5;"></i>
                                                 No matching customers found.
+                                            </div>
+
+                                            <!-- "+ Add New Customer" Action Button at bottom -->
+                                            <div onclick="triggerAddNewCustFromDropdown()"
+                                                style="padding:9px 13px; cursor:pointer; display:flex; align-items:center; gap:9px; border-top:1px solid #e2e8f0; background:#f8fafc; font-size:12.5px; font-weight:600; color:#2563eb; border-radius:0 0 10px 10px; transition:background .15s;"
+                                                onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                                                <div style="width:24px;height:24px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                                    <i class="fa-solid fa-plus" style="color:#fff; font-size:11px;"></i>
+                                                </div>
+                                                <span>Add New Customer</span>
                                             </div>
                                         </div>
                                     </div>
@@ -1136,6 +1134,67 @@
                                 </div>
                             </div>
                             <!-- End Bill Attachment -->
+
+                            <!-- ── Project Field (beside Bill Attachment) ── -->
+                            <div style="position:relative;">
+                                <label style="display:flex; align-items:center; gap:6px; margin-bottom:5px;">
+                                    <i class="fa-solid fa-diagram-project" style="color:#7c3aed; font-size:13px;"></i>
+                                    Project(s)
+                                    <span style="font-size:11px; font-weight:400; color:#94a3b8;">(Optional)</span>
+                                    <a href="{% url 'projects' %}" target="_blank" title="Manage Projects"
+                                        style="margin-left:auto; font-size:11px; color:#7c3aed; text-decoration:none; display:flex; align-items:center; gap:3px; font-weight:500;">
+                                        <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px;"></i>
+                                    </a>
+                                </label>
+
+                                <!-- Trigger box (shows tags + opens dropdown) -->
+                                <div id="projectTrigger"
+                                    onclick="toggleProjectDropdown()"
+                                    style="min-height:48px; border:2px dashed #c4b5fd; border-radius:8px; background:#faf5ff; padding:5px 34px 5px 10px; display:flex; flex-wrap:wrap; gap:5px; align-items:center; cursor:pointer; position:relative; transition:border-color .2s; box-sizing:border-box;">
+                                    <span id="projectPlaceholder" style="color:#94a3b8; font-size:12px; pointer-events:none; user-select:none;">Select customer first...</span>
+                                    <!-- Chevron icon on right -->
+                                    <span style="position:absolute; right:9px; top:50%; transform:translateY(-50%); color:#7c3aed; font-size:13px; pointer-events:none;">
+                                        <i class="fa-solid fa-chevron-down" id="projectChevron" style="transition:transform .2s;"></i>
+                                    </span>
+                                </div>
+
+                                <!-- Hidden inputs -->
+                                <div id="projectHiddenInputs"></div>
+
+                                <!-- Viewport-positioned dropdown (never pushes scroll containers) -->
+                                <div id="projectComboDropdown"
+                                    style="display:none; position:fixed; background:#fff; border:1px solid #c4b5fd; border-radius:10px; box-shadow:0 8px 28px rgba(124,58,237,.2); z-index:99999; overflow:hidden;">
+
+                                    <!-- Search -->
+                                    <div style="padding:8px 8px 4px;">
+                                        <div style="display:flex; align-items:center; border:1.5px solid #a78bfa; border-radius:7px; background:#f9f7ff; padding:0 8px; gap:6px;">
+                                            <i class="fa-solid fa-magnifying-glass" style="color:#a78bfa; font-size:12px; flex-shrink:0;"></i>
+                                            <input type="text" id="projectSearchInput"
+                                                placeholder="Search projects..."
+                                                oninput="filterProjects(this.value)"
+                                                autocomplete="off"
+                                                style="flex:1; border:none; background:transparent; padding:6px 0; font-size:12.5px; color:#334155; outline:none;">
+                                        </div>
+                                    </div>
+
+                                    <!-- Project list (scrollable, fixed height) -->
+                                    <div id="projectDropdown"
+                                        style="max-height:180px; overflow-y:auto; border-top:1px solid #f3e8ff;">
+                                    </div>
+
+                                    <!-- Add New Project at bottom -->
+                                    <div onclick="openNewProjectModal()"
+                                        style="padding:9px 13px; cursor:pointer; display:flex; align-items:center; gap:9px; border-top:1px solid #ede9fe; background:#f5f3ff; font-size:12.5px; font-weight:600; color:#7c3aed; border-radius:0 0 10px 10px; transition:background .15s;"
+                                        onmouseover="this.style.background='#ede9fe'" onmouseout="this.style.background='#f5f3ff'">
+                                        <div style="width:24px;height:24px;background:linear-gradient(135deg,#7c3aed,#6d28d9);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                            <i class="fa-solid fa-plus" style="color:#fff; font-size:11px;"></i>
+                                        </div>
+                                        Add New Project
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- ── End Project Field ── -->
+
                         </div>
                     </div>
                 </div>
@@ -2031,6 +2090,9 @@
                 pendingInvoices = data.invoices || [];
                 renderAllocTable();
             });
+
+        // Load projects for the selected customer
+        loadProjectsForCustomer(customerId);
     }
 
     // =============================================
@@ -2093,6 +2155,22 @@
         container.innerHTML = html;
     }
 
+    function updateCustDropdownPosition() {
+        const btn = document.getElementById('cust_combo_btn');
+        const menu = document.getElementById('cust_combo_menu');
+        if (!btn || !menu || menu.style.display !== 'block') return;
+        const rect = btn.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) {
+            closeCustDropdown();
+            return;
+        }
+        menu.style.position = 'fixed';
+        menu.style.top = (rect.bottom + 4) + 'px';
+        menu.style.left = rect.left + 'px';
+        menu.style.width = rect.width + 'px';
+        menu.style.zIndex = '99999';
+    }
+
     function toggleCustDropdown(e) {
         if (e) e.stopPropagation();
         const menu = document.getElementById('cust_combo_menu');
@@ -2106,6 +2184,7 @@
             closeCustDropdown();
         } else {
             menu.style.display = 'block';
+            updateCustDropdownPosition();
             if (btn) btn.classList.add('open');
             if (arrow) arrow.style.transform = 'rotate(180deg)';
             const input = document.getElementById('cust_search_input');
@@ -2167,9 +2246,13 @@
         openAddCustomerModal();
     }
 
+    window.addEventListener('scroll', updateCustDropdownPosition, true);
+    window.addEventListener('resize', updateCustDropdownPosition);
+
     document.addEventListener('click', function (e) {
-        const wrapper = document.querySelector('.cust-combo-wrapper');
-        if (wrapper && !wrapper.contains(e.target)) {
+        const btn = document.getElementById('cust_combo_btn');
+        const menu = document.getElementById('cust_combo_menu');
+        if (btn && menu && !btn.contains(e.target) && !menu.contains(e.target)) {
             closeCustDropdown();
         }
         const stWrapper = document.querySelector('.st-combo-wrapper');
@@ -3041,5 +3124,342 @@
             termsInput.value = quill.root.innerHTML;
         });
     }
+</script>
+
+<!-- ════════════════════════════════════════════════════════
+     NEW PROJECT QUICK-ADD MODAL
+════════════════════════════════════════════════════════ -->
+<div id="newProjectModal"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000; align-items:center; justify-content:center;">
+    <div style="background:#fff; width:480px; border-radius:10px; overflow:hidden; box-shadow:0 16px 40px rgba(0,0,0,.15);">
+        <!-- Header -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #e2e8f0; background:linear-gradient(135deg,#f5f3ff,#ede9fe);">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:34px; height:34px; background:linear-gradient(135deg,#7c3aed,#6d28d9); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:15px;">
+                    <i class="fa-solid fa-diagram-project"></i>
+                </div>
+                <div>
+                    <div style="font-weight:700; font-size:14px; color:#1e293b;">New Project</div>
+                    <div style="font-size:11px; color:#7c3aed;" id="npModal_customerLabel">—</div>
+                </div>
+            </div>
+            <button type="button" onclick="closeNewProjectModal()"
+                style="background:transparent; border:none; cursor:pointer; font-size:18px; color:#64748b;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <!-- Body -->
+        <div style="padding:20px; display:flex; flex-direction:column; gap:14px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <div style="grid-column:1/-1;">
+                    <label style="font-size:12px; font-weight:600; color:#374151; margin-bottom:4px; display:block;">Project Name <span style="color:#dc2626;">*</span></label>
+                    <input type="text" id="npModal_name" placeholder="e.g. Building A – Kathmandu"
+                        style="width:100%; padding:7px 11px; border:1.5px solid #cbd5e1; border-radius:7px; font-size:13px; box-sizing:border-box; outline:none;"
+                        onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#cbd5e1'">
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:600; color:#374151; margin-bottom:4px; display:block;">Code <span style="font-weight:400; color:#94a3b8;">(optional)</span></label>
+                    <input type="text" id="npModal_code" placeholder="e.g. PRJ-001"
+                        style="width:100%; padding:7px 11px; border:1.5px solid #cbd5e1; border-radius:7px; font-size:13px; box-sizing:border-box; outline:none;"
+                        onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#cbd5e1'">
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:600; color:#374151; margin-bottom:4px; display:block;">Location <span style="font-weight:400; color:#94a3b8;">(optional)</span></label>
+                    <input type="text" id="npModal_location" placeholder="e.g. Kathmandu"
+                        style="width:100%; padding:7px 11px; border:1.5px solid #cbd5e1; border-radius:7px; font-size:13px; box-sizing:border-box; outline:none;"
+                        onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#cbd5e1'">
+                </div>
+                <div style="grid-column:1/-1;">
+                    <label style="font-size:12px; font-weight:600; color:#374151; margin-bottom:4px; display:block;">Description <span style="font-weight:400; color:#94a3b8;">(optional)</span></label>
+                    <textarea id="npModal_desc" rows="2" placeholder="Brief description..."
+                        style="width:100%; padding:7px 11px; border:1.5px solid #cbd5e1; border-radius:7px; font-size:12px; box-sizing:border-box; outline:none; resize:vertical;"
+                        onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#cbd5e1'"></textarea>
+                </div>
+            </div>
+            <div id="npModal_error" style="display:none; background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:6px; padding:8px 12px; font-size:12px;"></div>
+        </div>
+        <!-- Footer -->
+        <div style="padding:14px 20px; border-top:1px solid #e2e8f0; background:#f8fafc; display:flex; justify-content:flex-end; gap:10px;">
+            <button type="button" onclick="closeNewProjectModal()"
+                style="padding:7px 16px; border:1px solid #cbd5e1; border-radius:7px; background:#fff; font-size:13px; cursor:pointer; color:#475569;">Cancel</button>
+            <button type="button" id="npModal_saveBtn" onclick="saveNewProject()"
+                style="padding:7px 18px; border:none; border-radius:7px; background:linear-gradient(135deg,#7c3aed,#6d28d9); color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Create Project</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// PROJECT COMBOBOX LOGIC (Matches Customer Combobox pattern)
+// ══════════════════════════════════════════════════════════════
+let _allProjects   = [];   // projects for current customer
+let _selectedProjs = [];   // [{id, name, code}]
+let _currentCustId = null;
+
+function updateProjectDropdownPosition() {
+    const trigger = document.getElementById('projectTrigger');
+    const dd = document.getElementById('projectComboDropdown');
+    if (!trigger || !dd || dd.style.display !== 'block') return;
+    const rect = trigger.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > window.innerHeight) {
+        closeProjectDropdown();
+        return;
+    }
+    dd.style.position = 'fixed';
+    dd.style.top = (rect.bottom + 3) + 'px';
+    dd.style.left = rect.left + 'px';
+    dd.style.width = rect.width + 'px';
+}
+
+function toggleProjectDropdown() {
+    if (!_currentCustId) {
+        showProjectToast('Please select a customer first to view or add projects.');
+        return;
+    }
+    const dd = document.getElementById('projectComboDropdown');
+    const chev = document.getElementById('projectChevron');
+    if (!dd) return;
+
+    const isOpen = dd.style.display === 'block';
+    if (isOpen) {
+        closeProjectDropdown();
+    } else {
+        dd.style.display = 'block';
+        updateProjectDropdownPosition();
+        if (chev) chev.style.transform = 'rotate(180deg)';
+        const inp = document.getElementById('projectSearchInput');
+        if (inp) {
+            inp.value = '';
+            inp.focus();
+        }
+        filterProjects('');
+    }
+}
+
+function closeProjectDropdown() {
+    const dd = document.getElementById('projectComboDropdown');
+    const chev = document.getElementById('projectChevron');
+    if (dd) dd.style.display = 'none';
+    if (chev) chev.style.transform = 'rotate(0deg)';
+}
+
+function showProjectToast(msg) {
+    let t = document.getElementById('_projToast');
+    if (!t) {
+        t = document.createElement('div');
+        t.id = '_projToast';
+        t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:11px 22px;border-radius:9px;font-size:13px;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.3);pointer-events:none;transition:opacity .3s;white-space:nowrap;';
+        document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+
+function loadProjectsForCustomer(customerId) {
+    _currentCustId = customerId;
+    _allProjects   = [];
+    _selectedProjs = [];
+    renderProjectTags();
+    closeProjectDropdown();
+
+    const ph = document.getElementById('projectPlaceholder');
+    if (!customerId) {
+        if (ph) ph.textContent = 'Select customer first...';
+        return;
+    }
+    if (ph) ph.textContent = 'Loading projects...';
+
+    fetch(`/api/projects/${customerId}/`)
+        .then(r => r.json())
+        .then(data => {
+            _allProjects = data;
+            updateProjectPlaceholder();
+        })
+        .catch(() => {
+            if (ph) ph.textContent = 'Select projects...';
+        });
+}
+
+function updateProjectPlaceholder() {
+    const ph = document.getElementById('projectPlaceholder');
+    if (!ph) return;
+    if (_selectedProjs.length === 0) {
+        ph.style.display = 'inline';
+        ph.textContent = _currentCustId 
+            ? (_allProjects.length === 0 ? 'No projects yet — click to add one' : 'Select projects...') 
+            : 'Select customer first...';
+    } else {
+        ph.style.display = 'none';
+    }
+}
+
+function renderProjectTags() {
+    const box    = document.getElementById('projectTrigger');
+    const hidden = document.getElementById('projectHiddenInputs');
+    if (!box || !hidden) return;
+
+    box.querySelectorAll('.proj-tag').forEach(t => t.remove());
+    hidden.innerHTML = '';
+
+    const ph = document.getElementById('projectPlaceholder');
+
+    _selectedProjs.forEach(p => {
+        const pill = document.createElement('span');
+        pill.className = 'proj-tag';
+        pill.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:#f5f3ff;color:#6d28d9;border:1px solid #ddd6fe;border-radius:5px;padding:3px 8px;font-size:11.5px;font-weight:600;z-index:2;';
+        pill.innerHTML = `<i class="fa-solid fa-diagram-project" style="font-size:10px;"></i>${p.name}${p.code ? ' <span style="opacity:.6;font-weight:400;">('+p.code+')</span>' : ''}<button type="button" onclick="removeProject(${p.id}, event)" style="background:none;border:none;cursor:pointer;color:#7c3aed;font-size:12px;padding:0 0 0 2px;line-height:1;">&times;</button>`;
+        box.insertBefore(pill, ph);
+
+        const inp = document.createElement('input');
+        inp.type  = 'hidden';
+        inp.name  = 'project_ids[]';
+        inp.value = p.id;
+        hidden.appendChild(inp);
+    });
+
+    updateProjectPlaceholder();
+}
+
+function filterProjects(query) {
+    const dd = document.getElementById('projectDropdown');
+    if (!dd) return;
+    const q  = (query || '').toLowerCase();
+    const available = _allProjects.filter(p =>
+        !_selectedProjs.find(s => s.id === p.id) &&
+        (p.name.toLowerCase().includes(q) || (p.code || '').toLowerCase().includes(q) || (p.location || '').toLowerCase().includes(q))
+    );
+
+    if (available.length === 0) {
+        dd.innerHTML = `<div style="padding:12px; text-align:center; color:#94a3b8; font-size:12px;"><i class="fa-solid fa-inbox" style="display:block;font-size:18px;margin-bottom:4px;opacity:.4;"></i>No projects found</div>`;
+    } else {
+        dd.innerHTML = available.map(p => `
+            <div onclick="addProject(${p.id},'${p.name.replace(/'/g,"\\'")  }','${(p.code||'').replace(/'/g,"\\'")}')"
+                style="padding:9px 13px; cursor:pointer; display:flex; align-items:center; gap:10px; border-bottom:1px solid #f8fafc; font-size:12.5px; color:#1e293b;"
+                onmouseover="this.style.background='#f5f3ff'" onmouseout="this.style.background='#fff'">
+                <div style="width:26px;height:26px;background:#ede9fe;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#7c3aed;flex-shrink:0;">
+                    <i class="fa-solid fa-diagram-project"></i>
+                </div>
+                <div>
+                    <div style="font-weight:600;">${p.name}${p.code ? ' <span style="font-weight:400;color:#94a3b8;font-size:11px;">('+p.code+')</span>' : ''}</div>
+                    ${p.location ? '<div style="font-size:11px;color:#64748b;"><i class="fa-solid fa-location-dot" style="font-size:10px;"></i> '+p.location+'</div>' : ''}
+                </div>
+                <span style="margin-left:auto;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600;background:${p.status==='Active'?'#d1fae5':'#f1f5f9'};color:${p.status==='Active'?'#065f46':'#475569'};">${p.status}</span>
+            </div>
+        `).join('');
+    }
+}
+
+function addProject(id, name, code) {
+    if (_selectedProjs.find(p => p.id === id)) return;
+    _selectedProjs.push({ id, name, code });
+    renderProjectTags();
+    closeProjectDropdown();
+}
+
+function removeProject(id, ev) {
+    if (ev) ev.stopPropagation();
+    _selectedProjs = _selectedProjs.filter(p => p.id !== id);
+    renderProjectTags();
+}
+
+// Close project dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    const trigger = document.getElementById('projectTrigger');
+    const combo   = document.getElementById('projectComboDropdown');
+    if (!trigger || !combo) return;
+    if (!trigger.contains(e.target) && !combo.contains(e.target)) {
+        closeProjectDropdown();
+    }
+});
+
+// Update project dropdown position dynamically on scroll or resize
+window.addEventListener('scroll', updateProjectDropdownPosition, true);
+window.addEventListener('resize', updateProjectDropdownPosition);
+
+// ══════════════════════════════════════════════════════════════
+// NEW PROJECT MODAL
+// ══════════════════════════════════════════════════════════════
+function openNewProjectModal() {
+    closeProjectDropdown();
+    const custId = document.getElementById('customer_select').value;
+    if (!custId) {
+        showProjectToast('Please select a customer first before creating a project.');
+        return;
+    }
+    const custLabel = document.getElementById('cust_combo_label').textContent || 'Selected Customer';
+    document.getElementById('npModal_customerLabel').textContent = custLabel;
+    document.getElementById('npModal_name').value     = '';
+    document.getElementById('npModal_code').value     = '';
+    document.getElementById('npModal_location').value = '';
+    document.getElementById('npModal_desc').value     = '';
+    document.getElementById('npModal_error').style.display = 'none';
+    // Always reset the save button in case it got stuck from a previous save
+    const saveBtn = document.getElementById('npModal_saveBtn');
+    if (saveBtn) { saveBtn.textContent = 'Create Project'; saveBtn.disabled = false; }
+    document.getElementById('newProjectModal').style.display = 'flex';
+    setTimeout(() => document.getElementById('npModal_name').focus(), 100);
+}
+
+function closeNewProjectModal() {
+    document.getElementById('newProjectModal').style.display = 'none';
+}
+
+function getCookie(name) {
+    let val = null;
+    document.cookie.split(';').forEach(c => {
+        const [k,v] = c.trim().split('=');
+        if (k === name) val = decodeURIComponent(v);
+    });
+    return val;
+}
+
+function saveNewProject() {
+    const name = document.getElementById('npModal_name').value.trim();
+    const custId = document.getElementById('customer_select').value;
+    const errEl  = document.getElementById('npModal_error');
+    if (!name) {
+        errEl.textContent = 'Project name is required.';
+        errEl.style.display = 'block';
+        return;
+    }
+    const btn = document.getElementById('npModal_saveBtn');
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+
+    fetch('/api/projects/create/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+        body: JSON.stringify({
+            customer_id:  custId,
+            name:         name,
+            code:         document.getElementById('npModal_code').value.trim(),
+            location:     document.getElementById('npModal_location').value.trim(),
+            description:  document.getElementById('npModal_desc').value.trim(),
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) {
+            errEl.textContent = data.error;
+            errEl.style.display = 'block';
+            btn.textContent = 'Create Project';
+            btn.disabled = false;
+            return;
+        }
+        // Add to local list + auto-select
+        _allProjects.push(data);
+        addProject(data.id, data.name, data.code || '');
+        // Reset button before closing so it's clean next time
+        btn.textContent = 'Create Project';
+        btn.disabled = false;
+        closeNewProjectModal();
+    })
+    .catch(() => {
+        errEl.textContent = 'Something went wrong. Please try again.';
+        errEl.style.display = 'block';
+        btn.textContent = 'Create Project';
+        btn.disabled = false;
+    });
+}
 </script>
 {% endblock %}

@@ -9,7 +9,7 @@ from decimal import Decimal
 from django.http import JsonResponse
 from django.utils import timezone
 from .models import (
-    Product, ProductCategory, Contact, Invoice, InvoiceItem,
+    Product, ProductCategory, Contact, Project, Invoice, InvoiceItem,
     InvoiceAllocation, PaymentAllocation, CustomerPayment,
     PurchaseBill, PurchaseBillItem, Expense, ExpenseCategory,
     SupplierPayment, SalesReturn, SalesReturnItem, UserProfile,
@@ -307,6 +307,96 @@ class SalesReturnView(View):
         return redirect('invoice_return')
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# PROJECT VIEWS
+# ─────────────────────────────────────────────────────────────────────────────
+
+class ProjectsJsonView(View):
+    """GET /api/projects/<customer_id>/ → JSON list of that customer's projects."""
+    def get(self, request, customer_id):
+        projects = Project.objects.filter(
+            customer_id=customer_id
+        ).values('id', 'name', 'code', 'status', 'location')
+        return JsonResponse(list(projects), safe=False)
+
+
+class ProjectCreateAPIView(View):
+    """POST /api/projects/create/ → create a new project, return JSON."""
+    def post(self, request):
+        import json as _json
+        try:
+            data = _json.loads(request.body)
+        except Exception:
+            data = request.POST
+        customer_id = data.get('customer_id')
+        name = (data.get('name') or '').strip()
+        if not customer_id or not name:
+            return JsonResponse({'error': 'customer_id and name are required.'}, status=400)
+        customer = get_object_or_404(Contact, id=customer_id)
+        project = Project.objects.create(
+            customer=customer,
+            name=name,
+            code=(data.get('code') or '').strip() or None,
+            description=(data.get('description') or '').strip() or None,
+            location=(data.get('location') or '').strip() or None,
+            start_date=data.get('start_date') or None,
+            end_date=data.get('end_date') or None,
+            status=data.get('status', 'Active'),
+        )
+        return JsonResponse({
+            'id': project.id,
+            'name': project.name,
+            'code': project.code or '',
+            'status': project.status,
+            'location': project.location or '',
+        })
+
+
+class ProjectListView(View):
+    """List all projects with summary financials."""
+    template_name = 'pages/sales/projects.html'
+
+    def get(self, request):
+        customer_id = request.GET.get('customer')
+        status_filter = request.GET.get('status')
+        projects = Project.objects.select_related('customer').prefetch_related('invoices')
+        if customer_id:
+            projects = projects.filter(customer_id=customer_id)
+        if status_filter:
+            projects = projects.filter(status=status_filter)
+        customers = Contact.objects.filter(contact_type__in=['Customer', 'Both']).order_by('name')
+        return render(request, self.template_name, {
+            'projects': projects,
+            'customers': customers,
+            'selected_customer': customer_id,
+            'selected_status': status_filter,
+        })
+
+
+class ProjectDetailView(View):
+    """Detail page for a single project — shows all linked invoices + totals."""
+    template_name = 'pages/sales/project_detail.html'
+
+    def get(self, request, pk):
+        project = get_object_or_404(Project.objects.select_related('customer'), pk=pk)
+        invoices = project.invoices.select_related('customer').prefetch_related('items__product').order_by('-date')
+        totals = invoices.aggregate(
+            total_invoiced=Sum('total_amount'),
+            total_paid=Sum('paid_amount'),
+        )
+        total_invoiced = totals['total_invoiced'] or 0
+        total_paid     = totals['total_paid'] or 0
+        total_due      = total_invoiced - total_paid
+        return render(request, self.template_name, {
+            'project': project,
+            'invoices': invoices,
+            'total_invoiced': total_invoiced,
+            'total_paid': total_paid,
+            'total_due': total_due,
+            'invoice_count': invoices.count(),
+        })
+
+
 class InvoiceAddView(View):
     template_name = "pages/sales/invoice_add.html"
 
@@ -314,7 +404,7 @@ class InvoiceAddView(View):
         customers = Contact.objects.filter(contact_type__in=['Customer', 'Both'])
         products = Product.objects.all()
         today = timezone.now().date()
-        
+
         # Check for preloaded receipt document from Document Manager URL query parameter
         doc_id = request.GET.get('doc_id') or request.GET.get('__ref_receipt_id')
         preloaded_doc = None
@@ -324,7 +414,7 @@ class InvoiceAddView(View):
             except (ReceiptDocument.DoesNotExist, ValueError):
                 preloaded_doc = None
 
-        # Serialize products for JavaScript to auto-populate Rate, Unit, Tax Type, Cost, Description
+        # Serialize products for JavaScript
         product_list = list(products.values('id', 'name', 'code', 'hs_code', 'selling_price', 'unit', 'purchase_price', 'description'))
 
         # Pre-fill from Quotation
@@ -436,6 +526,15 @@ class InvoiceAddView(View):
             status='Draft',
             created_by=request.user if request.user.is_authenticated else None
         )
+
+        # Link projects (M2M — one invoice can belong to multiple projects)
+        project_ids = request.POST.getlist('project_ids[]')
+        if project_ids:
+            valid_projects = Project.objects.filter(
+                id__in=[pid for pid in project_ids if pid],
+                customer=customer
+            )
+            invoice.projects.set(valid_projects)
 
         # 2. Process Items
         product_ids = request.POST.getlist('product_id[]')

@@ -50,6 +50,11 @@ from .views import (
     ConvertQuotationToSOView,
     ConvertSOToInvoiceView,
     PrintingTemplatesView,
+    # Project views
+    ProjectListView,
+    ProjectDetailView,
+    ProjectsJsonView,
+    ProjectCreateAPIView,
 )
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
@@ -59,6 +64,11 @@ urlpatterns = [
     path("api/customers/<int:pk>/", CustomerDetailAPIView.as_view(), name="api_customer_detail"),
     path("api/customers/add/", CustomerAddAPIView.as_view(), name="api_customer_add"),
     path("sales/customers/add/", CustomerAddView.as_view(), name="customer_add"),
+    # Projects
+    path("sales/projects/", ProjectListView.as_view(), name="projects"),
+    path("sales/projects/<int:pk>/", ProjectDetailView.as_view(), name="project_detail"),
+    path("api/projects/<int:customer_id>/", ProjectsJsonView.as_view(), name="projects_json"),
+    path("api/projects/create/", ProjectCreateAPIView.as_view(), name="project_create_api"),
     path("sales/quotation/", QuotationView.as_view(), name="quotation"),
     path("sales/quotation/add/", QuotationAddView.as_view(), name="quotation_add"),
     path("sales/quotation/<int:pk>/convert-to-so/", ConvertQuotationToSOView.as_view(), name="quotation_convert_to_so"),

@@ -1,0 +1,172 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% block title %}{{ project.name }} | Projects{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body{background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:13px;color:#1e293b;}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+table{width:100%;border-collapse:collapse;}
+thead th{background:#f8fafc;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#64748b;padding:10px 14px;border-bottom:1px solid #e2e8f0;text-align:left;white-space:nowrap;}
+tbody td{padding:11px 14px;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:#faf9ff;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600;}
+.badge-draft{background:#f1f5f9;color:#475569;}
+.badge-unpaid{background:#fef3c7;color:#92400e;}
+.badge-partial{background:#dbeafe;color:#1e40af;}
+.badge-paid{background:#d1fae5;color:#065f46;}
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px 18px;}
+.stat-label{font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;margin-bottom:4px;}
+.stat-val{font-size:20px;font-weight:800;color:#1e293b;}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.info-item{padding:10px 14px;background:#f8fafc;border-radius:8px;}
+.info-lbl{font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;margin-bottom:3px;}
+.info-val{font-size:13px;font-weight:600;color:#1e293b;}
+.action-btn{width:30px;height:30px;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#64748b;display:inline-flex;align-items:center;justify-content:center;font-size:12px;text-decoration:none;transition:all .15s;}
+.action-btn:hover{background:#ede9fe;color:#7c3aed;border-color:#c4b5fd;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="padding:16px 24px 0; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+    <div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+            <a href="{% url 'projects' %}" style="color:#94a3b8; text-decoration:none; font-size:12px;"><i class="fa-solid fa-arrow-left"></i> Projects</a>
+        </div>
+        <h2 style="font-size:22px; font-weight:800; margin:0; display:flex; align-items:center; gap:10px;">
+            <i class="fa-solid fa-diagram-project" style="color:#7c3aed;"></i>
+            {{ project.name }}
+            {% if project.code %}<span style="font-size:13px; font-weight:500; color:#94a3b8;">({{ project.code }})</span>{% endif %}
+        </h2>
+        <div style="font-size:13px; color:#64748b; margin-top:4px;">
+            <i class="fa-solid fa-building-user" style="color:#7c3aed;"></i>
+            <a href="{% url 'customers' %}?customer={{ project.customer.id }}" style="color:#2563eb; font-weight:600; text-decoration:none;">{{ project.customer.name }}</a>
+            {% if project.location %}&nbsp;&bull;&nbsp;<i class="fa-solid fa-location-dot" style="color:#94a3b8;"></i> {{ project.location }}{% endif %}
+            {% if project.start_date %}&nbsp;&bull;&nbsp;<i class="fa-regular fa-calendar" style="color:#94a3b8;"></i> {{ project.start_date }} {% if project.end_date %}&rarr; {{ project.end_date }}{% endif %}{% endif %}
+        </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+        {% if project.status == 'Active' %}<span class="badge" style="background:#d1fae5;color:#065f46;padding:5px 12px;font-size:12px;"><i class="fa-solid fa-circle" style="font-size:8px;"></i> Active</span>
+        {% elif project.status == 'Completed' %}<span class="badge" style="background:#dbeafe;color:#1e40af;padding:5px 12px;font-size:12px;"><i class="fa-solid fa-circle-check" style="font-size:11px;"></i> Completed</span>
+        {% elif project.status == 'On Hold' %}<span class="badge" style="background:#fef3c7;color:#92400e;padding:5px 12px;font-size:12px;"><i class="fa-solid fa-pause" style="font-size:11px;"></i> On Hold</span>
+        {% else %}<span class="badge" style="background:#fee2e2;color:#991b1b;padding:5px 12px;font-size:12px;"><i class="fa-solid fa-ban" style="font-size:11px;"></i> Cancelled</span>{% endif %}
+        <a href="{% url 'invoice_add' %}" style="height:36px; padding:0 16px; border:none; border-radius:8px; background:linear-gradient(135deg,#7c3aed,#6d28d9); color:#fff; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; text-decoration:none; box-shadow:0 2px 8px rgba(124,58,237,.25);">
+            <i class="fa-solid fa-plus"></i> New Invoice
+        </a>
+    </div>
+</div>
+
+<div style="padding:0 24px 80px;">
+
+    <!-- Financial Summary Strip -->
+    <div class="stat-strip">
+        <div class="stat-card" style="border-left:4px solid #7c3aed;">
+            <div class="stat-label"><i class="fa-solid fa-file-invoice" style="color:#7c3aed;"></i> Total Invoices</div>
+            <div class="stat-val" style="color:#7c3aed;">{{ invoice_count }}</div>
+        </div>
+        <div class="stat-card" style="border-left:4px solid #1d4ed8;">
+            <div class="stat-label"><i class="fa-solid fa-coins" style="color:#1d4ed8;"></i> Total Invoiced</div>
+            <div class="stat-val" style="color:#1d4ed8;">Rs. {{ total_invoiced|floatformat:2 }}</div>
+        </div>
+        <div class="stat-card" style="border-left:4px solid #16a34a;">
+            <div class="stat-label"><i class="fa-solid fa-circle-check" style="color:#16a34a;"></i> Total Paid</div>
+            <div class="stat-val" style="color:#16a34a;">Rs. {{ total_paid|floatformat:2 }}</div>
+        </div>
+        <div class="stat-card" style="border-left:4px solid #dc2626;">
+            <div class="stat-label"><i class="fa-solid fa-circle-exclamation" style="color:#dc2626;"></i> Balance Due</div>
+            <div class="stat-val" style="color:#dc2626;">Rs. {{ total_due|floatformat:2 }}</div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    {% if project.description %}
+    <div class="card" style="padding:14px 18px; margin-bottom:16px; display:flex; gap:10px; align-items:flex-start;">
+        <i class="fa-solid fa-circle-info" style="color:#7c3aed; margin-top:2px;"></i>
+        <div style="font-size:13px; color:#475569; line-height:1.6;">{{ project.description }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Invoices Table -->
+    <div class="card">
+        <div style="padding:14px 18px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-weight:700; font-size:14px; display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-file-invoice" style="color:#7c3aed;"></i>
+                Invoices for this Project
+            </div>
+            <span style="background:#ede9fe; color:#7c3aed; border-radius:6px; padding:3px 10px; font-size:12px; font-weight:700;">
+                {{ invoice_count }} invoice{{ invoice_count|pluralize }}
+            </span>
+        </div>
+
+        {% if invoices %}
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Invoice No.</th>
+                        <th>Date</th>
+                        <th>Sales Type</th>
+                        <th>Status</th>
+                        <th style="text-align:right;">Total</th>
+                        <th style="text-align:right;">Paid</th>
+                        <th style="text-align:right;">Balance</th>
+                        <th style="text-align:center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for inv in invoices %}
+                <tr>
+                    <td style="color:#94a3b8; font-size:12px;">{{ forloop.counter }}</td>
+                    <td style="font-weight:700; color:#1e293b;">
+                        <i class="fa-solid fa-file-invoice" style="color:#7c3aed; font-size:11px;"></i>
+                        {{ inv.invoice_number }}
+                    </td>
+                    <td style="color:#64748b; font-size:12px;">{{ inv.date }}</td>
+                    <td style="font-size:12px; color:#475569;">{{ inv.sales_type }}</td>
+                    <td>
+                        {% if inv.status == 'Draft' %}<span class="badge badge-draft">Draft</span>
+                        {% elif inv.status == 'Unpaid' %}<span class="badge badge-unpaid">Unpaid</span>
+                        {% elif inv.status == 'Partially Paid' %}<span class="badge badge-partial">Partial</span>
+                        {% else %}<span class="badge badge-paid"><i class="fa-solid fa-check" style="font-size:9px;"></i> Paid</span>{% endif %}
+                    </td>
+                    <td style="text-align:right; font-weight:700;">Rs. {{ inv.total_amount|floatformat:2 }}</td>
+                    <td style="text-align:right; font-weight:700; color:#16a34a;">Rs. {{ inv.paid_amount|floatformat:2 }}</td>
+                    <td style="text-align:right; font-weight:700; color:{% if inv.balance_due > 0 %}#dc2626{% else %}#16a34a{% endif %};">
+                        Rs. {{ inv.balance_due|floatformat:2 }}
+                    </td>
+                    <td style="text-align:center;">
+                        <a href="{% url 'invoice_detail' inv.pk %}" class="action-btn" title="View Invoice">
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+                <!-- Totals Footer -->
+                <tfoot>
+                    <tr style="background:#f8fafc;">
+                        <td colspan="5" style="padding:10px 14px; font-weight:700; font-size:12px; color:#475569; text-align:right;">TOTALS</td>
+                        <td style="padding:10px 14px; text-align:right; font-weight:800; color:#1e293b;">Rs. {{ total_invoiced|floatformat:2 }}</td>
+                        <td style="padding:10px 14px; text-align:right; font-weight:800; color:#16a34a;">Rs. {{ total_paid|floatformat:2 }}</td>
+                        <td style="padding:10px 14px; text-align:right; font-weight:800; color:#dc2626;">Rs. {{ total_due|floatformat:2 }}</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        {% else %}
+        <div style="padding:50px 20px; text-align:center; color:#94a3b8;">
+            <i class="fa-solid fa-file-invoice" style="font-size:36px; opacity:.3; display:block; margin-bottom:12px;"></i>
+            <div style="font-size:14px; font-weight:600; color:#475569; margin-bottom:6px;">No invoices yet</div>
+            <div style="font-size:12px;">When you create an invoice and tag it to this project, it will appear here.</div>
+            <a href="{% url 'invoice_add' %}" style="display:inline-flex; align-items:center; gap:6px; margin-top:14px; padding:8px 18px; background:#7c3aed; color:#fff; border-radius:7px; text-decoration:none; font-size:13px; font-weight:600;">
+                <i class="fa-solid fa-plus"></i> Create Invoice
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
