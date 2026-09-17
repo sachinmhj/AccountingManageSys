@@ -918,7 +918,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div>
+                            <div id="field_cust_balance">
                                 <label>Customer Balance</label>
                                 <div
                                     style="padding:6px 10px; background:#fff1f2; color:#e11d48; border-radius:4px; font-weight:600; font-size:15px; min-height:32px; display:flex; align-items:center; justify-content:space-between;">
@@ -930,11 +930,11 @@
                                     </a>
                                 </div>
                             </div>
-                            <div>
+                            <div id="field_invoice_no">
                                 <label>Invoice No. <span>*</span></label>
                                 <input type="text" class="form-control" name="invoice_no" value="INV-000125" readonly>
                             </div>
-                            <div>
+                            <div id="field_invoice_date">
                                 <label>Invoice Date <span>*</span></label>
                                 <div class="dual-date-stack">
                                     <div class="date-row">
@@ -949,7 +949,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div>
+                            <div id="field_sales_type">
                                 <label>Sales Type <span>*</span></label>
                                 <div class="st-combo-wrapper" style="position:relative;">
                                     <select name="sales_type" id="sales_type_select" style="display:none;">
@@ -1021,14 +1021,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <div>
+                            <div id="field_sale_category">
                                 <label>Sale Category <span>*</span></label>
                                 <select class="form-select" name="sale_category">
                                     <option>Local Sales</option>
                                     <option>Export</option>
                                 </select>
                             </div>
-                            <div class="vt-combo-wrapper" style="position:relative; width: 100%;">
+                            <div class="vt-combo-wrapper" id="field_vat_treatment" style="position:relative; width: 100%;">
                                 <label>VAT Treatment <span>*</span></label>
                                 <input type="hidden" name="vat_treatment" id="vt_hidden_input" value="Standard">
                                 <button type="button" class="st-combo-btn" id="vt_combo_btn"
@@ -1092,19 +1092,19 @@
                                     </div>
                                 </div>
                             </div>
-                            <div>
+                            <div id="field_currency">
                                 <label>Currency <span>*</span></label>
                                 <select class="form-select" name="currency">
                                     <option>NPR</option>
                                     <option>USD</option>
                                 </select>
                             </div>
-                            <div>
+                            <div id="field_reference_po">
                                 <label>Reference (PO / Order No.)</label>
                                 <input type="text" class="form-control" name="reference_po"
                                     placeholder="e.g. PO-458796">
                             </div>
-                            <div>
+                            <div id="field_due_date">
                                 <label>Due Date</label>
                                 <div class="dual-date-stack">
                                     <div class="date-row">
@@ -1119,7 +1119,7 @@
                                 </div>
                             </div>
                             <!-- Bill Attachment inside Customer & Invoice Info (Single Grid Cell beside Due Date) -->
-                            <div>
+                            <div id="field_bill_attachment">
                                 <label style="display:flex; align-items:center; gap:6px;">
                                     <i class="fa-solid fa-paperclip" style="color:#2563eb; font-size:13px;"></i>
                                     Bill Attachment
@@ -1200,7 +1200,7 @@
                             <!-- End Bill Attachment -->
 
                             <!-- ── Project Field (beside Bill Attachment) ── -->
-                            <div style="position:relative;">
+                            <div id="field_projects" style="position:relative;">
                                 <label style="display:flex; align-items:center; gap:6px; margin-bottom:5px;">
                                     <i class="fa-solid fa-diagram-project" style="color:#7c3aed; font-size:13px;"></i>
                                     Project(s)
@@ -1715,15 +1715,17 @@
     <div id="settingsModal"
         style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
         <div
-            style="background:#fff; width:400px; border-radius:8px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+            style="background:#fff; width:460px; max-height:85vh; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 10px 25px rgba(0,0,0,0.15);">
             <div
-                style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border);">
-                <h3 style="margin:0; font-size:16px;">Page Settings</h3>
+                style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); flex-shrink:0; background:#fff;">
+                <h3 style="margin:0; font-size:16px; font-weight:700; color:#1e293b; display:flex; align-items:center; gap:8px;">
+                    <i class="fa-solid fa-sliders" style="color:#2563eb;"></i> Page &amp; Field Settings
+                </h3>
                 <button type="button" onclick="toggleSettingsModal()"
                     style="background:transparent; border:none; cursor:pointer; font-size:18px; color:var(--text-gray);"><i
                         class="fa-solid fa-xmark"></i></button>
             </div>
-            <div style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+            <div style="padding:20px; display:flex; flex-direction:column; gap:16px; overflow-y:auto; flex:1;">
 
                 <!-- Section: Page Panels -->
                 <div>
@@ -1751,44 +1753,87 @@
                 <!-- Divider -->
                 <div style="border-top:1px solid var(--border);"></div>
 
-                <!-- Section: Items Details Options -->
+                <!-- Section: Customer & Invoice Information Fields Options -->
                 <div>
-                    <p style="margin:0 0 10px 0; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8;">Items Details Options</p>
-                    <div style="display:flex; flex-direction:column; gap:10px;">
-
-                        <!-- Show Cost Column -->
-                        <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; padding:10px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:7px; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
-                            <input type="checkbox" id="chk_show_cost" checked onchange="applySettings()" style="margin-top:2px; flex-shrink:0;">
-                            <div>
-                                <div style="font-weight:600; font-size:12.5px; color:#1e293b;"><i class="fa-solid fa-tag" style="color:#2563eb; margin-right:5px;"></i> Show Cost Column</div>
-                                <div style="font-size:11px; color:#64748b; margin-top:2px;">Show or hide the Cost column in the Items Details table.</div>
-                            </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                        <p style="margin:0; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8;">
+                            Customer &amp; Invoice Fields
+                        </p>
+                        <span style="font-size:10.5px; color:#64748b; font-weight:500;"><i class="fa-solid fa-lock" style="font-size:9px; color:#94a3b8;"></i> Customer field mandatory</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_field_cust_balance" checked onchange="applySettings()"> Customer Balance
                         </label>
-
-                        <!-- Show Profit Column -->
-                        <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; padding:10px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:7px; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
-                            <input type="checkbox" id="chk_show_profit" checked onchange="applySettings()" style="margin-top:2px; flex-shrink:0;">
-                            <div>
-                                <div style="font-weight:600; font-size:12.5px; color:#1e293b;"><i class="fa-solid fa-chart-line" style="color:#16a34a; margin-right:5px;"></i> Show Profit Column</div>
-                                <div style="font-size:11px; color:#64748b; margin-top:2px;">Show or hide the Profit column in the Items Details table.</div>
-                            </div>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_field_invoice_no" checked onchange="applySettings()"> Invoice No.
                         </label>
-
-                        <!-- Amount includes VAT -->
-                        <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; padding:10px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:7px; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
-                            <input type="checkbox" id="chk_amount_incl_vat" checked onchange="applySettings()" style="margin-top:2px; flex-shrink:0;">
-                            <div>
-                                <div style="font-weight:600; font-size:12.5px; color:#1e293b;"><i class="fa-solid fa-percent" style="color:#0891b2; margin-right:5px;"></i> Amount Total Includes VAT</div>
-                                <div style="font-size:11px; color:#64748b; margin-top:2px;">When checked, the Amount column and Grand Total include VAT. Uncheck for VAT-exclusive totals.</div>
-                            </div>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_field_invoice_date" checked onchange="applySettings()"> Invoice Date
                         </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_field_sales_type" checked onchange="applySettings()"> Sales Type
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_field_sale_category" checked onchange="applySettings()"> Sale Category
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_field_vat_treatment" checked onchange="applySettings()"> VAT Treatment
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_field_currency" checked onchange="applySettings()"> Currency
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_field_reference_po" checked onchange="applySettings()"> Reference (PO No.)
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_field_due_date" checked onchange="applySettings()"> Due Date
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_field_bill_attachment" checked onchange="applySettings()"> Bill Attachment
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; grid-column: span 2; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_field_projects" checked onchange="applySettings()"> Project(s)
+                        </label>
+                    </div>
+                </div>
 
+                <!-- Divider -->
+                <div style="border-top:1px solid var(--border);"></div>
+
+                <!-- Section: Items Details Fields & Options -->
+                <div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                        <p style="margin:0; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8;">
+                            Items Details Fields &amp; Options
+                        </p>
+                        <span style="font-size:10.5px; color:#64748b; font-weight:500;"><i class="fa-solid fa-lock" style="font-size:9px; color:#94a3b8;"></i> Core fields mandatory</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_show_cost" checked onchange="applySettings()"> Cost Column
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_show_profit" checked onchange="applySettings()"> Profit Column
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_show_desc" checked onchange="applySettings()"> Description Column
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_show_hscode" checked onchange="applySettings()"> HS Code Column
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_show_unit" checked onchange="applySettings()"> Unit Column
+                        </label>
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; padding:7px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; font-weight:500; color:#1e293b; transition:background .15s;" onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+                            <input type="checkbox" id="chk_amount_incl_vat" checked onchange="applySettings()"> Amount Includes VAT
+                        </label>
                     </div>
                 </div>
 
             </div>
             <div
-                style="padding:16px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; background:var(--bg-light);">
+                style="padding:16px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; background:var(--bg-light); flex-shrink:0;">
                 <button type="button" class="btn btn-primary" onclick="toggleSettingsModal()">Done</button>
             </div>
         </div>
@@ -2228,10 +2273,12 @@
         updateRowNumbers();
         calculateTotals();
         // Re-apply column visibility for new row
-        const chkC = document.getElementById('chk_show_cost');
-        const chkP = document.getElementById('chk_show_profit');
-        if (chkC) applyColumnVisibility('cost', chkC.checked);
-        if (chkP) applyColumnVisibility('profit', chkP.checked);
+        if (typeof itemCols !== 'undefined') {
+            itemCols.forEach(ic => {
+                const chk = document.getElementById(ic.id);
+                if (chk) applyColumnVisibility(ic.col, chk.checked);
+            });
+        }
     }
 
     function updateRowNumbers() {
@@ -3234,6 +3281,28 @@
         { key: 'terms', title: 'Terms & Conditions' }
     ];
 
+    const custFields = [
+        { chk: 'chk_field_cust_balance', id: 'field_cust_balance', key: 'field_cust_balance' },
+        { chk: 'chk_field_invoice_no', id: 'field_invoice_no', key: 'field_invoice_no' },
+        { chk: 'chk_field_invoice_date', id: 'field_invoice_date', key: 'field_invoice_date' },
+        { chk: 'chk_field_sales_type', id: 'field_sales_type', key: 'field_sales_type' },
+        { chk: 'chk_field_sale_category', id: 'field_sale_category', key: 'field_sale_category' },
+        { chk: 'chk_field_vat_treatment', id: 'field_vat_treatment', key: 'field_vat_treatment' },
+        { chk: 'chk_field_currency', id: 'field_currency', key: 'field_currency' },
+        { chk: 'chk_field_reference_po', id: 'field_reference_po', key: 'field_reference_po' },
+        { chk: 'chk_field_due_date', id: 'field_due_date', key: 'field_due_date' },
+        { chk: 'chk_field_bill_attachment', id: 'field_bill_attachment', key: 'field_bill_attachment' },
+        { chk: 'chk_field_projects', id: 'field_projects', key: 'field_projects' }
+    ];
+
+    const itemCols = [
+        { id: 'chk_show_cost', key: 'show_cost', col: 'cost' },
+        { id: 'chk_show_profit', key: 'show_profit', col: 'profit' },
+        { id: 'chk_show_desc', key: 'show_desc', col: 'description' },
+        { id: 'chk_show_hscode', key: 'show_hscode', col: 'hscode' },
+        { id: 'chk_show_unit', key: 'show_unit', col: 'unit' }
+    ];
+
     function toggleSettingsModal() {
         const modal = document.getElementById('settingsModal');
         modal.style.display = (modal.style.display === 'none' || modal.style.display === '') ? 'flex' : 'none';
@@ -3290,6 +3359,17 @@
             wrapperCust.style.display = settings['customer'] ? 'block' : 'none';
         }
 
+        // ── Customer & Invoice Info Fields Visibility ────────────────────
+        custFields.forEach(f => {
+            const chkEl = document.getElementById(f.chk);
+            const targetEl = document.getElementById(f.id);
+            if (chkEl && targetEl) {
+                const isChecked = chkEl.checked;
+                settings[f.key] = isChecked;
+                targetEl.style.display = isChecked ? '' : 'none';
+            }
+        });
+
         // Update 2-column row layouts dynamically
         updateRowLayout('row_a', 'terms', 'summary');
         updateRowLayout('row_b', 'profit', 'payment');
@@ -3298,13 +3378,12 @@
         // Update panel titles
         updatePanelHeaders();
 
-        // ── Items Detail: Show Cost / Profit Columns (separate) ─────────
-        const showCost = document.getElementById('chk_show_cost')?.checked !== false;
-        const showProfit = document.getElementById('chk_show_profit')?.checked !== false;
-        settings['show_cost'] = showCost;
-        settings['show_profit'] = showProfit;
-        applyColumnVisibility('cost', showCost);
-        applyColumnVisibility('profit', showProfit);
+        // ── Items Detail Fields & Options Visibility ────────────────────
+        itemCols.forEach(ic => {
+            const isChecked = document.getElementById(ic.id)?.checked !== false;
+            settings[ic.key] = isChecked;
+            applyColumnVisibility(ic.col, isChecked);
+        });
 
         // ── Items Detail: Amount Includes VAT ───────────────────────────
         const inclVat = document.getElementById('chk_amount_incl_vat')?.checked !== false;
@@ -3315,25 +3394,36 @@
     }
 
     /**
-     * Show or hide a single column (cost OR profit) in the items table ONLY.
-     * The Summary box is never affected by this — it always shows cost/profit totals.
-     * @param {string} col  - 'cost' or 'profit'
+     * Show or hide a single column in the items table ONLY.
+     * The Summary box is never affected by this.
+     * @param {string} col  - 'cost', 'profit', 'description', 'hscode', 'unit'
      * @param {boolean} show
      */
     function applyColumnVisibility(col, show) {
-        // Header th — match by exact text
-        const label = col === 'cost' ? 'Cost' : 'Profit';
-        document.querySelectorAll('#itemsTable thead th').forEach(th => {
-            if (th.textContent.trim() === label) {
+        const labels = {
+            'cost': 'Cost',
+            'profit': 'Profit',
+            'description': 'Description',
+            'hscode': 'HS Code',
+            'unit': 'Unit'
+        };
+        const targetLabel = labels[col] || col;
+
+        let colIdx = -1;
+        document.querySelectorAll('#itemsTable thead th').forEach((th, idx) => {
+            if (th.textContent.trim() === targetLabel) {
                 th.style.display = show ? '' : 'none';
+                colIdx = idx;
             }
         });
-        // Body tds — find by input class
-        const cls = col === 'cost' ? '.row-cost' : '.row-profit';
-        document.querySelectorAll('#itemsBody tr').forEach(tr => {
-            const td = tr.querySelector(cls)?.closest('td');
-            if (td) td.style.display = show ? '' : 'none';
-        });
+
+        if (colIdx !== -1) {
+            document.querySelectorAll('#itemsBody tr').forEach(tr => {
+                if (tr.children[colIdx]) {
+                    tr.children[colIdx].style.display = show ? '' : 'none';
+                }
+            });
+        }
     }
 
     /**
@@ -3367,11 +3457,18 @@
                         chk.checked = settings[cfg.key];
                     }
                 });
+                // Restore Customer & Invoice Info field checkboxes
+                custFields.forEach(f => {
+                    const chkEl = document.getElementById(f.chk);
+                    if (chkEl && settings[f.key] !== undefined) {
+                        chkEl.checked = settings[f.key];
+                    }
+                });
                 // Restore Items Detail checkboxes
-                const chkCost = document.getElementById('chk_show_cost');
-                if (chkCost && settings['show_cost'] !== undefined) chkCost.checked = settings['show_cost'];
-                const chkPr = document.getElementById('chk_show_profit');
-                if (chkPr && settings['show_profit'] !== undefined) chkPr.checked = settings['show_profit'];
+                itemCols.forEach(ic => {
+                    const chk = document.getElementById(ic.id);
+                    if (chk && settings[ic.key] !== undefined) chk.checked = settings[ic.key];
+                });
                 const chkVat = document.getElementById('chk_amount_incl_vat');
                 if (chkVat && settings['amount_incl_vat'] !== undefined) chkVat.checked = settings['amount_incl_vat'];
             } catch (e) { }
