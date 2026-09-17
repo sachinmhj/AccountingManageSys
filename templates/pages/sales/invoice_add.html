@@ -854,37 +854,27 @@
                                             <option value="">Select Customer...</option>
                                             {% for c in customers %}
                                             <option value="{{ c.id }}" data-phone="{{ c.phone|default:'' }}"
-                                                data-pan="{{ c.pan_vat|default:'' }}">{{ c.name }}</option>
+                                                data-pan="{{ c.pan_vat_number|default:'' }}"
+                                                data-pantype="{{ c.pan_type|default:'PAN' }}">{{ c.name }}</option>
                                             {% endfor %}
                                         </select>
 
-                                        <!-- Trigger Control Box -->
-                                        <button type="button" id="cust_combo_btn" class="cust-combo-btn"
-                                            onclick="toggleCustDropdown(event)">
-                                            <div style="display:flex; align-items:center; gap:8px; min-width:0;">
-                                                <i class="fa-solid fa-building-user"
-                                                    style="color:#64748b; font-size:14px; flex-shrink:0;"></i>
-                                                <span id="cust_combo_label"
-                                                    style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap; color:#64748b;">Select
-                                                    Customer...</span>
-                                            </div>
-                                            <i class="fa-solid fa-chevron-down" id="cust_combo_arrow"
-                                                style="color:#94a3b8; font-size:12px; transition:transform 0.2s; flex-shrink:0;"></i>
-                                        </button>
+                                        <!-- Direct Inline Search Input Control Box (Tigg Style) -->
+                                        <div style="position:relative; width:100%;">
+                                            <input type="text" id="cust_combo_input" class="form-control"
+                                                placeholder="Search customer by name, phone, PAN..."
+                                                autocomplete="off"
+                                                onfocus="openCustDropdown()"
+                                                onclick="openCustDropdown()"
+                                                oninput="onCustInput(this.value)"
+                                                onblur="onCustInputBlur()"
+                                                style="height:36px; padding-right:32px; font-weight:500; cursor:text; background:#ffffff;">
+                                            <i class="fa-solid fa-magnifying-glass" id="cust_combo_icon"
+                                                style="position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:13px; pointer-events:none;"></i>
+                                        </div>
 
-                                        <!-- Custom Floating Dropdown Menu -->
+                                        <!-- Custom Floating Dropdown Menu (No separate inner search bar!) -->
                                         <div id="cust_combo_menu" class="cust-combo-menu">
-                                            <!-- Real-time Search Box Header -->
-                                            <div
-                                                style="padding:8px 10px; border-bottom:1px solid #f1f5f9; background:#f8fafc; display:flex; align-items:center; gap:8px;">
-                                                <i class="fa-solid fa-magnifying-glass"
-                                                    style="color:#94a3b8; font-size:13px;"></i>
-                                                <input type="text" id="cust_search_input"
-                                                    placeholder="Search customer by name, phone..."
-                                                    oninput="filterCustOptions(this.value)" autocomplete="off"
-                                                    style="border:none; background:transparent; outline:none; width:100%; font-size:12.5px; color:#1e293b;">
-                                            </div>
-
                                             <!-- Scrollable Customer Options List -->
                                             <div id="cust_combo_list" style="max-height:220px; overflow-y:auto;">
                                                 <!-- Dynamically Populated -->
@@ -1211,39 +1201,30 @@
                                     </a>
                                 </label>
 
-                                <!-- Trigger box (shows tags + opens dropdown) -->
+                                <!-- Direct Inline Search Container (shows tags + inline input field) -->
                                 <div id="projectTrigger"
-                                    onclick="toggleProjectDropdown()"
-                                    style="min-height:48px; border:2px dashed #c4b5fd; border-radius:8px; background:#faf5ff; padding:5px 34px 5px 10px; display:flex; flex-wrap:wrap; gap:5px; align-items:center; cursor:pointer; position:relative; transition:border-color .2s; box-sizing:border-box;">
-                                    <span id="projectPlaceholder" style="color:#94a3b8; font-size:12px; pointer-events:none; user-select:none;">Select customer first...</span>
-                                    <!-- Chevron icon on right -->
-                                    <span style="position:absolute; right:9px; top:50%; transform:translateY(-50%); color:#7c3aed; font-size:13px; pointer-events:none;">
-                                        <i class="fa-solid fa-chevron-down" id="projectChevron" style="transition:transform .2s;"></i>
-                                    </span>
+                                    onclick="focusProjectInput()"
+                                    style="min-height:48px; border:2px dashed #c4b5fd; border-radius:8px; background:#faf5ff; padding:5px 30px 5px 10px; display:flex; flex-wrap:wrap; gap:5px; align-items:center; cursor:text; position:relative; transition:border-color .2s; box-sizing:border-box;">
+                                    <div id="projectTagList" style="display:flex; flex-wrap:wrap; gap:5px; align-items:center;"></div>
+                                    <input type="text" id="projectSearchInput" placeholder="Select customer first..." autocomplete="off"
+                                        onfocus="openProjectDropdown()"
+                                        onclick="openProjectDropdown()"
+                                        oninput="filterProjects(this.value)"
+                                        onblur="onProjectInputBlur()"
+                                        style="border:none; outline:none; background:transparent; font-size:12px; color:#334155; flex:1; min-width:100px; padding:3px 0;">
+                                    <i class="fa-solid fa-magnifying-glass" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:#7c3aed; font-size:12px; pointer-events:none;"></i>
                                 </div>
 
                                 <!-- Hidden inputs -->
                                 <div id="projectHiddenInputs"></div>
 
-                                <!-- Viewport-positioned dropdown (never pushes scroll containers) -->
+                                <!-- Viewport-positioned dropdown (No separate inner search bar!) -->
                                 <div id="projectComboDropdown"
                                     style="display:none; position:fixed; background:#fff; border:1px solid #c4b5fd; border-radius:10px; box-shadow:0 8px 28px rgba(124,58,237,.2); z-index:99999; overflow:hidden;">
 
-                                    <!-- Search -->
-                                    <div style="padding:8px 8px 4px;">
-                                        <div style="display:flex; align-items:center; border:1.5px solid #a78bfa; border-radius:7px; background:#f9f7ff; padding:0 8px; gap:6px;">
-                                            <i class="fa-solid fa-magnifying-glass" style="color:#a78bfa; font-size:12px; flex-shrink:0;"></i>
-                                            <input type="text" id="projectSearchInput"
-                                                placeholder="Search projects..."
-                                                oninput="filterProjects(this.value)"
-                                                autocomplete="off"
-                                                style="flex:1; border:none; background:transparent; padding:6px 0; font-size:12.5px; color:#334155; outline:none;">
-                                        </div>
-                                    </div>
-
                                     <!-- Project list (scrollable, fixed height) -->
                                     <div id="projectDropdown"
-                                        style="max-height:180px; overflow-y:auto; border-top:1px solid #f3e8ff;">
+                                        style="max-height:180px; overflow-y:auto;">
                                     </div>
 
                                     <!-- Add New Project at bottom -->
@@ -1849,12 +1830,6 @@
 
     <!-- ======================== Global Searchable Product Combobox Menu ======================== -->
     <div id="prod_combo_menu" class="prod-combo-menu">
-        <!-- Real-time Search Box Header -->
-        <div style="padding:8px 10px; border-bottom:1px solid #f1f5f9; background:#f8fafc; display:flex; align-items:center; gap:8px;">
-            <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8; font-size:13px;"></i>
-            <input type="text" id="prod_search_input" placeholder="Search product by name, code..." oninput="filterProdOptions(this.value)" autocomplete="off" style="border:none; background:transparent; outline:none; width:100%; font-size:12.5px; color:#1e293b;">
-        </div>
-
         <!-- Scrollable Product Options List -->
         <div id="prod_combo_list" style="max-height:230px; overflow-y:auto;">
             <!-- Dynamically Populated -->
@@ -1927,63 +1902,58 @@
     });
 
     // =============================================
-    // CUSTOM SEARCHABLE PRODUCT COMBOBOX FOR TABLE ROWS
+    // CUSTOM SEARCHABLE PRODUCT COMBOBOX FOR TABLE ROWS (Tigg Style Inline Input)
     // =============================================
-    let activeProdBtn = null;
+    let activeProdInput = null;
     let activeProdSelect = null;
     let activeProductTriggerSelect = null;
 
-    function toggleProdCombobox(event, btn) {
-        event.stopPropagation();
-        const tr = btn.closest('tr');
-        const select = tr.querySelector('.row-product');
+    function openProdCombobox(event, inputElem) {
+        if (!inputElem) return;
+        const tr = inputElem.closest('tr');
+        const select = tr ? tr.querySelector('.row-product') : null;
 
-        // If clicking the currently open menu button, toggle close
-        if (activeProdBtn === btn && document.getElementById('prod_combo_menu').style.display === 'block') {
-            closeProdCombobox();
-            return;
-        }
-
-        closeProdCombobox(); // close any existing open menu
-
-        activeProdBtn = btn;
+        activeProdInput = inputElem;
         activeProdSelect = select;
         activeProductTriggerSelect = select;
 
         const menu = document.getElementById('prod_combo_menu');
-        const rect = btn.getBoundingClientRect();
+        if (!menu) return;
+        const rect = inputElem.getBoundingClientRect();
 
-        // Position fixed relative to viewport
-        const menuWidth = Math.max(rect.width, 320);
+        const menuWidth = Math.max(rect.width + 34, 320);
+        menu.style.position = 'fixed';
         menu.style.width = menuWidth + 'px';
         menu.style.left = rect.left + 'px';
+        menu.style.zIndex = '999999';
 
-        // Check if fits below viewport
         const spaceBelow = window.innerHeight - rect.bottom;
-        if (spaceBelow < 260 && rect.top > 260) {
-            menu.style.top = (rect.top - 265) + 'px';
+        if (spaceBelow < 250 && rect.top > 250) {
+            menu.style.top = (rect.top - 255) + 'px';
         } else {
             menu.style.top = (rect.bottom + 4) + 'px';
         }
 
-        btn.classList.add('open');
         menu.style.display = 'block';
+        filterProdOptions(inputElem.value);
+    }
 
-        const searchInput = document.getElementById('prod_search_input');
-        if (searchInput) {
-            searchInput.value = '';
-            filterProdOptions('');
-            searchInput.focus();
-        }
+    function onProdInput(event, inputElem) {
+        openProdCombobox(event, inputElem);
+    }
+
+    function onProdBlur(inputElem) {
+        setTimeout(() => {
+            closeProdCombobox();
+            const tr = inputElem ? inputElem.closest('tr') : null;
+            const select = tr ? tr.querySelector('.row-product') : null;
+            if (select) syncProdInputFromSelect(inputElem, select);
+        }, 220);
     }
 
     function closeProdCombobox() {
         const menu = document.getElementById('prod_combo_menu');
         if (menu) menu.style.display = 'none';
-        if (activeProdBtn) {
-            activeProdBtn.classList.remove('open');
-            activeProdBtn = null;
-        }
     }
 
     function filterProdOptions(query) {
@@ -2020,7 +1990,7 @@
             const subtext = `${p.code ? 'Code: ' + p.code + ' | ' : ''}${p.unit ? p.unit + ' | ' : ''}Rs. ${priceStr}`;
 
             html += `
-            <div class="prod-option-item ${isSelected ? 'selected' : ''}" onclick="selectProdFromCombobox(${p.id}, '${safeName}')">
+            <div class="prod-option-item ${isSelected ? 'selected' : ''}" onmousedown="event.preventDefault(); selectProdFromCombobox(${p.id}, '${safeName}');">
                 <div style="display:flex; align-items:center; gap:9px; min-width:0;">
                     <div style="width:28px; height:28px; background:${iconBg}; color:${iconColor}; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0;">
                         <i class="fa-solid ${iconClass}"></i>
@@ -2040,47 +2010,45 @@
     function selectProdFromCombobox(productId, productName) {
         if (!activeProdSelect) return;
         activeProdSelect.value = productId;
-        updateProdBtnLabel(activeProdBtn, productId);
+        if (activeProdInput) {
+            const p = products.find(prod => String(prod.id) === String(productId));
+            activeProdInput.value = p ? (p.code ? `${p.code} - ${p.name}` : p.name) : productName;
+        }
         closeProdCombobox();
         productSelected(activeProdSelect);
     }
 
-    function updateProdBtnLabel(btn, productId) {
-        if (!btn) return;
-        const p = products.find(prod => String(prod.id) === String(productId));
-        const labelSpan = btn.querySelector('.prod-combo-label');
-        const iconElem = btn.querySelector('.prod-icon');
-
-        if (p && labelSpan) {
-            const isService = p.product_type === 'Service';
-            if (iconElem) {
-                iconElem.className = `fa-solid ${isService ? 'fa-wrench' : 'fa-box'} prod-icon`;
-                iconElem.style.color = isService ? '#0891b2' : '#2563eb';
+    function syncProdInputFromSelect(inputElem, selectElem) {
+        if (!inputElem || !selectElem) return;
+        const p = products.find(prod => String(prod.id) === String(selectElem.value));
+        if (p) {
+            inputElem.value = p.code ? `${p.code} - ${p.name}` : p.name;
+        } else {
+            if (document.activeElement !== inputElem) {
+                inputElem.value = '';
             }
-            labelSpan.textContent = p.code ? `${p.code} - ${p.name}` : p.name;
-            labelSpan.style.color = '#1e293b';
-            labelSpan.style.fontWeight = '600';
-        } else if (labelSpan) {
-            if (iconElem) {
-                iconElem.className = 'fa-solid fa-box prod-icon';
-                iconElem.style.color = '#64748b';
-            }
-            labelSpan.textContent = 'Select Product...';
-            labelSpan.style.color = '#64748b';
-            labelSpan.style.fontWeight = '500';
         }
     }
 
     function triggerAddNewProdFromDropdown() {
+        // Capture typed text before closing (blur clears it)
+        const typedText = activeProdInput ? activeProdInput.value.trim() : '';
         closeProdCombobox();
         openAddProductModal(activeProductTriggerSelect);
+        // Override name field with typed text after modal opens
+        if (typedText) {
+            setTimeout(() => {
+                const nameInput = document.getElementById('qp_name');
+                if (nameInput) { nameInput.value = typedText; nameInput.focus(); }
+            }, 120);
+        }
     }
 
     // Close product combobox when clicking outside or scrolling
     document.addEventListener('click', function (e) {
         const menu = document.getElementById('prod_combo_menu');
         if (menu && menu.style.display === 'block') {
-            if (!e.target.closest('#prod_combo_menu') && !e.target.closest('.prod-combo-btn')) {
+            if (!e.target.closest('#prod_combo_menu') && !e.target.closest('.prod-combo-input')) {
                 closeProdCombobox();
             }
         }
@@ -2094,24 +2062,18 @@
     }, true);
 
     function openAddProductModal(triggerElem = null) {
+        let typedText = '';
         if (triggerElem) {
-            if (triggerElem.tagName === 'SELECT') {
-                activeProductTriggerSelect = triggerElem;
-                activeProdSelect = triggerElem;
-                const tr = triggerElem.closest('tr');
-                if (tr) activeProdBtn = tr.querySelector('.prod-combo-btn');
-            } else if (triggerElem.classList && triggerElem.classList.contains('prod-combo-btn')) {
-                activeProdBtn = triggerElem;
-                const tr = triggerElem.closest('tr');
-                if (tr) activeProductTriggerSelect = tr.querySelector('.row-product');
-            } else {
-                const tr = triggerElem.closest('tr');
-                if (tr) {
-                    activeProductTriggerSelect = tr.querySelector('.row-product');
-                    activeProdBtn = tr.querySelector('.prod-combo-btn');
-                }
+            const tr = triggerElem.closest('tr');
+            if (tr) {
+                activeProductTriggerSelect = tr.querySelector('.row-product');
+                activeProdSelect = tr.querySelector('.row-product');
+                activeProdInput = tr.querySelector('.prod-combo-input');
+                if (activeProdInput) typedText = activeProdInput.value.trim();
             }
         }
+        // Also check activeProdInput if not set from triggerElem
+        if (!typedText && activeProdInput) typedText = activeProdInput.value.trim();
         const modal = document.getElementById('productModal');
         const form = document.getElementById('quickProductForm');
         const errBox = document.getElementById('quickProductError');
@@ -2120,7 +2082,11 @@
         if (modal) modal.style.display = 'flex';
         setTimeout(() => {
             const nameInput = document.getElementById('qp_name');
-            if (nameInput) nameInput.focus();
+            if (nameInput) {
+                // Pre-fill the typed search text as product name
+                if (typedText) nameInput.value = typedText;
+                nameInput.focus();
+            }
         }, 100);
     }
 
@@ -2139,14 +2105,14 @@
             const currentVal = select.value;
             select.innerHTML = productOptions;
             const tr = select.closest('tr');
-            const btn = tr ? tr.querySelector('.prod-combo-btn') : null;
+            const input = tr ? tr.querySelector('.prod-combo-input') : null;
 
             if (select === targetSelect && newSelectedId) {
                 select.value = newSelectedId;
-                if (btn) updateProdBtnLabel(btn, newSelectedId);
+                if (input) syncProdInputFromSelect(input, select);
             } else if (currentVal) {
                 select.value = currentVal;
-                if (btn) updateProdBtnLabel(btn, currentVal);
+                if (input) syncProdInputFromSelect(input, select);
             }
         });
 
@@ -2217,13 +2183,10 @@
             <td style="text-align:center; font-weight:600; color:var(--text-gray);" class="row-num">1</td>
             <td>
                 <div style="display:flex; gap:6px; align-items:center; position:relative;">
-                    <button type="button" class="prod-combo-btn" onclick="toggleProdCombobox(event, this)">
-                        <div style="display:flex; align-items:center; gap:8px; min-width:0; overflow:hidden;">
-                            <i class="fa-solid fa-box prod-icon" style="color:#64748b; font-size:13px; flex-shrink:0;"></i>
-                            <span class="prod-combo-label" style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap; color:#64748b;">Select Product...</span>
-                        </div>
-                        <i class="fa-solid fa-chevron-down prod-combo-arrow" style="color:#94a3b8; font-size:11px; transition:transform 0.2s; flex-shrink:0;"></i>
-                    </button>
+                    <div style="position:relative; flex:1;">
+                        <input type="text" class="form-control prod-combo-input" placeholder="Select Product..." autocomplete="off" onfocus="openProdCombobox(event, this)" onclick="openProdCombobox(event, this)" oninput="onProdInput(event, this)" onblur="onProdBlur(this)" style="height:34px; padding-left:28px; font-size:12.5px; font-weight:500; cursor:text; background:#ffffff;">
+                        <i class="fa-solid fa-box prod-icon" style="position:absolute; left:9px; top:50%; transform:translateY(-50%); color:#64748b; font-size:12px; pointer-events:none;"></i>
+                    </div>
                     <button type="button" onclick="openAddProductModal(this)" title="Add New Product" style="flex-shrink:0; width:28px; height:28px; border:none; border-radius:6px; background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#ffffff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:12px; box-shadow:0 2px 4px rgba(37,99,235,0.25); transition:transform .1s;">
                         <i class="fa-solid fa-plus"></i>
                     </button>
@@ -2543,7 +2506,8 @@
                     id: String(opt.value),
                     name: opt.textContent,
                     phone: opt.getAttribute('data-phone') || '',
-                    pan: opt.getAttribute('data-pan') || ''
+                    pan: opt.getAttribute('data-pan') || '',
+                    panType: opt.getAttribute('data-pantype') || 'PAN'
                 });
             }
         });
@@ -2556,7 +2520,8 @@
         const emptyState = document.getElementById('cust_combo_empty');
         if (!container) return;
 
-        const currentVal = document.getElementById('customer_select').value;
+        const selectElem = document.getElementById('customer_select');
+        const currentVal = selectElem ? selectElem.value : '';
 
         if (list.length === 0) {
             container.innerHTML = '';
@@ -2568,11 +2533,14 @@
         let html = '';
         list.forEach(item => {
             const isSelected = item.id === String(currentVal);
-            const sub = item.phone || item.pan ? `${item.phone ? '📞 ' + item.phone : ''}${item.phone && item.pan ? ' | ' : ''}${item.pan ? 'PAN: ' + item.pan : ''}` : '';
+            const phoneStr = item.phone ? `📞 ${item.phone}` : '';
+            const typeLabel = (item.panType || 'PAN').toUpperCase();
+            const panStr = item.pan ? `${typeLabel}: ${item.pan}` : '';
+            const sub = [phoneStr, panStr].filter(Boolean).join(' | ');
             const safeName = item.name.replace(/'/g, "\\'");
 
             html += `
-            <div class="cust-option-item ${isSelected ? 'selected' : ''}" onclick="selectCustFromCombobox('${item.id}', '${safeName}')">
+            <div class="cust-option-item ${isSelected ? 'selected' : ''}" onmousedown="event.preventDefault(); selectCustFromCombobox('${item.id}', '${safeName}');">
                 <div style="display:flex; align-items:center; gap:9px; min-width:0;">
                     <div style="width:28px; height:28px; background:${isSelected ? '#2563eb' : '#e2e8f0'}; color:${isSelected ? 'white' : '#64748b'}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0;">
                         <i class="fa-solid fa-user"></i>
@@ -2589,10 +2557,10 @@
     }
 
     function updateCustDropdownPosition() {
-        const btn = document.getElementById('cust_combo_btn');
+        const input = document.getElementById('cust_combo_input');
         const menu = document.getElementById('cust_combo_menu');
-        if (!btn || !menu || menu.style.display !== 'block') return;
-        const rect = btn.getBoundingClientRect();
+        if (!input || !menu || menu.style.display !== 'block') return;
+        const rect = input.getBoundingClientRect();
         if (rect.bottom < 0 || rect.top > window.innerHeight) {
             closeCustDropdown();
             return;
@@ -2604,88 +2572,106 @@
         menu.style.zIndex = '99999';
     }
 
-    function toggleCustDropdown(e) {
-        if (e) e.stopPropagation();
+    function openCustDropdown() {
         const menu = document.getElementById('cust_combo_menu');
-        const btn = document.getElementById('cust_combo_btn');
-        const arrow = document.getElementById('cust_combo_arrow');
-        if (!menu) return;
+        const input = document.getElementById('cust_combo_input');
+        if (!menu || !input) return;
+        menu.style.display = 'block';
+        updateCustDropdownPosition();
+        
+        const currentVal = input.value.trim();
+        const select = document.getElementById('customer_select');
+        const selectedOpt = select && select.selectedIndex >= 0 ? select.options[select.selectedIndex] : null;
+        const selectedName = selectedOpt && selectedOpt.value ? selectedOpt.textContent.trim() : '';
 
-        const isOpen = menu.style.display === 'block';
-
-        if (isOpen) {
-            closeCustDropdown();
+        if (currentVal && currentVal === selectedName) {
+            filterCustOptions('');
         } else {
-            menu.style.display = 'block';
-            updateCustDropdownPosition();
-            if (btn) btn.classList.add('open');
-            if (arrow) arrow.style.transform = 'rotate(180deg)';
-            const input = document.getElementById('cust_search_input');
-            if (input) {
-                input.value = '';
-                filterCustOptions('');
-                setTimeout(() => input.focus(), 50);
-            }
+            filterCustOptions(currentVal);
         }
+    }
+
+    function onCustInput(val) {
+        const menu = document.getElementById('cust_combo_menu');
+        if (!menu || menu.style.display !== 'block') {
+            openCustDropdown();
+        }
+        filterCustOptions(val);
+        updateCustDropdownPosition();
+    }
+
+    function onCustInputBlur() {
+        setTimeout(() => {
+            closeCustDropdown();
+            syncCustComboboxValue();
+        }, 200);
     }
 
     function closeCustDropdown() {
         const menu = document.getElementById('cust_combo_menu');
-        const btn = document.getElementById('cust_combo_btn');
-        const arrow = document.getElementById('cust_combo_arrow');
         if (menu) menu.style.display = 'none';
-        if (btn) btn.classList.remove('open');
-        if (arrow) arrow.style.transform = 'rotate(0deg)';
     }
 
     function filterCustOptions(q) {
-        const query = q.toLowerCase().trim();
-        const filtered = custOptionsData.filter(c =>
-            c.name.toLowerCase().includes(query) ||
-            c.phone.toLowerCase().includes(query) ||
-            c.pan.toLowerCase().includes(query)
-        );
+        const query = (q || '').toLowerCase().trim();
+        const cleanQuery = query.replace(/[^a-z0-9]/g, '');
+
+        const filtered = custOptionsData.filter(c => {
+            if (!query) return true;
+            const nameMatch = c.name.toLowerCase().includes(query);
+            const phoneMatch = c.phone.toLowerCase().includes(query) || (cleanQuery.length > 0 && c.phone.replace(/[^a-z0-9]/g, '').includes(cleanQuery));
+            const panMatch = c.pan.toLowerCase().includes(query) || (cleanQuery.length > 0 && c.pan.replace(/[^a-z0-9]/g, '').includes(cleanQuery));
+            return nameMatch || phoneMatch || panMatch;
+        });
         renderCustOptions(filtered);
     }
 
     function selectCustFromCombobox(id, name) {
         const select = document.getElementById('customer_select');
-        select.value = id;
+        if (select) {
+            select.value = id;
+            onCustomerChange(select);
+        }
         syncCustComboboxValue();
         closeCustDropdown();
-        onCustomerChange(select);
     }
 
     function syncCustComboboxValue() {
         const select = document.getElementById('customer_select');
-        const label = document.getElementById('cust_combo_label');
-        if (!select || !label) return;
+        const input = document.getElementById('cust_combo_input');
+        if (!select || !input) return;
 
-        const selectedOpt = select.options[select.selectedIndex];
-
+        const selectedOpt = select.selectedIndex >= 0 ? select.options[select.selectedIndex] : null;
         if (selectedOpt && selectedOpt.value) {
-            label.textContent = selectedOpt.textContent;
-            label.style.color = '#1e293b';
-            label.style.fontWeight = '600';
+            input.value = selectedOpt.textContent.trim();
         } else {
-            label.textContent = 'Select Customer...';
-            label.style.color = '#64748b';
-            label.style.fontWeight = '400';
+            if (document.activeElement !== input) {
+                input.value = '';
+            }
         }
     }
 
     function triggerAddNewCustFromDropdown() {
+        const typedText = (document.getElementById('cust_combo_input') || {}).value || '';
         closeCustDropdown();
         openAddCustomerModal();
+        // Pre-fill the typed search text into the customer name field
+        setTimeout(() => {
+            const nameField = document.getElementById('cm_name');
+            if (nameField && typedText.trim()) {
+                nameField.value = typedText.trim();
+                nameField.focus();
+            }
+        }, 120);
     }
 
     window.addEventListener('scroll', updateCustDropdownPosition, true);
     window.addEventListener('resize', updateCustDropdownPosition);
 
     document.addEventListener('click', function (e) {
-        const btn = document.getElementById('cust_combo_btn');
+        const input = document.getElementById('cust_combo_input');
         const menu = document.getElementById('cust_combo_menu');
-        if (btn && menu && !btn.contains(e.target) && !menu.contains(e.target)) {
+        if (input && menu && !input.contains(e.target) && !menu.contains(e.target)) {
             closeCustDropdown();
         }
         const stWrapper = document.querySelector('.st-combo-wrapper');
@@ -3021,14 +3007,17 @@
         cmOpen();
     }
 
-    window.onCustomerSaved = function (id, name) {
+    window.onCustomerSaved = function (id, name, phone = '', pan = '', panType = 'PAN') {
         const sel = document.getElementById('customer_select');
         let newOpt = document.createElement('option');
         newOpt.value = id;
         newOpt.textContent = name;
+        newOpt.setAttribute('data-phone', phone || '');
+        newOpt.setAttribute('data-pan', pan || '');
+        newOpt.setAttribute('data-pantype', panType || 'PAN');
         sel.appendChild(newOpt);
 
-        custOptionsData.push({ id: String(id), name: name, phone: '', pan: '' });
+        custOptionsData.push({ id: String(id), name: name, phone: phone || '', pan: pan || '', panType: panType || 'PAN' });
 
         sel.value = id;
         renderCustOptions(custOptionsData);
@@ -3692,36 +3681,51 @@ function updateProjectDropdownPosition() {
     dd.style.width = rect.width + 'px';
 }
 
-function toggleProjectDropdown() {
+function focusProjectInput() {
+    const inp = document.getElementById('projectSearchInput');
+    if (inp) inp.focus();
+}
+
+function openProjectDropdown() {
     if (!_currentCustId) {
         showProjectToast('Please select a customer first to view or add projects.');
         return;
     }
     const dd = document.getElementById('projectComboDropdown');
-    const chev = document.getElementById('projectChevron');
     if (!dd) return;
+    dd.style.display = 'block';
+    updateProjectDropdownPosition();
+    const inp = document.getElementById('projectSearchInput');
+    filterProjects(inp ? inp.value : '');
+}
 
-    const isOpen = dd.style.display === 'block';
-    if (isOpen) {
+function onProjectInputBlur() {
+    setTimeout(() => {
         closeProjectDropdown();
-    } else {
-        dd.style.display = 'block';
-        updateProjectDropdownPosition();
-        if (chev) chev.style.transform = 'rotate(180deg)';
         const inp = document.getElementById('projectSearchInput');
-        if (inp) {
-            inp.value = '';
-            inp.focus();
-        }
-        filterProjects('');
+        if (inp) inp.value = '';
+    }, 200);
+}
+
+function updateProjectDropdownPosition() {
+    const trigger = document.getElementById('projectTrigger');
+    const dd = document.getElementById('projectComboDropdown');
+    if (!trigger || !dd || dd.style.display !== 'block') return;
+    const rect = trigger.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > window.innerHeight) {
+        closeProjectDropdown();
+        return;
     }
+    dd.style.position = 'fixed';
+    dd.style.top = (rect.bottom + 4) + 'px';
+    dd.style.left = rect.left + 'px';
+    dd.style.width = Math.max(rect.width, 240) + 'px';
+    dd.style.zIndex = '99999';
 }
 
 function closeProjectDropdown() {
     const dd = document.getElementById('projectComboDropdown');
-    const chev = document.getElementById('projectChevron');
     if (dd) dd.style.display = 'none';
-    if (chev) chev.style.transform = 'rotate(0deg)';
 }
 
 function showProjectToast(msg) {
@@ -3745,12 +3749,12 @@ function loadProjectsForCustomer(customerId) {
     renderProjectTags();
     closeProjectDropdown();
 
-    const ph = document.getElementById('projectPlaceholder');
+    const inp = document.getElementById('projectSearchInput');
     if (!customerId) {
-        if (ph) ph.textContent = 'Select customer first...';
+        if (inp) inp.placeholder = 'Select customer first...';
         return;
     }
-    if (ph) ph.textContent = 'Loading projects...';
+    if (inp) inp.placeholder = 'Type to search projects...';
 
     fetch(`/api/projects/${customerId}/`)
         .then(r => r.json())
@@ -3759,39 +3763,36 @@ function loadProjectsForCustomer(customerId) {
             updateProjectPlaceholder();
         })
         .catch(() => {
-            if (ph) ph.textContent = 'Select projects...';
+            if (inp) inp.placeholder = 'Type to search projects...';
         });
 }
 
 function updateProjectPlaceholder() {
-    const ph = document.getElementById('projectPlaceholder');
-    if (!ph) return;
+    const inp = document.getElementById('projectSearchInput');
+    if (!inp) return;
     if (_selectedProjs.length === 0) {
-        ph.style.display = 'inline';
-        ph.textContent = _currentCustId 
-            ? (_allProjects.length === 0 ? 'No projects yet — click to add one' : 'Select projects...') 
+        inp.placeholder = _currentCustId 
+            ? (_allProjects.length === 0 ? 'No projects yet — click to add' : 'Search or select project...') 
             : 'Select customer first...';
     } else {
-        ph.style.display = 'none';
+        inp.placeholder = 'Add another project...';
     }
 }
 
 function renderProjectTags() {
-    const box    = document.getElementById('projectTrigger');
+    const box    = document.getElementById('projectTagList');
     const hidden = document.getElementById('projectHiddenInputs');
     if (!box || !hidden) return;
 
-    box.querySelectorAll('.proj-tag').forEach(t => t.remove());
+    box.innerHTML = '';
     hidden.innerHTML = '';
-
-    const ph = document.getElementById('projectPlaceholder');
 
     _selectedProjs.forEach(p => {
         const pill = document.createElement('span');
         pill.className = 'proj-tag';
         pill.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:#f5f3ff;color:#6d28d9;border:1px solid #ddd6fe;border-radius:5px;padding:3px 8px;font-size:11.5px;font-weight:600;z-index:2;';
         pill.innerHTML = `<i class="fa-solid fa-diagram-project" style="font-size:10px;"></i>${p.name}${p.code ? ' <span style="opacity:.6;font-weight:400;">('+p.code+')</span>' : ''}<button type="button" onclick="removeProject(${p.id}, event)" style="background:none;border:none;cursor:pointer;color:#7c3aed;font-size:12px;padding:0 0 0 2px;line-height:1;">&times;</button>`;
-        box.insertBefore(pill, ph);
+        box.appendChild(pill);
 
         const inp = document.createElement('input');
         inp.type  = 'hidden';
@@ -3816,7 +3817,7 @@ function filterProjects(query) {
         dd.innerHTML = `<div style="padding:12px; text-align:center; color:#94a3b8; font-size:12px;"><i class="fa-solid fa-inbox" style="display:block;font-size:18px;margin-bottom:4px;opacity:.4;"></i>No projects found</div>`;
     } else {
         dd.innerHTML = available.map(p => `
-            <div onclick="addProject(${p.id},'${p.name.replace(/'/g,"\\'")  }','${(p.code||'').replace(/'/g,"\\'")}')"
+            <div onmousedown="event.preventDefault(); addProject(${p.id},'${p.name.replace(/'/g,"\\'")  }','${(p.code||'').replace(/'/g,"\\'")}');"
                 style="padding:9px 13px; cursor:pointer; display:flex; align-items:center; gap:10px; border-bottom:1px solid #f8fafc; font-size:12.5px; color:#1e293b;"
                 onmouseover="this.style.background='#f5f3ff'" onmouseout="this.style.background='#fff'">
                 <div style="width:26px;height:26px;background:#ede9fe;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#7c3aed;flex-shrink:0;">
@@ -3835,6 +3836,8 @@ function filterProjects(query) {
 function addProject(id, name, code) {
     if (_selectedProjs.find(p => p.id === id)) return;
     _selectedProjs.push({ id, name, code });
+    const inp = document.getElementById('projectSearchInput');
+    if (inp) inp.value = '';
     renderProjectTags();
     closeProjectDropdown();
 }
@@ -3863,15 +3866,18 @@ window.addEventListener('resize', updateProjectDropdownPosition);
 // NEW PROJECT MODAL
 // ══════════════════════════════════════════════════════════════
 function openNewProjectModal() {
+    const typedText = (document.getElementById('projectSearchInput') || {}).value || '';
     closeProjectDropdown();
     const custId = document.getElementById('customer_select').value;
     if (!custId) {
         showProjectToast('Please select a customer first before creating a project.');
         return;
     }
-    const custLabel = document.getElementById('cust_combo_label').textContent || 'Selected Customer';
-    document.getElementById('npModal_customerLabel').textContent = custLabel;
-    document.getElementById('npModal_name').value     = '';
+    const custInput = document.getElementById('cust_combo_input');
+    const custLabel = custInput ? custInput.value.trim() : 'Selected Customer';
+    document.getElementById('npModal_customerLabel').textContent = custLabel || 'Selected Customer';
+    // Pre-fill the typed search text as the project name
+    document.getElementById('npModal_name').value     = typedText.trim();
     document.getElementById('npModal_code').value     = '';
     document.getElementById('npModal_location').value = '';
     document.getElementById('npModal_desc').value     = '';

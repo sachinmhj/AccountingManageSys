@@ -1227,7 +1227,14 @@ class CustomerAddAPIView(View):
         if first_cp:
             Contact.objects.filter(pk=customer.pk).update(contact_person=first_cp.name)
 
-        return JsonResponse({'status': 'success', 'id': customer.id, 'name': customer.name})
+        return JsonResponse({
+            'status': 'success',
+            'id': customer.id,
+            'name': customer.name,
+            'phone': customer.phone or '',
+            'pan_vat': customer.pan_vat_number or '',
+            'pan_type': customer.pan_type or 'PAN'
+        })
 
 
 class ProductAddAPIView(View):
