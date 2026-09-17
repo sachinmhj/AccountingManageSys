@@ -7,6 +7,7 @@ from .views import (
     CustomerAddView,
     CustomerDetailAPIView,
     CustomerAddAPIView,
+    ProductAddAPIView,
     InvoiceView,
     InvoiceDetailView,
     SalesReturnView,
@@ -63,6 +64,7 @@ urlpatterns = [
     path("sales/customers/", CustomersView.as_view(), name="customers"),
     path("api/customers/<int:pk>/", CustomerDetailAPIView.as_view(), name="api_customer_detail"),
     path("api/customers/add/", CustomerAddAPIView.as_view(), name="api_customer_add"),
+    path("api/products/add/", ProductAddAPIView.as_view(), name="api_product_add"),
     path("sales/customers/add/", CustomerAddView.as_view(), name="customer_add"),
     # Projects
     path("sales/projects/", ProjectListView.as_view(), name="projects"),

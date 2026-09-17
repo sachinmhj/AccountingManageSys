@@ -1230,6 +1230,83 @@ class CustomerAddAPIView(View):
         return JsonResponse({'status': 'success', 'id': customer.id, 'name': customer.name})
 
 
+class ProductAddAPIView(View):
+    """POST /api/products/add/ → Create a product/item via AJAX and return JSON."""
+    def post(self, request):
+        import json as _json
+        from django.db import IntegrityError
+
+        try:
+            data = _json.loads(request.body)
+        except Exception:
+            data = request.POST
+
+        name = (data.get('name') or '').strip()
+        if not name:
+            return JsonResponse({'status': 'error', 'message': 'Product name is required.'}, status=400)
+
+        code = (data.get('code') or '').strip() or None
+        product_type = data.get('product_type', 'Goods')
+        unit = data.get('unit', 'Pcs')
+        category_id = data.get('category_id') or data.get('category')
+        category_name = (data.get('category_name') or '').strip()
+
+        category = None
+        if category_id:
+            category = ProductCategory.objects.filter(id=category_id).first()
+        elif category_name:
+            category, _ = ProductCategory.objects.get_or_create(name=category_name)
+
+        try:
+            purchase_price = Decimal(str(data.get('purchase_price') or '0.00'))
+        except Exception:
+            purchase_price = Decimal('0.00')
+
+        try:
+            selling_price = Decimal(str(data.get('selling_price') or '0.00'))
+        except Exception:
+            selling_price = Decimal('0.00')
+
+        hs_code = (data.get('hs_code') or '').strip() or None
+        description = (data.get('description') or '').strip() or None
+
+        if code and Product.objects.filter(code=code).exists():
+            return JsonResponse({'status': 'error', 'message': f'Product code "{code}" already exists.'}, status=400)
+
+        try:
+            product = Product.objects.create(
+                name=name,
+                code=code,
+                product_type=product_type,
+                category=category,
+                unit=unit,
+                purchase_price=purchase_price,
+                selling_price=selling_price,
+                hs_code=hs_code,
+                description=description,
+            )
+        except IntegrityError as e:
+            return JsonResponse({'status': 'error', 'message': 'Could not save product. Code may already exist.'}, status=400)
+
+        return JsonResponse({
+            'status': 'success',
+            'product': {
+                'id': product.id,
+                'name': product.name,
+                'code': product.code or '',
+                'product_type': product.product_type,
+                'unit': product.unit,
+                'purchase_price': str(product.purchase_price),
+                'selling_price': str(product.selling_price),
+                'hs_code': product.hs_code or '',
+                'description': product.description or '',
+                'category_id': product.category.id if product.category else None,
+                'category_name': product.category.name if product.category else '',
+            }
+        })
+
+
+
 
 class CustomerPaymentView(TemplateView):
     template_name = "pages/sales/customer_payment.html"

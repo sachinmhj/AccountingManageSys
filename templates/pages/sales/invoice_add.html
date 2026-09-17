@@ -209,6 +209,70 @@
         font-weight: 600;
     }
 
+    /* Custom Searchable Product Combobox for Items Table */
+    .prod-combo-btn {
+        width: 100%;
+        height: 34px;
+        padding: 4px 10px;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 7px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12.5px;
+        font-weight: 500;
+        color: #1e293b;
+        cursor: pointer;
+        box-sizing: border-box;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        outline: none;
+    }
+
+    .prod-combo-btn:hover {
+        border-color: #94a3b8;
+    }
+
+    .prod-combo-btn.open {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .prod-combo-menu {
+        display: none;
+        position: fixed;
+        z-index: 999999;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        animation: custSlideDown 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .prod-option-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8.5px 12px;
+        border-bottom: 1px solid #f8fafc;
+        cursor: pointer;
+        font-size: 12.5px;
+        color: #334155;
+        transition: background 0.12s, color 0.12s;
+    }
+
+    .prod-option-item:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .prod-option-item.selected {
+        background: #eff6ff;
+        color: #2563eb;
+        font-weight: 600;
+    }
+
     /* Custom Sales Type Combobox */
     .st-combo-btn {
         width: 100%;
@@ -1733,7 +1797,40 @@
     <!-- ======================== Quick Add Customer Modal ======================== -->
     {% include "includes/customer_modal.html" %}
     <!-- ======================== End Quick Add Customer Modal ======================== -->
-    <!-- ======================== End Quick Add Customer Modal ======================== -->
+
+    <!-- ======================== Quick Add Product Modal ======================== -->
+    {% include "includes/product_modal.html" %}
+    <!-- ======================== End Quick Add Product Modal ======================== -->
+
+    <!-- ======================== Global Searchable Product Combobox Menu ======================== -->
+    <div id="prod_combo_menu" class="prod-combo-menu">
+        <!-- Real-time Search Box Header -->
+        <div style="padding:8px 10px; border-bottom:1px solid #f1f5f9; background:#f8fafc; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8; font-size:13px;"></i>
+            <input type="text" id="prod_search_input" placeholder="Search product by name, code..." oninput="filterProdOptions(this.value)" autocomplete="off" style="border:none; background:transparent; outline:none; width:100%; font-size:12.5px; color:#1e293b;">
+        </div>
+
+        <!-- Scrollable Product Options List -->
+        <div id="prod_combo_list" style="max-height:230px; overflow-y:auto;">
+            <!-- Dynamically Populated -->
+        </div>
+
+        <!-- Empty Search State -->
+        <div id="prod_combo_empty" style="display:none; padding:16px; text-align:center; color:#94a3b8; font-size:12px;">
+            <i class="fa-solid fa-box-open" style="font-size:18px; margin-bottom:4px; display:block; opacity:0.5;"></i>
+            No matching products found.
+        </div>
+
+        <!-- "+ Add New Product / Item" Action Button at bottom -->
+        <div onclick="triggerAddNewProdFromDropdown()"
+            style="padding:9px 13px; cursor:pointer; display:flex; align-items:center; gap:9px; border-top:1px solid #e2e8f0; background:#f8fafc; font-size:12.5px; font-weight:600; color:#2563eb; border-radius:0 0 10px 10px; transition:background .15s;"
+            onmouseover="this.style.background='#eff6ff'" onmouseout="this.style.background='#f8fafc'">
+            <div style="width:24px;height:24px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fa-solid fa-plus" style="color:#fff; font-size:11px;"></i>
+            </div>
+            <span>Add New Product / Item</span>
+        </div>
+    </div>
 
     <!-- Sticky Footer -->
     <div class="sticky-footer">
@@ -1784,7 +1881,284 @@
         loadSettings();
     });
 
-    // 3. Dynamic Row HTML
+    // =============================================
+    // CUSTOM SEARCHABLE PRODUCT COMBOBOX FOR TABLE ROWS
+    // =============================================
+    let activeProdBtn = null;
+    let activeProdSelect = null;
+    let activeProductTriggerSelect = null;
+
+    function toggleProdCombobox(event, btn) {
+        event.stopPropagation();
+        const tr = btn.closest('tr');
+        const select = tr.querySelector('.row-product');
+
+        // If clicking the currently open menu button, toggle close
+        if (activeProdBtn === btn && document.getElementById('prod_combo_menu').style.display === 'block') {
+            closeProdCombobox();
+            return;
+        }
+
+        closeProdCombobox(); // close any existing open menu
+
+        activeProdBtn = btn;
+        activeProdSelect = select;
+        activeProductTriggerSelect = select;
+
+        const menu = document.getElementById('prod_combo_menu');
+        const rect = btn.getBoundingClientRect();
+
+        // Position fixed relative to viewport
+        const menuWidth = Math.max(rect.width, 320);
+        menu.style.width = menuWidth + 'px';
+        menu.style.left = rect.left + 'px';
+
+        // Check if fits below viewport
+        const spaceBelow = window.innerHeight - rect.bottom;
+        if (spaceBelow < 260 && rect.top > 260) {
+            menu.style.top = (rect.top - 265) + 'px';
+        } else {
+            menu.style.top = (rect.bottom + 4) + 'px';
+        }
+
+        btn.classList.add('open');
+        menu.style.display = 'block';
+
+        const searchInput = document.getElementById('prod_search_input');
+        if (searchInput) {
+            searchInput.value = '';
+            filterProdOptions('');
+            searchInput.focus();
+        }
+    }
+
+    function closeProdCombobox() {
+        const menu = document.getElementById('prod_combo_menu');
+        if (menu) menu.style.display = 'none';
+        if (activeProdBtn) {
+            activeProdBtn.classList.remove('open');
+            activeProdBtn = null;
+        }
+    }
+
+    function filterProdOptions(query) {
+        const q = (query || '').toLowerCase().trim();
+        const container = document.getElementById('prod_combo_list');
+        const emptyState = document.getElementById('prod_combo_empty');
+        if (!container) return;
+
+        const filtered = products.filter(p => {
+            const name = (p.name || '').toLowerCase();
+            const code = (p.code || '').toLowerCase();
+            return name.includes(q) || code.includes(q);
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = '';
+            if (emptyState) emptyState.style.display = 'block';
+            return;
+        }
+        if (emptyState) emptyState.style.display = 'none';
+
+        const currentVal = activeProdSelect ? activeProdSelect.value : '';
+
+        let html = '';
+        filtered.forEach(p => {
+            const isSelected = String(p.id) === String(currentVal);
+            const isService = p.product_type === 'Service';
+            const iconClass = isService ? 'fa-wrench' : 'fa-box';
+            const iconBg = isService ? '#ecfeff' : '#eff6ff';
+            const iconColor = isService ? '#0891b2' : '#2563eb';
+            const safeName = p.name.replace(/'/g, "\\'");
+
+            const priceStr = parseFloat(p.selling_price || 0).toLocaleString('en-NP', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const subtext = `${p.code ? 'Code: ' + p.code + ' | ' : ''}${p.unit ? p.unit + ' | ' : ''}Rs. ${priceStr}`;
+
+            html += `
+            <div class="prod-option-item ${isSelected ? 'selected' : ''}" onclick="selectProdFromCombobox(${p.id}, '${safeName}')">
+                <div style="display:flex; align-items:center; gap:9px; min-width:0;">
+                    <div style="width:28px; height:28px; background:${iconBg}; color:${iconColor}; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0;">
+                        <i class="fa-solid ${iconClass}"></i>
+                    </div>
+                    <div style="min-width:0; overflow:hidden;">
+                        <div style="font-weight:600; font-size:12.5px; color:#1e293b; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${p.name}</div>
+                        <div style="font-size:11px; color:#64748b; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${subtext}</div>
+                    </div>
+                </div>
+                ${isSelected ? '<i class="fa-solid fa-check text-primary" style="font-size:13px; flex-shrink:0; color:#2563eb;"></i>' : ''}
+            </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function selectProdFromCombobox(productId, productName) {
+        if (!activeProdSelect) return;
+        activeProdSelect.value = productId;
+        updateProdBtnLabel(activeProdBtn, productId);
+        closeProdCombobox();
+        productSelected(activeProdSelect);
+    }
+
+    function updateProdBtnLabel(btn, productId) {
+        if (!btn) return;
+        const p = products.find(prod => String(prod.id) === String(productId));
+        const labelSpan = btn.querySelector('.prod-combo-label');
+        const iconElem = btn.querySelector('.prod-icon');
+
+        if (p && labelSpan) {
+            const isService = p.product_type === 'Service';
+            if (iconElem) {
+                iconElem.className = `fa-solid ${isService ? 'fa-wrench' : 'fa-box'} prod-icon`;
+                iconElem.style.color = isService ? '#0891b2' : '#2563eb';
+            }
+            labelSpan.textContent = p.code ? `${p.code} - ${p.name}` : p.name;
+            labelSpan.style.color = '#1e293b';
+            labelSpan.style.fontWeight = '600';
+        } else if (labelSpan) {
+            if (iconElem) {
+                iconElem.className = 'fa-solid fa-box prod-icon';
+                iconElem.style.color = '#64748b';
+            }
+            labelSpan.textContent = 'Select Product...';
+            labelSpan.style.color = '#64748b';
+            labelSpan.style.fontWeight = '500';
+        }
+    }
+
+    function triggerAddNewProdFromDropdown() {
+        closeProdCombobox();
+        openAddProductModal(activeProductTriggerSelect);
+    }
+
+    // Close product combobox when clicking outside or scrolling
+    document.addEventListener('click', function (e) {
+        const menu = document.getElementById('prod_combo_menu');
+        if (menu && menu.style.display === 'block') {
+            if (!e.target.closest('#prod_combo_menu') && !e.target.closest('.prod-combo-btn')) {
+                closeProdCombobox();
+            }
+        }
+    });
+
+    window.addEventListener('scroll', function () {
+        const menu = document.getElementById('prod_combo_menu');
+        if (menu && menu.style.display === 'block') {
+            closeProdCombobox();
+        }
+    }, true);
+
+    function openAddProductModal(triggerElem = null) {
+        if (triggerElem) {
+            if (triggerElem.tagName === 'SELECT') {
+                activeProductTriggerSelect = triggerElem;
+                activeProdSelect = triggerElem;
+                const tr = triggerElem.closest('tr');
+                if (tr) activeProdBtn = tr.querySelector('.prod-combo-btn');
+            } else if (triggerElem.classList && triggerElem.classList.contains('prod-combo-btn')) {
+                activeProdBtn = triggerElem;
+                const tr = triggerElem.closest('tr');
+                if (tr) activeProductTriggerSelect = tr.querySelector('.row-product');
+            } else {
+                const tr = triggerElem.closest('tr');
+                if (tr) {
+                    activeProductTriggerSelect = tr.querySelector('.row-product');
+                    activeProdBtn = tr.querySelector('.prod-combo-btn');
+                }
+            }
+        }
+        const modal = document.getElementById('productModal');
+        const form = document.getElementById('quickProductForm');
+        const errBox = document.getElementById('quickProductError');
+        if (form) form.reset();
+        if (errBox) errBox.style.display = 'none';
+        if (modal) modal.style.display = 'flex';
+        setTimeout(() => {
+            const nameInput = document.getElementById('qp_name');
+            if (nameInput) nameInput.focus();
+        }, 100);
+    }
+
+    function closeAddProductModal() {
+        const modal = document.getElementById('productModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function refreshAllProductSelects(newSelectedId = null, targetSelect = null) {
+        let productOptions = '<option value="">Select Product...</option>';
+        products.forEach(p => {
+            productOptions += `<option value="${p.id}">${p.code ? p.code + ' - ' : ''}${p.name}</option>`;
+        });
+
+        document.querySelectorAll('.row-product').forEach(select => {
+            const currentVal = select.value;
+            select.innerHTML = productOptions;
+            const tr = select.closest('tr');
+            const btn = tr ? tr.querySelector('.prod-combo-btn') : null;
+
+            if (select === targetSelect && newSelectedId) {
+                select.value = newSelectedId;
+                if (btn) updateProdBtnLabel(btn, newSelectedId);
+            } else if (currentVal) {
+                select.value = currentVal;
+                if (btn) updateProdBtnLabel(btn, currentVal);
+            }
+        });
+
+        if (targetSelect && newSelectedId) {
+            productSelected(targetSelect);
+        }
+    }
+
+    function submitQuickProductForm(event) {
+        event.preventDefault();
+        const btn = document.getElementById('btn_save_quick_product');
+        const errBox = document.getElementById('quickProductError');
+        const errText = document.getElementById('quickProductErrorText');
+
+        const formData = new FormData(event.target);
+        const dataObj = {};
+        formData.forEach((val, key) => dataObj[key] = val);
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+        if (errBox) errBox.style.display = 'none';
+
+        fetch('/api/products/add/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken') || ''
+            },
+            body: JSON.stringify(dataObj)
+        })
+        .then(r => r.json())
+        .then(res => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Save Product';
+
+            if (res.status === 'success' && res.product) {
+                products.push(res.product);
+                closeAddProductModal();
+                refreshAllProductSelects(res.product.id, activeProductTriggerSelect);
+                activeProductTriggerSelect = null;
+            } else {
+                if (errBox && errText) {
+                    errText.textContent = res.message || 'Failed to save product.';
+                    errBox.style.display = 'flex';
+                }
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Save Product';
+            if (errBox && errText) {
+                errText.textContent = 'Server error. Please try again.';
+                errBox.style.display = 'flex';
+            }
+        });
+    }
+
     function addRow() {
         const tbody = document.getElementById("itemsBody");
         const tr = document.createElement("tr");
@@ -1797,16 +2171,28 @@
         tr.innerHTML = `
             <td style="text-align:center; font-weight:600; color:var(--text-gray);" class="row-num">1</td>
             <td>
-                <select class="form-select row-product" name="product_id[]" onchange="productSelected(this)" required>
-                    ${productOptions}
-                </select>
+                <div style="display:flex; gap:6px; align-items:center; position:relative;">
+                    <button type="button" class="prod-combo-btn" onclick="toggleProdCombobox(event, this)">
+                        <div style="display:flex; align-items:center; gap:8px; min-width:0; overflow:hidden;">
+                            <i class="fa-solid fa-box prod-icon" style="color:#64748b; font-size:13px; flex-shrink:0;"></i>
+                            <span class="prod-combo-label" style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap; color:#64748b;">Select Product...</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down prod-combo-arrow" style="color:#94a3b8; font-size:11px; transition:transform 0.2s; flex-shrink:0;"></i>
+                    </button>
+                    <button type="button" onclick="openAddProductModal(this)" title="Add New Product" style="flex-shrink:0; width:28px; height:28px; border:none; border-radius:6px; background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#ffffff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:12px; box-shadow:0 2px 4px rgba(37,99,235,0.25); transition:transform .1s;">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                    <select class="form-select row-product" name="product_id[]" style="display:none;" required onchange="productSelected(this)">
+                        ${productOptions}
+                    </select>
+                </div>
             </td>
             <td><input type="text" class="form-control" name="description[]" placeholder="Description"></td>
             <td><input type="text" class="row-hs-code" name="hs_code[]" placeholder="e.g. 0901.11" style="width:100%; border:1px solid var(--border); border-radius:4px; padding:4px 6px; font-size:12px; font-family:monospace; color:#475569;"></td>
             <td><input type="number" step="0.01" class="row-qty" name="quantity[]" value="1" oninput="calculateRow(this)" required></td>
             <td>
                 <select class="form-select row-unit" name="unit[]">
-                    <option>Pcs</option><option>Kg</option><option>Box</option>
+                    <option>Pcs</option><option>Kg</option><option>Box</option><option>Ltr</option><option>Bag</option><option>Meter</option><option>Set</option><option>Pair</option><option>Dozen</option><option>Other</option>
                 </select>
             </td>
             <td><input type="number" step="0.01" class="row-rate" name="unit_price[]" value="0.00" oninput="calculateRow(this)" required></td>
