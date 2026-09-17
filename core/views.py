@@ -624,6 +624,28 @@ class InvoiceAddView(View):
 
         grand_total = subtotal_taxable + subtotal_nontaxable + total_vat
         
+        # Global (summary-level) discount
+        global_disc_val = Decimal(request.POST.get('global_discount', '0') or '0')
+        global_disc_type = request.POST.get('global_discount_type', 'Percent')
+        global_disc_amt = Decimal('0.00')
+        raw_subtotal = subtotal_taxable + subtotal_nontaxable
+        if global_disc_val > 0 and raw_subtotal > 0:
+            if global_disc_type == 'Percent':
+                global_disc_amt = raw_subtotal * (global_disc_val / Decimal('100'))
+            else:
+                global_disc_amt = min(global_disc_val, raw_subtotal)
+            # Reduce taxable/non-taxable proportionally
+            tax_ratio = subtotal_taxable / raw_subtotal if raw_subtotal else Decimal('0')
+            subtotal_taxable = (raw_subtotal - global_disc_amt) * tax_ratio
+            subtotal_nontaxable = (raw_subtotal - global_disc_amt) * (1 - tax_ratio)
+            if invoice.vat_treatment == 'Standard':
+                total_vat = subtotal_taxable * Decimal('0.13')
+            else:
+                total_vat = Decimal('0.00')
+            grand_total = subtotal_taxable + subtotal_nontaxable + total_vat
+
+        total_discount += global_disc_amt if 'total_discount' in dir() else global_disc_amt
+        
         # Round off (if passed from JS)
         round_off = request.POST.get('round_off', '0.00')
         invoice.round_off = Decimal(round_off) if round_off else Decimal('0.00')

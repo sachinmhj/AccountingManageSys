@@ -1279,7 +1279,30 @@
                     <div class="panel" id="panel_summary" style="margin-bottom:0;">
                         <div class="panel-header" id="header_summary">Summary</div>
                         <div class="summary-row"><span>Sub Total</span><span id="lbl_subtotal">0.00</span></div>
-                        <div class="summary-row"><span>Discount</span><span id="lbl_discount">0.00</span></div>
+
+                        <!-- Global Discount Row (editable) -->
+                        <div class="summary-row" style="align-items:center;">
+                            <span style="display:flex; align-items:center; gap:6px;">
+                                Discount
+                                <!-- % / Amt toggle -->
+                                <span id="global_disc_type_toggle"
+                                    style="display:inline-flex; border:1px solid #cbd5e1; border-radius:5px; overflow:hidden; font-size:10.5px; font-weight:700; cursor:pointer; user-select:none;">
+                                    <span id="gdt_pct" onclick="setGlobalDiscType('Percent')"
+                                        style="padding:2px 7px; background:#2563eb; color:#fff; transition:all .12s;">%</span>
+                                    <span id="gdt_amt" onclick="setGlobalDiscType('Amount')"
+                                        style="padding:2px 7px; background:#f1f5f9; color:#64748b; transition:all .12s;">Amt</span>
+                                </span>
+                            </span>
+                            <span style="display:flex; align-items:center; gap:6px;">
+                                <input type="number" step="0.01" min="0" id="inp_global_discount" name="global_discount"
+                                    style="width:70px; text-align:right; border:1px solid #cbd5e1; border-radius:5px; padding:3px 6px; font-size:12px; font-weight:600;"
+                                    value="0" placeholder="0" oninput="calculateTotals()">
+                                <input type="hidden" name="global_discount_type" id="inp_global_discount_type" value="Percent">
+                                <span id="lbl_global_discount_amt" style="color:#dc2626; font-weight:600; min-width:45px; text-align:right;">0.00</span>
+                            </span>
+                        </div>
+
+                        <div class="summary-row"><span>Item Discounts</span><span id="lbl_discount" style="color:#dc2626;">0.00</span></div>
                         <div class="summary-row"><span>Non Taxable Amount</span><span id="lbl_non_taxable">0.00</span>
                         </div>
                         <div class="summary-row"><span>Taxable Amount</span><span id="lbl_taxable">0.00</span></div>
@@ -2412,9 +2435,27 @@
     }
 
     // 6. Calculate Global Totals
+    // ── Global Discount Toggle ──────────────────────────────────
+    let _globalDiscType = 'Percent';
+
+    function setGlobalDiscType(type) {
+        _globalDiscType = type;
+        document.getElementById('inp_global_discount_type').value = type;
+        const pctBtn = document.getElementById('gdt_pct');
+        const amtBtn = document.getElementById('gdt_amt');
+        if (type === 'Percent') {
+            pctBtn.style.background = '#2563eb'; pctBtn.style.color = '#fff';
+            amtBtn.style.background = '#f1f5f9'; amtBtn.style.color = '#64748b';
+        } else {
+            amtBtn.style.background = '#2563eb'; amtBtn.style.color = '#fff';
+            pctBtn.style.background = '#f1f5f9'; pctBtn.style.color = '#64748b';
+        }
+        calculateTotals();
+    }
+
     function calculateTotals() {
         let subTotal = 0;
-        let totalDiscount = 0;
+        let totalItemDiscount = 0;
         let taxableAmount = 0;
         let nonTaxableAmount = 0;
         let vat = 0;
@@ -2438,35 +2479,55 @@
             const lineSub = lineGross - lineDisc;
 
             subTotal += lineSub;
-            totalDiscount += lineDisc;
+            totalItemDiscount += lineDisc;
 
             const isTaxable = (overallVt === 'Standard') && (taxType === 'Standard' || taxType === 'Taxable');
             if (isTaxable) {
                 taxableAmount += lineSub;
-                vat += lineSub * 0.13;
             } else {
                 nonTaxableAmount += lineSub;
             }
 
-            // Cost from dataset
             totalCost += parseFloat(tr.dataset.cost) || 0;
         });
 
+        // ── Apply Global (Summary) Discount ─────────────────────
+        const globalDiscVal = parseFloat(document.getElementById('inp_global_discount')?.value) || 0;
+        const globalDiscType = _globalDiscType;
+        let globalDiscAmt = 0;
+        if (globalDiscType === 'Percent') {
+            globalDiscAmt = subTotal * (globalDiscVal / 100);
+        } else {
+            globalDiscAmt = Math.min(globalDiscVal, subTotal); // can't exceed subtotal
+        }
+
+        // Reduce taxable/non-taxable proportionally
+        const afterGlobalDisc = subTotal - globalDiscAmt;
+        const taxRatio = subTotal > 0 ? taxableAmount / subTotal : 0;
+        const nonTaxRatio = subTotal > 0 ? nonTaxableAmount / subTotal : 0;
+        taxableAmount = afterGlobalDisc * taxRatio;
+        nonTaxableAmount = afterGlobalDisc * nonTaxRatio;
+
+        // Recalculate VAT on post-discount taxable amount
+        vat = (overallVt === 'Standard') ? taxableAmount * 0.13 : 0;
+
+        // Update global discount display
+        const gdAmt = document.getElementById('lbl_global_discount_amt');
+        if (gdAmt) gdAmt.textContent = globalDiscAmt.toFixed(2);
+
         const roundOff = parseFloat(document.getElementById("inp_round_off").value) || 0;
-        // Respect the VAT-inclusive / VAT-exclusive setting
         const inclVatForTotal = (window._amountInclVat !== undefined) ? window._amountInclVat : true;
-        grandTotal = subTotal + (inclVatForTotal ? vat : 0) + roundOff;
+        grandTotal = afterGlobalDisc + (inclVatForTotal ? vat : 0) + roundOff;
         const grossProfit = grandTotal - totalCost;
         const margin = grandTotal > 0 ? (grossProfit / grandTotal) * 100 : 0;
 
-        // Update Summary UI
         const setVal = (id, val) => {
             const el = document.getElementById(id);
             if (el) el.textContent = val;
         };
 
         setVal("lbl_subtotal", subTotal.toFixed(2));
-        setVal("lbl_discount", totalDiscount.toFixed(2));
+        setVal("lbl_discount", totalItemDiscount.toFixed(2));
         setVal("lbl_non_taxable", nonTaxableAmount.toFixed(2));
         setVal("lbl_taxable", taxableAmount.toFixed(2));
         setVal("lbl_vat", vat.toFixed(2));
@@ -2474,7 +2535,6 @@
         setVal("lbl_total_cost", totalCost.toFixed(2));
         setVal("lbl_gross_profit", grossProfit.toFixed(2));
         setVal("lbl_profit_margin", margin.toFixed(2) + '%');
-
         setVal("pay_total_due", grandTotal.toFixed(2));
         setVal("ftr_total", `Rs. ${grandTotal.toFixed(2)}`);
 
