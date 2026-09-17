@@ -312,10 +312,9 @@
                     </select>
                 </div>
                 <div>
-                    <label><i class="fa-solid fa-paperclip" style="color:var(--primary); margin-right:4px;"></i> Bill
-                        Image / Memo</label>
-                    <input type="file" name="bill_attachment" id="return_attachment_input" accept="image/*,.pdf"
-                        style="display:none;" onchange="handleReturnFileSelect(this.files[0])">
+                    <label><i class="fa-solid fa-paperclip" style="color:var(--primary); margin-right:4px;"></i> Bill Attachments <span style="font-size:10.5px; color:#94a3b8; font-weight:400;">(Multiple allowed)</span></label>
+                    <input type="file" name="bill_attachments" id="return_attachment_input" accept="image/*,.pdf" multiple
+                        style="display:none;" onchange="handleReturnFilesSelect(this.files)">
 
                     <!-- Drop Zone -->
                     <div id="return_attach_dropzone"
@@ -330,48 +329,20 @@
                                 <i class="fa-solid fa-cloud-arrow-up" style="font-size:13px;"></i>
                             </div>
                             <div>
-                                <div style="font-size:11.5px; font-weight:600; color:#334155;">Upload Bill / Memo</div>
-                                <div style="font-size:10px; color:#94a3b8;">PNG, JPG, PDF</div>
+                                <div style="font-size:11.5px; font-weight:600; color:#334155;">Upload Bill(s) / Memo(s)</div>
+                                <div style="font-size:10px; color:#94a3b8;">PNG, JPG, PDF (Multi-file)</div>
                             </div>
                         </div>
-                        <span
-                            style="font-size:10.5px; font-weight:600; color:#2563eb; background:#dbeafe; padding:3px 8px; border-radius:5px;">Browse</span>
+                        <span style="font-size:10.5px; font-weight:600; color:#2563eb; background:#dbeafe; padding:3px 8px; border-radius:5px;">Browse</span>
                     </div>
 
-                    <!-- Attachment Summary Pill (shown after file selected) -->
-                    <div id="return_attach_preview_pill"
-                        style="display:none; border:1px solid #bfdbfe; background:#eff6ff; border-radius:8px; padding:6px 10px; align-items:center; justify-content:space-between;">
-                        <div style="display:flex; align-items:center; gap:8px; min-width:0;">
-                            <div
-                                style="width:30px; height:30px; background:#2563eb; color:#fff; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                                <i id="return_preview_icon" class="fa-solid fa-file-image"></i>
-                            </div>
-                            <div style="min-width:0; overflow:hidden;">
-                                <div id="return_preview_filename"
-                                    style="font-size:11.5px; font-weight:600; color:#1e293b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:90px;">
-                                </div>
-                                <div style="font-size:10px; color:#16a34a; font-weight:600;"><i
-                                        class="fa-solid fa-circle-check"></i> Attached</div>
-                            </div>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
-                            <button type="button" class="btn"
-                                style="padding:4px 7px; font-size:10.5px; background:#2563eb; color:#fff; border:none;"
-                                onclick="openAttachmentPreviewModal()" title="Preview File">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
-                            <button type="button" class="btn"
-                                style="padding:4px 7px; font-size:10.5px; background:#fff; color:#475569; border:1px solid #cbd5e1;"
-                                onclick="document.getElementById('return_attachment_input').click()"
-                                title="Change File">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button type="button" class="btn"
-                                style="padding:4px 7px; font-size:10.5px; background:#fee2e2; color:#dc2626; border:none;"
-                                onclick="clearReturnAttachment()" title="Remove File">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
+                    <!-- Multi-Attachment List Container -->
+                    <div id="return_attach_list_container" style="display:none; flex-direction:column; gap:5px; margin-top:6px;">
+                        <div id="return_attach_pills" style="display:flex; flex-direction:column; gap:4px; max-height:140px; overflow-y:auto;"></div>
+                        <button type="button" class="btn" style="padding:4px 8px; font-size:11px; color:#2563eb; background:#eff6ff; border:1px solid #bfdbfe; font-weight:600;"
+                            onclick="document.getElementById('return_attachment_input').click();">
+                            <i class="fa-solid fa-plus"></i> Add More Attachments
+                        </button>
                     </div>
                 </div>
                 <div>
@@ -787,36 +758,66 @@
     }
 
     /* ── Attachment Handling & Preview Modal ────────────────────── */
-    let returnAttachmentFile = null;
-    let returnAttachmentObjectUrl = null;
+    let returnAttachmentFiles = [];
 
-    function handleReturnFileSelect(file) {
-        if (!file) return;
-        returnAttachmentFile = file;
-
-        if (returnAttachmentObjectUrl) {
-            URL.revokeObjectURL(returnAttachmentObjectUrl);
-        }
-        returnAttachmentObjectUrl = URL.createObjectURL(file);
-
-        const dropzone = document.getElementById('return_attach_dropzone');
-        const pill = document.getElementById('return_attach_preview_pill');
-        const filenameEl = document.getElementById('return_preview_filename');
-        const iconEl = document.getElementById('return_preview_icon');
-
-        if (filenameEl) filenameEl.textContent = file.name;
-        if (iconEl) {
-            if (file.type.startsWith('image/')) {
-                iconEl.className = 'fa-solid fa-file-image';
-            } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
-                iconEl.className = 'fa-solid fa-file-pdf';
-            } else {
-                iconEl.className = 'fa-solid fa-file-lines';
+    function handleReturnFilesSelect(files) {
+        if (!files || files.length === 0) return;
+        Array.from(files).forEach(f => {
+            if (!returnAttachmentFiles.some(ex => ex.name === f.name && ex.size === f.size)) {
+                returnAttachmentFiles.push(f);
             }
+        });
+        syncReturnFilesInput();
+        renderReturnFilesList();
+    }
+
+    function syncReturnFilesInput() {
+        const input = document.getElementById('return_attachment_input');
+        if (!input) return;
+        const dt = new DataTransfer();
+        returnAttachmentFiles.forEach(f => dt.items.add(f));
+        input.files = dt.files;
+    }
+
+    function renderReturnFilesList() {
+        const dz = document.getElementById('return_attach_dropzone');
+        const container = document.getElementById('return_attach_list_container');
+        const pills = document.getElementById('return_attach_pills');
+
+        if (returnAttachmentFiles.length === 0) {
+            if (dz) dz.style.display = 'flex';
+            if (container) container.style.display = 'none';
+            return;
         }
 
-        if (dropzone) dropzone.style.display = 'none';
-        if (pill) pill.style.display = 'flex';
+        if (dz) dz.style.display = 'none';
+        if (container) container.style.display = 'flex';
+
+        pills.innerHTML = '';
+        returnAttachmentFiles.forEach((f, idx) => {
+            const sizeKB = (f.size / 1024).toFixed(0);
+            const sizeStr = f.size > 1024 * 1024 ? `${(f.size / 1048576).toFixed(1)} MB` : `${sizeKB} KB`;
+            const ext = f.name.split('.').pop().toUpperCase();
+            const html = `
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:5px 10px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:6px; font-size:11.5px;">
+                    <div style="display:flex; align-items:center; gap:6px; min-width:0; flex:1;">
+                        <span style="background:#2563eb; color:#fff; border-radius:4px; padding:1px 5px; font-size:10px; font-weight:700; flex-shrink:0;">${ext}</span>
+                        <span style="font-weight:600; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${f.name}</span>
+                        <span style="color:#94a3b8; font-size:10px; flex-shrink:0;">${sizeStr}</span>
+                    </div>
+                    <button type="button" onclick="removeReturnFile(${idx})" style="border:none; background:none; color:#dc2626; cursor:pointer; font-size:13px; flex-shrink:0; margin-left:6px;" title="Remove">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            `;
+            pills.insertAdjacentHTML('beforeend', html);
+        });
+    }
+
+    function removeReturnFile(idx) {
+        returnAttachmentFiles.splice(idx, 1);
+        syncReturnFilesInput();
+        renderReturnFilesList();
     }
 
     function handleReturnFileDrop(e) {
@@ -827,63 +828,19 @@
             dropzone.style.background = '#f8fafc';
         }
         const files = e.dataTransfer ? e.dataTransfer.files : null;
-        if (files && files[0]) {
-            const input = document.getElementById('return_attachment_input');
-            const dt = new DataTransfer();
-            dt.items.add(files[0]);
-            input.files = dt.files;
-            handleReturnFileSelect(files[0]);
+        if (files && files.length > 0) {
+            handleReturnFilesSelect(files);
         }
     }
 
     function clearReturnAttachment() {
         const input = document.getElementById('return_attachment_input');
         const dropzone = document.getElementById('return_attach_dropzone');
-        const pill = document.getElementById('return_attach_preview_pill');
-
+        const container = document.getElementById('return_attach_list_container');
         if (input) input.value = '';
-        if (returnAttachmentObjectUrl) {
-            URL.revokeObjectURL(returnAttachmentObjectUrl);
-            returnAttachmentObjectUrl = null;
-        }
-        returnAttachmentFile = null;
-
+        returnAttachmentFiles = [];
         if (dropzone) dropzone.style.display = 'flex';
-        if (pill) pill.style.display = 'none';
-    }
-
-    function openAttachmentPreviewModal() {
-        if (!returnAttachmentFile || !returnAttachmentObjectUrl) return;
-        const modal = document.getElementById('attachmentPreviewModal');
-        const img = document.getElementById('modal_preview_image');
-        const pdf = document.getElementById('modal_preview_pdf');
-        const fallback = document.getElementById('modal_preview_fallback');
-        const filenameLabel = document.getElementById('modal_preview_filename');
-
-        if (filenameLabel) filenameLabel.textContent = returnAttachmentFile.name;
-
-        if (returnAttachmentFile.type.startsWith('image/')) {
-            img.src = returnAttachmentObjectUrl;
-            img.style.display = 'block';
-            pdf.style.display = 'none';
-            fallback.style.display = 'none';
-        } else if (returnAttachmentFile.type === 'application/pdf' || returnAttachmentFile.name.endsWith('.pdf')) {
-            pdf.src = returnAttachmentObjectUrl;
-            pdf.style.display = 'block';
-            img.style.display = 'none';
-            fallback.style.display = 'none';
-        } else {
-            img.style.display = 'none';
-            pdf.style.display = 'none';
-            fallback.style.display = 'block';
-        }
-
-        if (modal) modal.style.display = 'flex';
-    }
-
-    function closeAttachmentPreviewModal() {
-        const modal = document.getElementById('attachmentPreviewModal');
-        if (modal) modal.style.display = 'none';
+        if (container) container.style.display = 'none';
     }
 </script>
 

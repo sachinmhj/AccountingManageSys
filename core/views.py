@@ -14,7 +14,8 @@ from .models import (
     PurchaseBill, PurchaseBillItem, Expense, ExpenseCategory,
     SupplierPayment, SalesReturn, SalesReturnItem, UserProfile,
     ContactPerson, Quotation, QuotationItem, ReceiptDocument,
-    SalesOrder, SalesOrderItem, PageHelpGuide, PageNote, PageVideoTutorial
+    SalesOrder, SalesOrderItem, PageHelpGuide, PageNote, PageVideoTutorial,
+    BillAttachment
 )
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -180,7 +181,10 @@ class SalesReturnView(View):
         if original_invoice_id:
             original_invoice = Invoice.objects.filter(id=original_invoice_id).first()
 
-        bill_attachment = request.FILES.get('bill_attachment')
+        bill_files = request.FILES.getlist('bill_attachments')
+        if not bill_files:
+            bill_files = request.FILES.getlist('bill_attachment')
+        first_bill = bill_files[0] if bill_files else None
 
         sales_return = SalesReturn.objects.create(
             customer=customer,
@@ -190,10 +194,18 @@ class SalesReturnView(View):
             mobile=mobile,
             refund_method=refund_method,
             notes=notes,
-            bill_attachment=bill_attachment,
+            bill_attachment=first_bill,
             status='Pending',
             created_by=request.user if request.user.is_authenticated else None
         )
+
+        for bf in bill_files:
+            BillAttachment.objects.create(
+                sales_return=sales_return,
+                file=bf,
+                original_name=bf.name,
+                file_size=bf.size if hasattr(bf, 'size') else 0
+            )
 
         product_ids    = request.POST.getlist('product_id[]')
         returned_qtys  = request.POST.getlist('returned_qty[]')
@@ -739,10 +751,20 @@ class InvoiceAddView(View):
         else:
             invoice.status = 'Unpaid'
 
-        # Save bill attachment if uploaded
-        bill_file = request.FILES.get('bill_attachment')
-        if bill_file:
-            invoice.bill_attachment = bill_file
+        # Save bill attachments if uploaded
+        bill_files = request.FILES.getlist('bill_attachments')
+        if not bill_files:
+            bill_files = request.FILES.getlist('bill_attachment')
+
+        for idx, bf in enumerate(bill_files):
+            BillAttachment.objects.create(
+                invoice=invoice,
+                file=bf,
+                original_name=bf.name,
+                file_size=bf.size if hasattr(bf, 'size') else 0
+            )
+            if idx == 0 and not invoice.bill_attachment:
+                invoice.bill_attachment = bf
 
         invoice.save()
 

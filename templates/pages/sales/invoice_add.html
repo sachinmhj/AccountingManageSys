@@ -153,6 +153,7 @@
         border-radius: 10px;
         box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
         overflow: hidden;
+        min-width: 280px;
         animation: custSlideDown 0.18s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -430,8 +431,16 @@
         gap: 16px;
     }
 
-    .panel-responsive-scroll {
+    .grid-4 > * {
+        min-width: 0;
+        width: 100%;
         overflow: visible;
+        box-sizing: border-box;
+    }
+
+    .panel-responsive-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .panel-responsive-scroll .grid-4 {
@@ -811,7 +820,7 @@
 {% endblock %}
 
 {% block content %}
-<form method="POST" action="{% url 'invoice_add' %}" id="invoiceForm" enctype="multipart/form-data">
+<form method="POST" action="{% url 'invoice_add' %}" id="invoiceForm" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
 
     <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 16px 8px 16px;">
@@ -831,7 +840,7 @@
         <div style="display:flex; gap:8px;">
             <button type="button" class="btn" onclick="toggleSettingsModal()"><i class="fa-solid fa-gear"></i>
                 Settings</button>
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-primary" onclick="submitInvoiceForm()">Save</button>
         </div>
     </div>
 
@@ -865,7 +874,7 @@
                                         <!-- Direct Inline Search Input Control Box (Tigg Style) -->
                                         <div style="position:relative; width:100%;">
                                             <input type="text" id="cust_combo_input" class="form-control"
-                                                placeholder="Search customer by name, phone, PAN..." autocomplete="off"
+                                                placeholder="Select Customer..." autocomplete="off"
                                                 onfocus="openCustDropdown()" onclick="openCustDropdown()"
                                                 oninput="onCustInput(this.value)" onblur="onCustInputBlur()"
                                                 style="height:36px; padding-right:32px; font-weight:500; cursor:text; background:#ffffff;">
@@ -1028,7 +1037,7 @@
                                 <!-- Trigger Button -->
                                 <button type="button" id="vt_combo_btn" onclick="toggleVtDropdown(event)"
                                     style="width:100%; height:38px; padding:0 12px; border:1.5px solid #cbd5e1; border-radius:7px; background:#fff; display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-size:13px; transition:border-color .15s, box-shadow .15s; outline:none; box-sizing:border-box;">
-                                    <span id="vt_display_val" style="font-size:15px; font-weight:700; color:#1e293b; letter-spacing:0.5px;">13%</span>
+                                    <span id="vt_display_val" style="font-size:13px; font-weight:600; color:#1e293b;"><span style="color:#2563eb; font-weight:700;">%</span> Standard (13%)</span>
                                     <i class="fa-solid fa-chevron-down" id="vt_combo_arrow" style="color:#94a3b8; font-size:11px; transition:transform .2s;"></i>
                                 </button>
 
@@ -1090,86 +1099,74 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Bill Attachment inside Customer & Invoice Info (Single Grid Cell beside Due Date) -->
+                            <!-- Bill Attachment Section (Compact 48px Cell Matching Grid Row) -->
                             <div id="field_bill_attachment">
                                 <label style="display:flex; align-items:center; gap:6px;">
                                     <i class="fa-solid fa-paperclip" style="color:#2563eb; font-size:13px;"></i>
-                                    Bill Attachment
+                                    Bill Attachment(s)
                                     <span style="font-size:11px; font-weight:400; color:#94a3b8;">(Optional)</span>
                                 </label>
 
-                                <!-- Drop Zone -->
+                                <!-- Drop Zone (shown when 0 files attached) -->
                                 <div id="attachDropZone"
-                                    style="border:2px dashed #cbd5e1; border-radius:8px; padding:6px 10px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition:all 0.2s; background:#f8fafc; min-height:48px;"
+                                    style="border:2px dashed #cbd5e1; border-radius:8px; padding:6px 10px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition:all 0.2s; background:#f8fafc; height:48px; box-sizing:border-box;"
                                     ondragover="event.preventDefault(); this.style.borderColor='#2563eb'; this.style.background='#eff6ff';"
                                     ondragleave="this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc';"
                                     ondrop="handleAttachDrop(event);"
-                                    onclick="document.getElementById('bill_attachment_input').click();">
+                                    onclick="triggerFilePick();">
                                     <div style="display:flex; align-items:center; gap:8px; min-width:0;">
-                                        <div
-                                            style="width:30px; height:30px; background:#eff6ff; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                                            <i class="fa-solid fa-cloud-arrow-up"
-                                                style="font-size:14px; color:#2563eb;"></i>
+                                        <div style="width:30px; height:30px; background:#eff6ff; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                            <i class="fa-solid fa-cloud-arrow-up" style="font-size:14px; color:#2563eb;"></i>
                                         </div>
                                         <div style="min-width:0; overflow:hidden;">
-                                            <div
-                                                style="font-size:11.5px; font-weight:600; color:#475569; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">
-                                                Upload Bill</div>
-                                            <div style="font-size:10px; color:#94a3b8; white-space:nowrap;">PDF, JPG,
-                                                PNG</div>
+                                            <div style="font-size:11.5px; font-weight:600; color:#475569; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">Upload Bill</div>
+                                            <div style="font-size:10px; color:#94a3b8; white-space:nowrap;">PDF, JPG, PNG</div>
                                         </div>
                                     </div>
-                                    <span
-                                        style="font-size:10.5px; font-weight:600; color:#2563eb; background:#dbeafe; padding:3px 8px; border-radius:5px; flex-shrink:0;">Browse</span>
+                                    <span style="font-size:10.5px; font-weight:600; color:#2563eb; background:#dbeafe; padding:3px 8px; border-radius:5px; flex-shrink:0;">Browse</span>
                                 </div>
 
-                                <!-- Hidden file input -->
-                                <input type="file" name="bill_attachment" id="bill_attachment_input"
-                                    accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx" style="display:none;"
-                                    onchange="previewAttachment(this.files[0]);">
-                                <input type="hidden" name="linked_doc_id" id="linked_doc_id_input"
-                                    value="{% if preloaded_doc %}{{ preloaded_doc.id }}{% endif %}">
-                                <input type="hidden" name="source_quotation_id" id="sourceQuotationId" value="">
-                                <input type="hidden" name="source_sales_order_id" id="sourceSalesOrderId" value="">
-
-                                <!-- Attached File Summary Pill (shown when file is selected) -->
-                                <div id="attachPreview"
-                                    style="display:none; padding:6px 10px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; align-items:center; justify-content:space-between; gap:8px; min-height:48px;">
+                                <!-- Attached Files Compact Summary Pill (shown when >= 1 files attached, height: 48px) -->
+                                <div id="attachFilesContainer"
+                                    style="display:none; width:100%; padding:0 8px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; align-items:center; justify-content:space-between; gap:4px; height:48px; box-sizing:border-box; overflow:hidden;">
                                     <div style="display:flex; align-items:center; gap:8px; min-width:0; flex:1;">
-                                        <div
-                                            style="width:30px; height:30px; background:#2563eb; color:#ffffff; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0;">
-                                            <i id="previewDocIcon" class="fa-solid fa-file-invoice"></i>
+                                        <div style="width:30px; height:30px; background:linear-gradient(135deg,#2563eb,#1d4ed8); color:#ffffff; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; box-shadow:0 2px 6px rgba(37,99,235,0.25);">
+                                            <i id="attachMainIcon" class="fa-solid fa-paperclip"></i>
                                         </div>
-                                        <div style="min-width:0;">
-                                            <div id="previewFileName"
-                                                style="font-size:11.5px; font-weight:600; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:110px;">
-                                            </div>
-                                            <div style="font-size:10px; color:#16a34a; font-weight:600;">
-                                                <i class="fa-solid fa-circle-check"></i> Attached
+                                        <div style="min-width:0; flex:1; display:flex; flex-direction:column; justify-content:center; overflow:hidden;">
+                                            <div id="attachSummaryTitle" style="font-size:11.5px; font-weight:700; color:#1e293b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.2;">1 File Attached</div>
+                                            <div id="attachSummarySubtitle" style="font-size:10px; color:#16a34a; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.2; margin-top:2px;">
+                                                <i class="fa-solid fa-circle-check" style="font-size:9px;"></i> Ready
                                             </div>
                                         </div>
                                     </div>
                                     <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
                                         <button type="button" onclick="toggleViewerPanel()"
-                                            style="background:#2563eb; color:#ffffff; border:none; border-radius:5px; padding:4px 7px; font-size:10.5px; font-weight:600; cursor:pointer;"
-                                            title="View Split Panel">
-                                            <i class="fa-solid fa-eye"></i>
+                                            style="background:#2563eb; color:#ffffff; border:none; border-radius:6px; padding:5px 8px; font-size:10.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px; box-shadow:0 2px 5px rgba(37,99,235,0.25);"
+                                            title="View & Manage Attachments">
+                                            <i class="fa-solid fa-eye" style="font-size:9.5px;"></i> View
                                         </button>
-                                        <button type="button"
-                                            onclick="document.getElementById('bill_attachment_input').click()"
-                                            style="background:#ffffff; color:#475569; border:1px solid #cbd5e1; border-radius:5px; padding:4px 7px; font-size:10.5px; cursor:pointer;"
-                                            title="Change File">
-                                            <i class="fa-solid fa-pen"></i>
+                                        <button type="button" onclick="triggerFilePick()"
+                                            style="background:#ffffff; color:#2563eb; border:1px solid #bfdbfe; border-radius:6px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; cursor:pointer;"
+                                            title="Add More Files">
+                                            <i class="fa-solid fa-plus"></i>
                                         </button>
-                                        <button type="button" onclick="clearAttachment()"
-                                            style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; border-radius:5px; padding:4px 7px; font-size:10.5px; cursor:pointer;"
-                                            title="Remove Attachment">
+                                        <button type="button" onclick="clearAllAttachments()"
+                                            style="background:#fef2f2; color:#dc2626; border:1px solid #fca5a5; border-radius:6px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:10px; cursor:pointer;"
+                                            title="Remove All Attachments">
                                             <i class="fa-solid fa-trash-can"></i>
                                         </button>
                                     </div>
                                 </div>
+
+                                <!-- Hidden multi-file input -->
+                                <input type="file" name="bill_attachments" id="bill_attachment_input" multiple
+                                    accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.doc,.docx,.xls,.xlsx" style="display:none;"
+                                    onchange="handleMultipleFileSelect(this.files);">
+                                <input type="hidden" name="linked_doc_id" id="linked_doc_id_input" value="{% if preloaded_doc %}{{ preloaded_doc.id }}{% endif %}">
+                                <input type="hidden" name="source_quotation_id" id="sourceQuotationId" value="">
+                                <input type="hidden" name="source_sales_order_id" id="sourceSalesOrderId" value="">
                             </div>
-                            <!-- End Bill Attachment -->
 
                             <!-- ── Project Field (beside Bill Attachment) ── -->
                             <div id="field_projects" style="position:relative;">
@@ -1606,7 +1603,13 @@
                         <div style="font-size:11px; color:#64748b;">Split View Mode</div>
                     </div>
                 </div>
-                <div style="display:flex; align-items:center; gap:6px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <!-- Multi-file Navigation Controls -->
+                    <div id="viewerNavControls" style="display:none; align-items:center; gap:4px; background:#f1f5f9; padding:2px 6px; border-radius:6px; border:1px solid #cbd5e1;">
+                        <button type="button" onclick="navViewerFile(-1)" style="border:none; background:none; cursor:pointer; color:#475569; font-size:11px; padding:2px 4px;"><i class="fa-solid fa-chevron-left"></i></button>
+                        <span id="viewerFileCounter" style="font-size:10.5px; font-weight:700; color:#1e293b;">1 / 1</span>
+                        <button type="button" onclick="navViewerFile(1)" style="border:none; background:none; cursor:pointer; color:#475569; font-size:11px; padding:2px 4px;"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
                     <a id="viewerOpenTabBtn" href="#" target="_blank" class="viewer-hdr-btn"
                         title="Open attachment in new tab">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i>
@@ -1641,7 +1644,7 @@
                     <button type="button" class="viewer-tool-btn" onclick="rotateBillViewer()"
                         title="Rotate 90° Clockwise"><i class="fa-solid fa-rotate"></i> Rotate</button>
                 </div>
-                <button type="button" class="viewer-tool-btn danger" onclick="clearAttachment()" title="Remove File"><i
+                <button type="button" class="viewer-tool-btn danger" onclick="removeCurrentViewerFile()" title="Remove File"><i
                         class="fa-solid fa-trash-can"></i> Remove</button>
             </div>
 
@@ -1947,6 +1950,21 @@
     // 1. Load Products from backend JSON
     const products = JSON.parse('{{ products_json|safe|escapejs }}');
     let grandTotal = 0;
+
+    function submitInvoiceForm() {
+        const custSel = document.getElementById('customer_select');
+        if (!custSel || !custSel.value) {
+            const inp = document.getElementById('cust_combo_input');
+            if (inp) {
+                inp.style.outline = '2px solid #ef4444';
+                inp.focus();
+                setTimeout(() => { inp.style.outline = ''; }, 2000);
+            }
+            alert('Please select a Customer before saving.');
+            return;
+        }
+        document.getElementById('invoiceForm').submit();
+    }
 
     // 2. Add Initial Row + Init Dual Dates
     document.addEventListener("DOMContentLoaded", function () {
@@ -2631,10 +2649,11 @@
             closeCustDropdown();
             return;
         }
+        const dropW = Math.max(rect.width, 280);
         menu.style.position = 'fixed';
         menu.style.top = (rect.bottom + 4) + 'px';
         menu.style.left = rect.left + 'px';
-        menu.style.width = rect.width + 'px';
+        menu.style.width = dropW + 'px';
         menu.style.zIndex = '99999';
     }
 
@@ -2839,7 +2858,17 @@
 
         // Update trigger button text
         const disp = document.getElementById('vt_display_val');
-        if (disp) disp.textContent = displayText;
+        if (disp) {
+            if (val === 'Standard') {
+                disp.innerHTML = '<span style="color:#2563eb; font-weight:700;">%</span> Standard (13%)';
+            } else if (val === 'Zero Rated') {
+                disp.innerHTML = '<span style="color:#059669; font-weight:700;">%</span> Zero Rated (0%)';
+            } else if (val === 'Exempt') {
+                disp.innerHTML = '<span style="color:#dc2626; font-weight:700;">❌</span> Exempt';
+            } else {
+                disp.textContent = displayText;
+            }
+        }
 
         // Reset all pills to unselected style
         const pillStyles = {
@@ -3044,35 +3073,125 @@
         initCustCombobox();
     });
 
-    // ── Dynamic Split-Screen Bill Attachment Viewer Engine ───────────────
-    let currentAttachmentObjectUrl = null;
-    let currentAttachmentFile = null;
+    // ── Dynamic Split-Screen Bill Attachment Viewer Engine (Multi-file) ──
+    let selectedBillFiles = [];
+    let currentViewerIndex = 0;
     let billViewerScale = 1.0;
     let billViewerRotation = 0;
 
-    function previewAttachment(file) {
-        if (!file) return;
-        currentAttachmentFile = file;
+    const iconMap = {
+        'pdf': 'fa-file-pdf',
+        'jpg': 'fa-file-image',
+        'jpeg': 'fa-file-image',
+        'png': 'fa-file-image',
+        'gif': 'fa-file-image',
+        'webp': 'fa-file-image',
+        'doc': 'fa-file-word',
+        'docx': 'fa-file-word',
+        'xls': 'fa-file-excel',
+        'xlsx': 'fa-file-excel'
+    };
 
+    function triggerFilePick() {
+        document.getElementById('bill_attachment_input').click();
+    }
+
+    function handleMultipleFileSelect(files) {
+        if (!files || files.length === 0) return;
+
+        Array.from(files).forEach(f => {
+            if (!selectedBillFiles.some(existing => existing.name === f.name && existing.size === f.size)) {
+                selectedBillFiles.push(f);
+            }
+        });
+
+        syncFilesInput();
+        renderAttachedFilesList();
+
+        if (selectedBillFiles.length > 0) {
+            previewAttachmentAtIndex(selectedBillFiles.length - 1);
+        }
+    }
+
+    function syncFilesInput() {
+        const input = document.getElementById('bill_attachment_input');
+        if (!input) return;
+        const dt = new DataTransfer();
+        selectedBillFiles.forEach(f => dt.items.add(f));
+        input.files = dt.files;
+    }
+
+    function renderAttachedFilesList() {
+        const dropZone = document.getElementById('attachDropZone');
+        const container = document.getElementById('attachFilesContainer');
+        const summaryTitle = document.getElementById('attachSummaryTitle');
+        const summarySubtitle = document.getElementById('attachSummarySubtitle');
+
+        if (selectedBillFiles.length === 0) {
+            if (dropZone) dropZone.style.display = 'flex';
+            if (container) container.style.display = 'none';
+            return;
+        }
+
+        if (dropZone) dropZone.style.display = 'none';
+        if (container) container.style.display = 'flex';
+
+        const totalKB = selectedBillFiles.reduce((acc, f) => acc + f.size, 0) / 1024;
+        const sizeStr = totalKB > 1024 ? `${(totalKB / 1024).toFixed(1)} MB` : `${totalKB.toFixed(0)} KB`;
+
+        if (summaryTitle) {
+            summaryTitle.textContent = selectedBillFiles.length > 1 ? `${selectedBillFiles.length} Files Attached` : 'Attached';
+        }
+        if (summarySubtitle) {
+            summarySubtitle.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${sizeStr}`;
+        }
+    }
+
+    function removeFileAtIndex(idx) {
+        if (idx < 0 || idx >= selectedBillFiles.length) return;
+        selectedBillFiles.splice(idx, 1);
+        syncFilesInput();
+
+        if (selectedBillFiles.length === 0) {
+            clearAllAttachments();
+        } else {
+            currentViewerIndex = Math.min(currentViewerIndex, selectedBillFiles.length - 1);
+            renderAttachedFilesList();
+            previewAttachmentAtIndex(currentViewerIndex);
+        }
+    }
+
+    function clearAllAttachments() {
+        selectedBillFiles = [];
+        syncFilesInput();
+        renderAttachedFilesList();
+
+        const input = document.getElementById('bill_attachment_input');
+        const docIdInput = document.getElementById('linked_doc_id_input');
+        const viewerCol = document.getElementById('invoiceViewerCol');
+        const ws = document.getElementById('invoiceWorkspace');
+        const vFileName = document.getElementById('viewerFileName');
+
+        if (input) input.value = '';
+        if (docIdInput) docIdInput.value = '';
+        if (vFileName) vFileName.textContent = '';
+
+        if (viewerCol) viewerCol.style.display = 'none';
+        if (ws) ws.classList.remove('split-view-active');
+        resetBillViewer();
+    }
+
+    function previewAttachmentAtIndex(idx) {
+        if (selectedBillFiles.length === 0 || idx < 0 || idx >= selectedBillFiles.length) return;
+        currentViewerIndex = idx;
+        renderAttachedFilesList();
+
+        const file = selectedBillFiles[idx];
         const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
         const ext = file.name.split('.').pop().toLowerCase();
 
-        // 1. Update In-form Attached Pill Status
-        const dropZone = document.getElementById('attachDropZone');
-        const previewPill = document.getElementById('attachPreview');
-        const pillName = document.getElementById('previewFileName');
-        const pillSize = document.getElementById('previewFileSize');
-        const pillIcon = document.getElementById('previewDocIcon');
-        dropZone.style.display = 'none';
-        previewPill.style.display = 'flex';
+        const objectUrl = URL.createObjectURL(file);
 
-        // 2. Revoke old Object URL if exists
-        if (currentAttachmentObjectUrl) {
-            URL.revokeObjectURL(currentAttachmentObjectUrl);
-        }
-        currentAttachmentObjectUrl = URL.createObjectURL(file);
-
-        // 3. Update Right Viewer Panel Elements
         const viewerCol = document.getElementById('invoiceViewerCol');
         const vFileName = document.getElementById('viewerFileName');
         const vFileSize = document.getElementById('viewerFileSize');
@@ -3081,23 +3200,28 @@
         const vImg = document.getElementById('viewerImg');
         const vPdf = document.getElementById('viewerPdf');
         const vDocFallback = document.getElementById('viewerDocFallback');
+        const navControls = document.getElementById('viewerNavControls');
+        const fileCounter = document.getElementById('viewerFileCounter');
 
         if (vFileName) vFileName.textContent = file.name;
         if (vFileSize) vFileSize.textContent = `${sizeMB} MB`;
-        if (vOpenTabBtn) vOpenTabBtn.href = currentAttachmentObjectUrl;
+        if (vOpenTabBtn) vOpenTabBtn.href = objectUrl;
 
-        // Reset transforms
+        if (navControls) {
+            navControls.style.display = selectedBillFiles.length > 1 ? 'flex' : 'none';
+            if (fileCounter) fileCounter.textContent = `${idx + 1} / ${selectedBillFiles.length}`;
+        }
+
         resetBillViewer();
 
-        // 4. Render content based on File Type
         if (file.type.startsWith('image/')) {
-            vImg.src = currentAttachmentObjectUrl;
+            vImg.src = objectUrl;
             vImgContainer.style.display = 'block';
             vPdf.style.display = 'none';
             vPdf.src = '';
             vDocFallback.style.display = 'none';
         } else if (file.type === 'application/pdf' || ext === 'pdf') {
-            vPdf.src = currentAttachmentObjectUrl;
+            vPdf.src = objectUrl;
             vPdf.style.display = 'block';
             vImgContainer.style.display = 'none';
             vDocFallback.style.display = 'none';
@@ -3112,17 +3236,36 @@
             const fbBtn = document.getElementById('viewerFallbackDownloadBtn');
             if (fbIcon) fbIcon.className = `fa-solid ${iconMap[ext] || 'fa-file-lines'}`;
             if (fbName) fbName.textContent = file.name;
-            if (fbBtn) fbBtn.href = currentAttachmentObjectUrl;
+            if (fbBtn) fbBtn.href = objectUrl;
         }
 
-        // 5. Open Dynamic Split View Panel!
-        viewerCol.style.display = 'flex';
-        const ws = document.getElementById('invoiceWorkspace');
-        if (ws) ws.classList.add('split-view-active');
+        if (viewerCol) {
+            viewerCol.style.display = 'flex';
+            const ws = document.getElementById('invoiceWorkspace');
+            if (ws) ws.classList.add('split-view-active');
+            document.querySelectorAll('.panel-responsive-scroll').forEach(el => el.scrollLeft = 0);
+        }
+    }
 
-        // Scroll right viewer into sight smoothly on mobile or small screens
-        if (window.innerWidth < 992) {
-            viewerCol.scrollIntoView({ behavior: 'smooth' });
+    function navViewerFile(dir) {
+        if (selectedBillFiles.length === 0) return;
+        let newIdx = currentViewerIndex + dir;
+        if (newIdx < 0) newIdx = selectedBillFiles.length - 1;
+        if (newIdx >= selectedBillFiles.length) newIdx = 0;
+        previewAttachmentAtIndex(newIdx);
+    }
+
+    function removeCurrentViewerFile() {
+        if (selectedBillFiles.length === 0) return;
+        selectedBillFiles.splice(currentViewerIndex, 1);
+        syncFilesInput();
+
+        if (selectedBillFiles.length === 0) {
+            clearAllAttachments();
+        } else {
+            currentViewerIndex = Math.min(currentViewerIndex, selectedBillFiles.length - 1);
+            renderAttachedFilesList();
+            previewAttachmentAtIndex(currentViewerIndex);
         }
     }
 
@@ -3131,13 +3274,12 @@
         const ws = document.getElementById('invoiceWorkspace');
         if (!viewerCol) return;
         if (viewerCol.style.display === 'none' || viewerCol.style.display === '') {
-            const vFileName = document.getElementById('viewerFileName');
-            const hasPreloadedDoc = (vFileName && vFileName.textContent.trim().length > 0);
-            if (currentAttachmentFile || hasPreloadedDoc) {
-                viewerCol.style.display = 'flex';
-                if (ws) ws.classList.add('split-view-active');
-            } else {
-                document.getElementById('bill_attachment_input').click();
+            viewerCol.style.display = 'flex';
+            if (ws) ws.classList.add('split-view-active');
+            // Ensure scrollLeft = 0 so left column fields (Customer, etc.) are never hidden
+            document.querySelectorAll('.panel-responsive-scroll').forEach(el => el.scrollLeft = 0);
+            if (selectedBillFiles.length > 0) {
+                previewAttachmentAtIndex(currentViewerIndex);
             }
         } else {
             viewerCol.style.display = 'none';
@@ -3153,38 +3295,9 @@
             dz.style.background = '#f8fafc';
         }
         const files = event.dataTransfer ? event.dataTransfer.files : null;
-        if (files && files[0]) {
-            const input = document.getElementById('bill_attachment_input');
-            const dt = new DataTransfer();
-            dt.items.add(files[0]);
-            input.files = dt.files;
-            previewAttachment(files[0]);
+        if (files && files.length > 0) {
+            handleMultipleFileSelect(files);
         }
-    }
-
-    function clearAttachment() {
-        const input = document.getElementById('bill_attachment_input');
-        const docIdInput = document.getElementById('linked_doc_id_input');
-        const dropZone = document.getElementById('attachDropZone');
-        const previewPill = document.getElementById('attachPreview');
-        const viewerCol = document.getElementById('invoiceViewerCol');
-        const ws = document.getElementById('invoiceWorkspace');
-        const vFileName = document.getElementById('viewerFileName');
-
-        if (input) input.value = '';
-        if (docIdInput) docIdInput.value = '';
-        if (vFileName) vFileName.textContent = '';
-        if (currentAttachmentObjectUrl) {
-            URL.revokeObjectURL(currentAttachmentObjectUrl);
-            currentAttachmentObjectUrl = null;
-        }
-        currentAttachmentFile = null;
-
-        if (dropZone) dropZone.style.display = 'flex';
-        if (previewPill) previewPill.style.display = 'none';
-        if (viewerCol) viewerCol.style.display = 'none';
-        if (ws) ws.classList.remove('split-view-active');
-        resetBillViewer();
     }
 
     // ── Viewer Controls (Zoom, Rotate, Wheel) ──────────────────────────

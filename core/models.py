@@ -274,6 +274,46 @@ class Invoice(models.Model):
     def balance_due(self):
         return self.total_amount - self.paid_amount
 
+    @property
+    def all_attachments(self):
+        atts = list(self.attachments.all())
+        if self.bill_attachment and not any(a.file and a.file.name == self.bill_attachment.name for a in atts):
+            import os
+            class LegacyAtt:
+                def __init__(self, file_field):
+                    self.id = None
+                    self.file = file_field
+                    self.original_name = os.path.basename(file_field.name) if file_field else "Attachment"
+                    try:
+                        self.file_size = file_field.size
+                    except Exception:
+                        self.file_size = 0
+            atts.insert(0, LegacyAtt(self.bill_attachment))
+        return atts
+
+
+class BillAttachment(models.Model):
+    invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE, related_name='attachments', null=True, blank=True)
+    sales_return = models.ForeignKey('SalesReturn', on_delete=models.CASCADE, related_name='attachments', null=True, blank=True)
+    file = models.FileField(upload_to='bill_attachments/')
+    original_name = models.CharField(max_length=255, blank=True, null=True)
+    file_size = models.BigIntegerField(default=0)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.file and not self.original_name:
+            import os
+            self.original_name = os.path.basename(self.file.name)
+        if self.file and hasattr(self.file, 'size') and not self.file_size:
+            try:
+                self.file_size = self.file.size
+            except Exception:
+                pass
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.original_name or (self.file.name if self.file else "Attachment")
+
 
 # ============================================================
 # 4. Sales — Invoice Items
@@ -479,6 +519,23 @@ class SalesReturn(models.Model):
 
     def __str__(self):
         return f"{self.return_number} - {self.customer.name}"
+
+    @property
+    def all_attachments(self):
+        atts = list(self.attachments.all())
+        if self.bill_attachment and not any(a.file and a.file.name == self.bill_attachment.name for a in atts):
+            import os
+            class LegacyAtt:
+                def __init__(self, file_field):
+                    self.id = None
+                    self.file = file_field
+                    self.original_name = os.path.basename(file_field.name) if file_field else "Attachment"
+                    try:
+                        self.file_size = file_field.size
+                    except Exception:
+                        self.file_size = 0
+            atts.insert(0, LegacyAtt(self.bill_attachment))
+        return atts
 
 
 class SalesReturnItem(models.Model):
