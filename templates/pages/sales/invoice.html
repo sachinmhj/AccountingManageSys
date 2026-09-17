@@ -221,6 +221,11 @@
         color: var(--warning);
     }
 
+    .status-pdc {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
     .status-draft {
         background: #f1f5f9;
         color: var(--text-gray);
@@ -505,6 +510,8 @@
                     <td class="col-status">
                         {% if invoice.status == 'Paid' %}
                         <span class="status-badge status-paid">Paid</span>
+                        {% elif invoice.status == 'PDC Pending' %}
+                        <span class="status-badge status-pdc" title="Post-Dated Cheque Pending Clearance"><i class="bi bi-clock-history me-1"></i>PDC Pending</span>
                         {% elif invoice.status == 'Unpaid' %}
                         <span class="status-badge status-unpaid">Due</span>
                         {% elif invoice.status == 'Partially Paid' %}

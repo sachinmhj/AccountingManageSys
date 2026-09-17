@@ -13,10 +13,10 @@
                     <th>Payment No.</th>
                     <th>Customer</th>
                     <th>Date</th>
-                    <th>Method</th>
-                    <th>Narration / Note</th>
+                    <th>Method & Details</th>
+                    <th>PDC Status</th>
                     <th style="text-align:right">Amount</th>
-                    <th>Type</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
 
@@ -26,20 +26,61 @@
                     <td style="font-weight:600; color:#2563eb;">{{ payment.payment_number }}</td>
                     <td>{{ payment.customer.name }}</td>
                     <td>{{ payment.payment_date }}</td>
-                    <td>{{ payment.payment_method }}</td>
-                    <td style="color:#64748b; font-size:12px;">{{ payment.narration|default:"—" }}</td>
+                    <td>
+                        <span class="fw-semibold">{{ payment.payment_method }}</span>
+                        {% if payment.is_pdc %}
+                            <div style="font-size:11px; color:#475569;">
+                                <i class="bi bi-bank"></i> {{ payment.cheque_bank|default:"" }} | No: {{ payment.cheque_no|default:"" }}
+                                {% if payment.cheque_date %}<br><span class="text-primary"><i class="bi bi-calendar-event"></i> Due: {{ payment.cheque_date }}</span>{% endif %}
+                            </div>
+                        {% elif payment.cheque_no %}
+                            <div style="font-size:11px; color:#64748b;">
+                                {{ payment.cheque_bank }} | No: {{ payment.cheque_no }}
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if payment.is_pdc %}
+                            {% if payment.pdc_status == 'Pending Clearance' %}
+                                <span style="display:inline-block; padding:3px 9px; border-radius:12px; font-size:11px; font-weight:600; background:#fef3c7; color:#b45309;">
+                                    <i class="fa-solid fa-clock" style="font-size:10px;"></i> Pending Clearance
+                                </span>
+                            {% elif payment.pdc_status == 'Cleared' %}
+                                <span style="display:inline-block; padding:3px 9px; border-radius:12px; font-size:11px; font-weight:600; background:#dcfce7; color:#15803d;">
+                                    <i class="fa-solid fa-circle-check" style="font-size:10px;"></i> Cleared
+                                </span>
+                            {% elif payment.pdc_status == 'Bounced' %}
+                                <span style="display:inline-block; padding:3px 9px; border-radius:12px; font-size:11px; font-weight:600; background:#fee2e2; color:#b91c1c;">
+                                    <i class="fa-solid fa-circle-xmark" style="font-size:10px;"></i> Bounced
+                                </span>
+                            {% endif %}
+                        {% else %}
+                            <span style="display:inline-block; padding:3px 9px; border-radius:12px; font-size:11px; font-weight:600; background:#f1f5f9; color:#475569;">
+                                Direct
+                            </span>
+                        {% endif %}
+                    </td>
                     <td style="text-align:right; font-weight:600; {% if payment.amount < 0 %}color:#dc2626;{% else %}color:#16a34a;{% endif %}">
                         Rs. {{ payment.amount|floatformat:2 }}
                     </td>
                     <td>
-                        {% if payment.amount < 0 %}
-                            <span style="display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; background:#fef2f2; color:#dc2626;">
-                                <i class="fa-solid fa-rotate-left" style="font-size:10px;"></i> Refund
-                            </span>
+                        {% if payment.is_pdc and payment.pdc_status == 'Pending Clearance' %}
+                            <div style="display:flex; gap:6px;">
+                                <form method="POST" action="{% url 'clear_pdc' payment.pk %}" style="margin:0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success py-0 px-2" style="font-size:11px;" title="Deposit & Clear Cheque">
+                                        <i class="fa-solid fa-check me-1"></i>Clear
+                                    </button>
+                                </form>
+                                <form method="POST" action="{% url 'bounce_pdc' payment.pk %}" style="margin:0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" style="font-size:11px;" title="Mark Cheque Bounced">
+                                        <i class="fa-solid fa-xmark me-1"></i>Bounce
+                                    </button>
+                                </form>
+                            </div>
                         {% else %}
-                            <span style="display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; background:#f0fdf4; color:#16a34a;">
-                                <i class="fa-solid fa-circle-check" style="font-size:10px;"></i> Payment
-                            </span>
+                            <span style="color:#cbd5e1; font-size:12px;">—</span>
                         {% endif %}
                     </td>
                 </tr>

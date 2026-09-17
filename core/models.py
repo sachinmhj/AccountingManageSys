@@ -170,6 +170,7 @@ class Invoice(models.Model):
         ('Unpaid', 'Unpaid'),
         ('Partially Paid', 'Partially Paid'),
         ('Paid', 'Paid'),
+        ('PDC Pending', 'PDC Pending'),
     )
     SALES_TYPE_CHOICES = (
         ('Goods', 'Goods'),
@@ -422,6 +423,19 @@ class CustomerPayment(models.Model):
     bank_account = models.CharField(max_length=100, blank=True, null=True)
     reference_no = models.CharField(max_length=100, blank=True, null=True)
     narration = models.TextField(blank=True, null=True)
+
+    # Cheque & PDC (Post-Dated Cheque) Fields
+    is_pdc = models.BooleanField(default=False, help_text="Is this a Post-Dated Cheque?")
+    cheque_bank = models.CharField(max_length=100, blank=True, null=True)
+    cheque_no = models.CharField(max_length=50, blank=True, null=True)
+    cheque_date = models.DateField(blank=True, null=True)
+    PDC_STATUS_CHOICES = (
+        ('Pending Clearance', 'Pending Clearance'),
+        ('Cleared', 'Cleared'),
+        ('Bounced', 'Bounced'),
+        ('Cancelled', 'Cancelled'),
+    )
+    pdc_status = models.CharField(max_length=20, choices=PDC_STATUS_CHOICES, default='Cleared', blank=True, null=True)
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Unallocated')
 

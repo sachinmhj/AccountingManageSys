@@ -705,12 +705,31 @@ class InvoiceAddView(View):
                 payment_date = invoice_date
 
         if paid_amount > 0:
+            is_pdc = (request.POST.get('is_pdc') == '1') if payment_method == 'Cheque' else False
+            cheque_bank = request.POST.get('cheque_bank', '') if payment_method == 'Cheque' else ''
+            cheque_no = request.POST.get('cheque_no', '') if payment_method == 'Cheque' else ''
+            cheque_date_raw = request.POST.get('cheque_date', '') if payment_method == 'Cheque' else ''
+            cheque_date_val = None
+            if cheque_date_raw:
+                try:
+                    from datetime import date
+                    cheque_date_val = date.fromisoformat(cheque_date_raw)
+                except ValueError:
+                    cheque_date_val = None
+
+            pdc_status_val = 'Pending Clearance' if is_pdc else 'Cleared'
+
             payment = CustomerPayment.objects.create(
                 customer=customer,
                 invoice=invoice,
                 amount=paid_amount,
                 payment_date=payment_date,
                 payment_method=payment_method,
+                is_pdc=is_pdc,
+                cheque_bank=cheque_bank,
+                cheque_no=cheque_no,
+                cheque_date=cheque_date_val,
+                pdc_status=pdc_status_val,
                 status='Fully Allocated',
                 created_by=request.user if request.user.is_authenticated else None
             )
@@ -766,7 +785,9 @@ class InvoiceAddView(View):
                 invoice.paid_amount = paid_amount
 
         # Determine Status
-        if invoice.paid_amount >= invoice.total_amount:
+        if is_pdc and pdc_status_val == 'Pending Clearance':
+            invoice.status = 'PDC Pending'
+        elif invoice.paid_amount >= invoice.total_amount:
             invoice.status = 'Paid'
         elif invoice.paid_amount > 0:
             invoice.status = 'Partially Paid'
@@ -1417,6 +1438,42 @@ class CustomerPaymentAddView(View):
             elif invoice.paid_amount > 0:
                 invoice.status = 'Partially Paid'
             invoice.save()
+
+        return redirect('customer_payment')
+
+class ClearPDCView(View):
+    def post(self, request, pk):
+        payment = get_object_or_404(CustomerPayment, pk=pk)
+        payment.pdc_status = 'Cleared'
+        payment.save()
+
+        # Update linked invoice status
+        if payment.invoice:
+            inv = payment.invoice
+            if inv.paid_amount >= inv.total_amount:
+                inv.status = 'Paid'
+            elif inv.paid_amount > 0:
+                inv.status = 'Partially Paid'
+            inv.save()
+
+        return redirect('customer_payment')
+
+class BouncePDCView(View):
+    def post(self, request, pk):
+        payment = get_object_or_404(CustomerPayment, pk=pk)
+        if payment.pdc_status != 'Bounced':
+            payment.pdc_status = 'Bounced'
+            payment.save()
+
+            # Revert payment from linked invoice
+            if payment.invoice:
+                inv = payment.invoice
+                inv.paid_amount = max(Decimal('0.00'), inv.paid_amount - payment.amount)
+                if inv.paid_amount <= 0:
+                    inv.status = 'Unpaid'
+                else:
+                    inv.status = 'Partially Paid'
+                inv.save()
 
         return redirect('customer_payment')
 

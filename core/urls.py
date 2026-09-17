@@ -56,6 +56,8 @@ from .views import (
     ProjectDetailView,
     ProjectsJsonView,
     ProjectCreateAPIView,
+    ClearPDCView,
+    BouncePDCView,
 )
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
@@ -83,6 +85,8 @@ urlpatterns = [
     path("sales/invoice/return/<int:pk>/", SalesReturnDetailView.as_view(), name="sales_return_detail"),
     path("sales/customer-payment/",CustomerPaymentView.as_view(),name="customer_payment"),  
     path("sales/customer-payment/<int:pk>/",CustomerPaymentDetailView.as_view(),name="customer_payment_detail"),
+    path("sales/customer-payment/<int:pk>/clear-pdc/", ClearPDCView.as_view(), name="clear_pdc"),
+    path("sales/customer-payment/<int:pk>/bounce-pdc/", BouncePDCView.as_view(), name="bounce_pdc"),
     path("inventory/",InventoryView.as_view(),name="inventory"),
     path("inventory/product/",InventoryProductView.as_view(),name="inventory_product"),
     path("sales/invoice/add/", InvoiceAddView.as_view(), name="invoice_add"),
