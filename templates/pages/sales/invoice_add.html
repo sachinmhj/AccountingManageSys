@@ -1378,16 +1378,16 @@
                         <div style="display:flex; flex-direction:column; gap:10px;">
 
                             <!-- Amount Received -->
-                            <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                <label style="margin:0; font-weight:600;">Amount Received <span>*</span></label>
+                            <div style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                <label style="margin:0; font-weight:600; white-space:nowrap;">Amount Received <span>*</span></label>
                                 <input type="number" step="0.01" class="form-control" name="paid_amount"
                                     id="inp_paid_amount" style="text-align:right; font-weight:700; font-size:15px;"
                                     value="0.00" oninput="updateBalance(); autoDistribute();">
                             </div>
 
                             <!-- Payment Method -->
-                            <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                <label style="margin:0; font-weight:600;">Payment Method <span>*</span></label>
+                            <div style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                <label style="margin:0; font-weight:600; white-space:nowrap;">Payment Method <span>*</span></label>
                                 <select class="form-select" name="payment_method" id="payment_method_sel"
                                     onchange="onPayMethodChange(this.value)">
                                     <option value="Cash">Cash</option>
@@ -1400,8 +1400,8 @@
                             <!-- === BANK TRANSFER EXTRA FIELDS === -->
                             <div id="fields_bank" style="display:none; flex-direction:column; gap:10px;">
                                 <div
-                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                    <label style="margin:0; font-weight:600;">Bank Account <span>*</span></label>
+                                    style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; font-weight:600; white-space:nowrap;">Bank Account <span>*</span></label>
                                     <select class="form-select" name="bank_account">
                                         <option value="">Select Bank Account</option>
                                         <option>NMB Bank - 1234567890</option>
@@ -1411,8 +1411,8 @@
                                     </select>
                                 </div>
                                 <div
-                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                    <label style="margin:0;">Transaction ID</label>
+                                    style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; white-space:nowrap;">Transaction ID</label>
                                     <input type="text" class="form-control" name="bank_txn_id"
                                         placeholder="Bank transaction ID">
                                 </div>
@@ -1420,37 +1420,37 @@
 
                             <!-- === CHEQUE EXTRA FIELDS === -->
                             <div id="fields_cheque" style="display:none; flex-direction:column; gap:10px;">
-                                <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                    <label style="margin:0; font-weight:600;">Cheque Type</label>
+                                <div style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; font-weight:600; white-space:nowrap;">Cheque Type</label>
                                     <div style="display:flex; align-items:center; gap:10px;">
                                         <div class="form-check form-switch mb-0" style="display:flex; align-items:center; gap:8px;">
                                             <input class="form-check-input" type="checkbox" role="switch" id="is_pdc_toggle" name="is_pdc" value="1" onchange="togglePDCNotice(this.checked)">
-                                            <label class="form-check-label fw-semibold text-primary mb-0" for="is_pdc_toggle" style="cursor:pointer; font-size:13px;">Is Post-Dated Cheque (PDC)</label>
+                                            <label class="form-check-label fw-semibold text-primary mb-0" for="is_pdc_toggle" style="cursor:pointer; font-size:13px; white-space:nowrap;">Is Post-Dated Cheque (PDC)</label>
                                         </div>
                                     </div>
                                 </div>
-                                <div id="pdc_notice_box" style="display:none; background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; border-radius:6px; padding:8px 12px; font-size:12px; margin-left:152px;">
+                                <div id="pdc_notice_box" style="display:none; background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; border-radius:6px; padding:8px 12px; font-size:12px; margin-left:172px;">
                                     <i class="bi bi-clock-history me-1"></i><strong>PDC Cheque:</strong> Payment will be recorded with status <strong>Pending Clearance</strong> until the Cheque Date.
                                 </div>
                                 <div
-                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                    <label style="margin:0; font-weight:600;">Bank Name <span>*</span></label>
+                                    style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; font-weight:600; white-space:nowrap;">Bank Name <span>*</span></label>
                                     <input type="text" class="form-control" name="cheque_bank"
                                         placeholder="e.g. Nabil Bank">
                                 </div>
                                 <div
-                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                    <label style="margin:0; font-weight:600;">Cheque No. <span>*</span></label>
+                                    style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; font-weight:600; white-space:nowrap;">Cheque No. <span>*</span></label>
                                     <input type="text" class="form-control" name="cheque_no" placeholder="CHQ-458796">
                                 </div>
                                 <div
-                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                    <label style="margin:0;">Cheque Date</label>
+                                    style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; white-space:nowrap;">Cheque Date</label>
                                     <div class="dual-date-stack">
                                         <div class="date-row">
                                             <span class="date-label">AD</span>
                                             <input type="date" class="form-control" name="cheque_date"
-                                                id="cheque_date_ad">
+                                                id="cheque_date_ad" oninput="this.dataset.userModified='true';" onchange="this.dataset.userModified='true';">
                                         </div>
                                         <div class="date-row" style="position:relative;">
                                             <span class="date-label bs-label">BS</span>
@@ -1464,8 +1464,8 @@
                             <!-- === MOBILE BANKING EXTRA FIELDS === -->
                             <div id="fields_mobile" style="display:none; flex-direction:column; gap:10px;">
                                 <div
-                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                    <label style="margin:0; font-weight:600;">App / Wallet <span>*</span></label>
+                                    style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; font-weight:600; white-space:nowrap;">App / Wallet <span>*</span></label>
                                     <select class="form-select" name="mobile_app">
                                         <option value="">Select App</option>
                                         <option>eSewa</option>
@@ -1476,32 +1476,32 @@
                                     </select>
                                 </div>
                                 <div
-                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                    <label style="margin:0; font-weight:600;">Mobile No. <span>*</span></label>
+                                    style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; font-weight:600; white-space:nowrap;">Mobile No. <span>*</span></label>
                                     <input type="text" class="form-control" name="mobile_no" placeholder="98XXXXXXXX">
                                 </div>
                                 <div
-                                    style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                    <label style="margin:0;">Transaction ID</label>
+                                    style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                    <label style="margin:0; white-space:nowrap;">Transaction ID</label>
                                     <input type="text" class="form-control" name="mobile_txn_id" placeholder="TXN ID">
                                 </div>
                             </div>
 
                             <!-- Reference No. -->
-                            <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                <label style="margin:0;">Reference No.</label>
+                            <div style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                <label style="margin:0; white-space:nowrap;">Reference No.</label>
                                 <input type="text" class="form-control" name="reference_no"
                                     placeholder="Reference number">
                             </div>
 
                             <!-- Payment Date -->
-                            <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                <label style="margin:0; font-weight:600;">Payment Date <span>*</span></label>
+                            <div style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                <label style="margin:0; font-weight:600; white-space:nowrap;" id="lbl_payment_date">Payment Date <span>*</span></label>
                                 <div class="dual-date-stack">
                                     <div class="date-row">
                                         <span class="date-label">AD</span>
                                         <input type="date" class="form-control" name="payment_date" id="payment_date_ad"
-                                            value="{{ today|date:'Y-m-d' }}">
+                                            value="{{ today|date:'Y-m-d' }}" onchange="syncChequeDateInInvoiceAdd();">
                                     </div>
                                     <div class="date-row" style="position:relative;">
                                         <span class="date-label bs-label">BS</span>
@@ -1512,8 +1512,8 @@
                             </div>
 
                             <!-- Narration -->
-                            <div style="display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px;">
-                                <label style="margin:0;">Narration</label>
+                            <div style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
+                                <label style="margin:0; white-space:nowrap;">Narration</label>
                                 <textarea class="form-control" name="narration" rows="2"
                                     style="resize:none; font-size:12px;"
                                     placeholder="Payment received from customer"></textarea>
@@ -2557,9 +2557,37 @@
         const bank = document.getElementById('fields_bank');
         const cheque = document.getElementById('fields_cheque');
         const mobile = document.getElementById('fields_mobile');
+        const lblPaymentDate = document.getElementById('lbl_payment_date');
+
         if (bank) bank.style.display = (method === 'Bank Transfer') ? 'flex' : 'none';
         if (cheque) cheque.style.display = (method === 'Cheque') ? 'flex' : 'none';
         if (mobile) mobile.style.display = (method === 'Mobile Banking') ? 'flex' : 'none';
+
+        if (lblPaymentDate) {
+            if (method === 'Cheque') {
+                lblPaymentDate.innerHTML = 'Cheque Received Date <span style="color:#ef4444;">*</span>';
+            } else {
+                lblPaymentDate.innerHTML = 'Payment Date <span style="color:#ef4444;">*</span>';
+            }
+        }
+
+        if (method === 'Cheque') {
+            syncChequeDateInInvoiceAdd();
+        }
+    }
+
+    function syncChequeDateInInvoiceAdd() {
+        const payMethod = document.getElementById('payment_method_sel');
+        if (!payMethod || payMethod.value !== 'Cheque') return;
+
+        const payDateAd = document.getElementById('payment_date_ad');
+        const chqDateAd = document.getElementById('cheque_date_ad');
+        if (payDateAd && chqDateAd) {
+            if (!chqDateAd.value || chqDateAd.dataset.userModified !== 'true') {
+                chqDateAd.value = payDateAd.value;
+                chqDateAd.dispatchEvent(new Event('change'));
+            }
+        }
     }
 
     function togglePDCNotice(checked) {

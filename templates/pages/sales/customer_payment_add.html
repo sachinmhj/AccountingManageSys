@@ -112,12 +112,12 @@
                     </div>
 
                     <div class="form-group col-span-4">
-                        <label>Received Date <span class="required">*</span></label>
+                        <label id="lbl_received_date">Received Date <span class="required">*</span></label>
                         <div class="dual-date-stack">
                             <div class="date-row">
                                 <span class="date-label">AD</span>
                                 <input type="date" name="payment_date" id="pay_date_ad" value="{{ today|date:'Y-m-d' }}"
-                                    required>
+                                    required onchange="syncChequeDateInCustomerPayment()">
                             </div>
                             <div class="date-row" style="position:relative;">
                                 <span class="date-label bs-label">BS</span>
@@ -154,8 +154,7 @@
                     <div class="payment-grid">
                         <div class="form-group col-span-6">
                             <label>Payment Mode</label>
-                            <!-- Changed name to payment_method for backend compatibility -->
-                            <select name="payment_method" required>
+                            <select name="payment_method" id="pay_method_sel" required onchange="onPayMethodChangeCust(this.value)">
                                 <option value="" disabled selected hidden>Payment Mode</option>
                                 <option value="Cash">Cash</option>
                                 <option value="Cheque">Cheque</option>
@@ -166,6 +165,41 @@
                         <div class="form-group col-span-6">
                             <label>Payment Reference#</label>
                             <input type="text" name="payment_reference" placeholder="Payment Reference#">
+                        </div>
+                    </div>
+
+                    <!-- === CHEQUE EXTRA FIELDS === -->
+                    <div id="fields_cheque_cust" style="display:none; flex-direction:column; gap:10px; margin-top:14px; padding:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <input type="checkbox" id="cust_is_pdc" name="is_pdc" value="1" style="width:16px; height:16px; cursor:pointer;" onchange="toggleCustPDCNotice(this.checked)">
+                            <label for="cust_is_pdc" style="margin:0; font-weight:600; color:#2563eb; cursor:pointer; font-size:13px;">Is Post-Dated Cheque (PDC)</label>
+                        </div>
+                        <div id="cust_pdc_notice" style="display:none; background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; border-radius:6px; padding:8px 12px; font-size:12px;">
+                            <i class="fa-solid fa-clock me-1"></i><strong>PDC Cheque:</strong> Payment will be recorded with status <strong>Pending Clearance</strong> until the Cheque Date.
+                        </div>
+
+                        <div class="payment-grid sub-grid" style="grid-template-columns: repeat(12, 1fr); gap:12px;">
+                            <div class="form-group col-span-6">
+                                <label style="font-weight:600;">Bank Name <span class="required">*</span></label>
+                                <input type="text" class="form-control" name="cheque_bank" placeholder="e.g. Nabil Bank">
+                            </div>
+                            <div class="form-group col-span-6">
+                                <label style="font-weight:600;">Cheque No. <span class="required">*</span></label>
+                                <input type="text" class="form-control" name="cheque_no" placeholder="CHQ-458796">
+                            </div>
+                            <div class="form-group col-span-12">
+                                <label style="font-weight:600;">Cheque Date</label>
+                                <div class="dual-date-stack">
+                                    <div class="date-row">
+                                        <span class="date-label">AD</span>
+                                        <input type="date" class="form-control" name="cheque_date" id="cust_cheque_date_ad" oninput="this.dataset.userModified='true';" onchange="this.dataset.userModified='true';">
+                                    </div>
+                                    <div class="date-row" style="position:relative;">
+                                        <span class="date-label bs-label">BS</span>
+                                        <input type="text" class="form-control" id="cust_cheque_date_bs" placeholder="Pick BS date">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -597,10 +631,49 @@
             alert("Please enter Account Name.");
         }
     }
+    function onPayMethodChangeCust(method) {
+        const cheque = document.getElementById('fields_cheque_cust');
+        const lblReceivedDate = document.getElementById('lbl_received_date');
+
+        if (cheque) cheque.style.display = (method === 'Cheque') ? 'flex' : 'none';
+
+        if (lblReceivedDate) {
+            if (method === 'Cheque') {
+                lblReceivedDate.innerHTML = 'Cheque Received Date <span class="required">*</span>';
+            } else {
+                lblReceivedDate.innerHTML = 'Received Date <span class="required">*</span>';
+            }
+        }
+
+        if (method === 'Cheque') {
+            syncChequeDateInCustomerPayment();
+        }
+    }
+
+    function toggleCustPDCNotice(checked) {
+        const box = document.getElementById('cust_pdc_notice');
+        if (box) box.style.display = checked ? 'block' : 'none';
+    }
+
+    function syncChequeDateInCustomerPayment() {
+        const payMethod = document.getElementById('pay_method_sel');
+        if (!payMethod || payMethod.value !== 'Cheque') return;
+
+        const payDateAd = document.getElementById('pay_date_ad');
+        const chqDateAd = document.getElementById('cust_cheque_date_ad');
+        if (payDateAd && chqDateAd) {
+            if (!chqDateAd.value || chqDateAd.dataset.userModified !== 'true') {
+                chqDateAd.value = payDateAd.value;
+                chqDateAd.dispatchEvent(new Event('change'));
+            }
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         if (typeof initDualDate === 'function') {
             initDualDate('pay_date_ad', 'pay_date_bs');
             initDualDate('rcpt_date_ad', 'rcpt_date_bs');
+            initDualDate('cust_cheque_date_ad', 'cust_cheque_date_bs');
         }
     });
 </script>

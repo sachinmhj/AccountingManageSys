@@ -717,6 +717,9 @@ class InvoiceAddView(View):
                 except ValueError:
                     cheque_date_val = None
 
+            if payment_method == 'Cheque' and not cheque_date_val:
+                cheque_date_val = payment_date
+
             pdc_status_val = 'Pending Clearance' if is_pdc else 'Cleared'
 
             payment = CustomerPayment.objects.create(
@@ -730,6 +733,8 @@ class InvoiceAddView(View):
                 cheque_no=cheque_no,
                 cheque_date=cheque_date_val,
                 pdc_status=pdc_status_val,
+                reference_no=reference_no,
+                narration=narration,
                 status='Fully Allocated',
                 created_by=request.user if request.user.is_authenticated else None
             )
@@ -1424,11 +1429,42 @@ class CustomerPaymentAddView(View):
             amount = pending_amount
 
         if amount > 0:
+            is_pdc = (request.POST.get('is_pdc') == '1') if payment_method == 'Cheque' else False
+            cheque_bank = request.POST.get('cheque_bank', '') if payment_method == 'Cheque' else ''
+            cheque_no = request.POST.get('cheque_no', '') if payment_method == 'Cheque' else ''
+            cheque_date_raw = request.POST.get('cheque_date', '') if payment_method == 'Cheque' else ''
+            cheque_date_val = None
+            if cheque_date_raw:
+                try:
+                    from datetime import date
+                    cheque_date_val = date.fromisoformat(cheque_date_raw)
+                except ValueError:
+                    cheque_date_val = None
+
+            if payment_method == 'Cheque' and not cheque_date_val:
+                try:
+                    from datetime import date
+                    cheque_date_val = date.fromisoformat(payment_date) if isinstance(payment_date, str) else payment_date
+                except (ValueError, TypeError):
+                    cheque_date_val = None
+
+            pdc_status_val = 'Pending Clearance' if is_pdc else 'Cleared'
+
             CustomerPayment.objects.create(
+                customer=invoice.customer,
                 invoice=invoice,
                 amount=amount,
                 payment_date=payment_date,
-                payment_method=payment_method
+                payment_method=payment_method,
+                is_pdc=is_pdc,
+                cheque_bank=cheque_bank,
+                cheque_no=cheque_no,
+                cheque_date=cheque_date_val,
+                pdc_status=pdc_status_val,
+                reference_no=request.POST.get('payment_reference', ''),
+                narration=request.POST.get('notes', ''),
+                status='Fully Allocated',
+                created_by=request.user if request.user.is_authenticated else None
             )
             
             # Update invoice
@@ -1903,11 +1939,39 @@ class SupplierPaymentAddView(View):
             amount = pending_amount
 
         if amount > 0:
+            is_pdc = (request.POST.get('is_pdc') == '1') if payment_method == 'Cheque' else False
+            cheque_bank = request.POST.get('cheque_bank', '') if payment_method == 'Cheque' else ''
+            cheque_no = request.POST.get('cheque_no', '') if payment_method == 'Cheque' else ''
+            cheque_date_raw = request.POST.get('cheque_date', '') if payment_method == 'Cheque' else ''
+            cheque_date_val = None
+            if cheque_date_raw:
+                try:
+                    from datetime import date
+                    cheque_date_val = date.fromisoformat(cheque_date_raw)
+                except ValueError:
+                    cheque_date_val = None
+
+            if payment_method == 'Cheque' and not cheque_date_val:
+                try:
+                    from datetime import date
+                    cheque_date_val = date.fromisoformat(payment_date) if isinstance(payment_date, str) else payment_date
+                except (ValueError, TypeError):
+                    cheque_date_val = None
+
+            pdc_status_val = 'Pending Clearance' if is_pdc else 'Cleared'
+
             SupplierPayment.objects.create(
                 purchase_bill=bill,
                 amount=amount,
                 payment_date=payment_date,
-                payment_method=payment_method
+                payment_method=payment_method,
+                is_pdc=is_pdc,
+                cheque_bank=cheque_bank,
+                cheque_no=cheque_no,
+                cheque_date=cheque_date_val,
+                pdc_status=pdc_status_val,
+                reference_no=request.POST.get('reference_no', ''),
+                narration=request.POST.get('narration', ''),
             )
             
             # Update bill

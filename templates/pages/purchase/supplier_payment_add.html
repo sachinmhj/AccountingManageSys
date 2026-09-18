@@ -55,18 +55,42 @@
             </div>
 
             <div class="form-group">
-                <label>Payment Date <span>*</span></label>
-                <input type="date" name="payment_date" class="form-control" value="{{ today|date:'Y-m-d' }}" required>
+                <label id="lbl_supp_pay_date">Payment Date <span>*</span></label>
+                <input type="date" name="payment_date" id="supp_payment_date_ad" class="form-control" value="{{ today|date:'Y-m-d' }}" required onchange="syncChequeDateInSupplierPayment()">
             </div>
 
             <div class="form-group">
                 <label>Payment Method <span>*</span></label>
-                <select name="payment_method" class="form-select" required>
+                <select name="payment_method" id="supp_payment_method_sel" class="form-select" required onchange="onPayMethodChangeSupp(this.value)">
                     <option value="Cash">Cash</option>
                     <option value="Bank Transfer">Bank Transfer</option>
                     <option value="Cheque">Cheque</option>
                     <option value="Online">Online</option>
                 </select>
+            </div>
+
+            <!-- === CHEQUE EXTRA FIELDS === -->
+            <div id="fields_cheque_supp" style="display:none; flex-direction:column; gap:10px; margin-top:14px; padding:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="supp_is_pdc" name="is_pdc" value="1" style="width:16px; height:16px; cursor:pointer;" onchange="toggleSuppPDCNotice(this.checked)">
+                    <label for="supp_is_pdc" style="margin:0; font-weight:600; color:#2563eb; cursor:pointer; font-size:13px;">Is Post-Dated Cheque (PDC)</label>
+                </div>
+                <div id="supp_pdc_notice" style="display:none; background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; border-radius:6px; padding:8px 12px; font-size:12px;">
+                    <i class="fa-solid fa-clock me-1"></i><strong>PDC Cheque:</strong> Payment will be recorded with status <strong>Pending Clearance</strong> until the Cheque Date.
+                </div>
+
+                <div class="form-group">
+                    <label style="font-weight:600;">Bank Name <span style="color:#ef4444;">*</span></label>
+                    <input type="text" class="form-control" name="cheque_bank" placeholder="e.g. Nabil Bank">
+                </div>
+                <div class="form-group">
+                    <label style="font-weight:600;">Cheque No. <span style="color:#ef4444;">*</span></label>
+                    <input type="text" class="form-control" name="cheque_no" placeholder="CHQ-458796">
+                </div>
+                <div class="form-group">
+                    <label style="font-weight:600;">Cheque Date</label>
+                    <input type="date" class="form-control" name="cheque_date" id="supp_cheque_date_ad" oninput="this.dataset.userModified='true';" onchange="this.dataset.userModified='true';">
+                </div>
             </div>
 
             <div class="form-group">
@@ -127,9 +151,40 @@ function fetchUnpaidBills(supplierId) {
                 container.innerHTML = '<p style="color: #666;">No unpaid bills found for this supplier.</p>';
             }
         })
-        .catch(err => {
-            container.innerHTML = '<p style="color: red;">Error fetching bills.</p>';
-        });
+}
+
+function onPayMethodChangeSupp(method) {
+    const cheque = document.getElementById('fields_cheque_supp');
+    const lbl = document.getElementById('lbl_supp_pay_date');
+    if (cheque) cheque.style.display = (method === 'Cheque') ? 'flex' : 'none';
+    if (lbl) {
+        if (method === 'Cheque') {
+            lbl.innerHTML = 'Cheque Received Date <span style="color:#ef4444;">*</span>';
+        } else {
+            lbl.innerHTML = 'Payment Date <span style="color:#ef4444;">*</span>';
+        }
+    }
+    if (method === 'Cheque') {
+        syncChequeDateInSupplierPayment();
+    }
+}
+
+function toggleSuppPDCNotice(checked) {
+    const box = document.getElementById('supp_pdc_notice');
+    if (box) box.style.display = checked ? 'block' : 'none';
+}
+
+function syncChequeDateInSupplierPayment() {
+    const payMethod = document.getElementById('supp_payment_method_sel');
+    if (!payMethod || payMethod.value !== 'Cheque') return;
+
+    const payDateAd = document.getElementById('supp_payment_date_ad');
+    const chqDateAd = document.getElementById('supp_cheque_date_ad');
+    if (payDateAd && chqDateAd) {
+        if (!chqDateAd.value || chqDateAd.dataset.userModified !== 'true') {
+            chqDateAd.value = payDateAd.value;
+        }
+    }
 }
 </script>
 {% endblock %}

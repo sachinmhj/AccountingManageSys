@@ -750,6 +750,21 @@ class SupplierPayment(models.Model):
     payment_date = models.DateField(default=timezone.now)
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='Cash')
 
+    # Cheque & PDC Fields
+    is_pdc = models.BooleanField(default=False, help_text="Is this a Post-Dated Cheque?")
+    cheque_bank = models.CharField(max_length=100, blank=True, null=True)
+    cheque_no = models.CharField(max_length=50, blank=True, null=True)
+    cheque_date = models.DateField(blank=True, null=True)
+    PDC_STATUS_CHOICES = (
+        ('Pending Clearance', 'Pending Clearance'),
+        ('Cleared', 'Cleared'),
+        ('Bounced', 'Bounced'),
+        ('Cancelled', 'Cancelled'),
+    )
+    pdc_status = models.CharField(max_length=20, choices=PDC_STATUS_CHOICES, default='Cleared', blank=True, null=True)
+    reference_no = models.CharField(max_length=100, blank=True, null=True)
+    narration = models.TextField(blank=True, null=True)
+
     def __str__(self):
         return f"Payment of {self.amount} for Bill #{self.purchase_bill.id}"
 
