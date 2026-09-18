@@ -1,0 +1,219 @@
+{% load static %}
+<style>
+.bm-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.60);
+    z-index: 9990;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    backdrop-filter: blur(2px);
+}
+.bm-overlay.open { display: flex; }
+.bm-dialog {
+    background: #fff;
+    border-radius: 14px;
+    width: 480px;
+    max-width: 100%;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+    animation: bmSlideIn .22s cubic-bezier(.4,0,.2,1);
+    overflow: hidden;
+}
+@keyframes bmSlideIn {
+    from { opacity: 0; transform: translateY(-18px) scale(.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.bm-header {
+    background: linear-gradient(135deg, #1e40af 0%, #2563eb 60%, #3b82f6 100%);
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.bm-header-left { display: flex; align-items: center; gap: 12px; }
+.bm-header-icon {
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+}
+.bm-header-icon i { color: white; font-size: 18px; }
+.bm-header-text h3 { margin: 0; font-size: 16px; font-weight: 700; color: white; }
+.bm-header-text p  { margin: 2px 0 0; font-size: 11.5px; color: rgba(255,255,255,0.72); }
+.bm-close-btn {
+    width: 30px; height: 30px;
+    background: rgba(255,255,255,0.15);
+    border: none; border-radius: 8px;
+    cursor: pointer; color: white; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+}
+.bm-close-btn:hover { background: rgba(255,255,255,0.3); }
+
+.bm-body { padding: 20px 24px; }
+.bm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.bm-field-full { grid-column: 1 / -1; }
+.bm-field label {
+    display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 5px;
+}
+.bm-field label span { color: #ef4444; }
+.bm-field input {
+    width: 100%; height: 38px; padding: 0 12px;
+    border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; color: #0f172a;
+    outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.bm-field input:focus {
+    border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+}
+
+.bm-footer {
+    padding: 14px 24px 18px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex; justify-content: flex-end; gap: 10px;
+}
+.bm-btn-cancel {
+    height: 38px; padding: 0 16px; border: 1px solid #cbd5e1; background: white;
+    border-radius: 8px; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer;
+}
+.bm-btn-save {
+    height: 38px; padding: 0 20px; border: none; background: #2563eb;
+    border-radius: 8px; font-size: 13px; font-weight: 600; color: white; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.3); transition: background .15s;
+}
+.bm-btn-save:hover { background: #1d4ed8; }
+</style>
+
+<div class="bm-overlay" id="bankAccountModal">
+    <div class="bm-dialog">
+        <div class="bm-header">
+            <div class="bm-header-left">
+                <div class="bm-header-icon"><i class="fa-solid fa-building-columns"></i></div>
+                <div class="bm-header-text">
+                    <h3>New Bank Account</h3>
+                    <p>Add a bank account for company payments & transfers</p>
+                </div>
+            </div>
+            <button type="button" class="bm-close-btn" onclick="closeBankAccountModal()">✕</button>
+        </div>
+
+        <form id="bankAccountModalForm" onsubmit="saveBankAccountFromModal(event)">
+            <div class="bm-body">
+                <div id="bmErrorMsg" style="display:none; margin-bottom:12px; padding:8px 12px; background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; border-radius:6px; font-size:12px;"></div>
+
+                <div class="bm-grid">
+                    <div class="bm-field bm-field-full">
+                        <label>Bank Name <span>*</span></label>
+                        <input type="text" id="bm_bank_name" placeholder="e.g. Nabil Bank, Everest Bank" required>
+                    </div>
+
+                    <div class="bm-field bm-field-full">
+                        <label>Account Number <span>*</span></label>
+                        <input type="text" id="bm_account_number" placeholder="e.g. 1122334455" required>
+                    </div>
+
+                    <div class="bm-field">
+                        <label>Account Name / Title</label>
+                        <input type="text" id="bm_account_name" placeholder="e.g. Operational Account">
+                    </div>
+
+                    <div class="bm-field">
+                        <label>Branch Name</label>
+                        <input type="text" id="bm_branch_name" placeholder="e.g. Kathmandu Branch">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bm-footer">
+                <button type="button" class="bm-btn-cancel" onclick="closeBankAccountModal()">Cancel</button>
+                <button type="submit" class="bm-btn-save" id="bmSaveBtn">Save Bank Account</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openBankAccountModal(prefillBankName = '') {
+    const modal = document.getElementById('bankAccountModal');
+    const form = document.getElementById('bankAccountModalForm');
+    const errBox = document.getElementById('bmErrorMsg');
+    if (form) form.reset();
+    if (errBox) errBox.style.display = 'none';
+    if (prefillBankName && document.getElementById('bm_bank_name')) {
+        document.getElementById('bm_bank_name').value = prefillBankName;
+    }
+    if (modal) modal.classList.add('open');
+}
+
+function closeBankAccountModal() {
+    const modal = document.getElementById('bankAccountModal');
+    if (modal) modal.classList.remove('open');
+}
+
+function saveBankAccountFromModal(e) {
+    e.preventDefault();
+    const bankName = document.getElementById('bm_bank_name').value.trim();
+    const accNum = document.getElementById('bm_account_number').value.trim();
+    const accName = document.getElementById('bm_account_name').value.trim();
+    const branchName = document.getElementById('bm_branch_name').value.trim();
+    const errBox = document.getElementById('bmErrorMsg');
+    const saveBtn = document.getElementById('bmSaveBtn');
+
+    if (!bankName || !accNum) {
+        if (errBox) {
+            errBox.textContent = 'Please enter both Bank Name and Account Number.';
+            errBox.style.display = 'block';
+        }
+        return;
+    }
+
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+    }
+
+    fetch("{% url 'api_bank_account_add' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            bank_name: bankName,
+            account_number: accNum,
+            account_name: accName,
+            branch_name: branchName
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Bank Account';
+        }
+        if (data.success) {
+            closeBankAccountModal();
+            if (typeof window.onBankAccountSaved === 'function') {
+                window.onBankAccountSaved(data.bank_account);
+            }
+        } else {
+            if (errBox) {
+                errBox.textContent = data.error || 'Failed to save bank account.';
+                errBox.style.display = 'block';
+            }
+        }
+    })
+    .catch(err => {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Bank Account';
+        }
+        if (errBox) {
+            errBox.textContent = 'Network error saving bank account.';
+            errBox.style.display = 'block';
+        }
+    });
+}
+</script>

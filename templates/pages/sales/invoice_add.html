@@ -210,6 +210,31 @@
         font-weight: 600;
     }
 
+    .bank-option-item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start !important;
+        gap: 10px !important;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        color: #334155;
+        transition: background 0.12s, color 0.12s;
+        margin-bottom: 2px;
+    }
+
+    .bank-option-item:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    .bank-option-item.selected {
+        background: #eff6ff;
+        color: #2563eb;
+        font-weight: 600;
+    }
+
     /* Custom Searchable Product Combobox for Items Table */
     .prod-combo-btn {
         width: 100%;
@@ -1403,13 +1428,38 @@
                                 <div
                                     style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
                                     <label style="margin:0; font-weight:600; white-space:nowrap;">Bank Account <span>*</span></label>
-                                    <select class="form-select" name="bank_account">
-                                        <option value="">Select Bank Account</option>
-                                        <option>NMB Bank - 1234567890</option>
-                                        <option>Everest Bank - 9876543210</option>
-                                        <option>Nabil Bank - 1122334455</option>
-                                        <option>Global IME - 5566778899</option>
-                                    </select>
+                                    <div style="position:relative;">
+                                        <select class="form-select" name="bank_account" id="bank_account_sel" style="display:none;">
+                                            <option value="">Select Bank Account</option>
+                                            {% for b in bank_accounts %}
+                                            <option value="{{ b.bank_name }} - {{ b.account_number }}">{{ b.bank_name }} - {{ b.account_number }}</option>
+                                            {% empty %}
+                                            <option value="NMB Bank - 1234567890">NMB Bank - 1234567890</option>
+                                            <option value="Everest Bank - 9876543210">Everest Bank - 9876543210</option>
+                                            <option value="Nabil Bank - 1122334455">Nabil Bank - 1122334455</option>
+                                            <option value="Global IME - 5566778899">Global IME - 5566778899</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="bank-combo-wrapper" style="position:relative;">
+                                            <div class="form-control d-flex align-items-center justify-content-between" id="bank_combo_trigger" onclick="toggleBankComboboxMenu(event)" style="cursor:pointer; background:#fff; height:38px;">
+                                                <span id="bank_combo_label" style="color:#64748b; font-size:13px;"><i class="fa-solid fa-building-columns text-primary me-2"></i>Select Bank Account...</span>
+                                                <i class="fa-solid fa-chevron-down text-muted" style="font-size:11px;"></i>
+                                            </div>
+                                            <div class="bank-combo-menu shadow-lg" id="bank_combo_menu" style="display:none; position:absolute; top:calc(100% + 4px); left:0; right:0; background:#fff; border:1px solid #cbd5e1; border-radius:10px; z-index:99999; padding:8px; box-shadow:0 10px 25px rgba(0,0,0,0.15);">
+                                                <div style="position:relative; margin-bottom:6px;">
+                                                    <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:12px;"></i>
+                                                    <input type="text" id="bank_combo_search" placeholder="Search Bank Account..." oninput="filterBankOptions(this.value)" style="width:100%; height:34px; padding-left:32px; padding-right:10px; border:1px solid #e2e8f0; border-radius:6px; font-size:12px; outline:none;" onclick="event.stopPropagation()">
+                                                </div>
+                                                <div id="bank_combo_list" style="max-height:180px; overflow-y:auto;"></div>
+                                                <div id="bank_combo_empty" style="display:none; padding:10px; text-align:center; color:#64748b; font-size:12px;">No bank account found</div>
+                                                <div style="border-top:1px solid #f1f5f9; margin-top:6px; padding-top:6px;">
+                                                    <button type="button" class="btn btn-sm btn-light w-100 text-primary fw-semibold d-flex align-items-center justify-content-center gap-1" onclick="event.stopPropagation(); openBankAccountModal();" style="font-size:12px;">
+                                                        <i class="fa-solid fa-plus-circle"></i> Add New Bank Account
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div
                                     style="display:grid; grid-template-columns:160px 1fr; align-items:center; gap:12px;">
@@ -1905,6 +1955,10 @@
     <!-- ======================== Quick Add Product Modal ======================== -->
     {% include "includes/product_modal.html" %}
     <!-- ======================== End Quick Add Product Modal ======================== -->
+
+    <!-- ======================== Quick Add Bank Account Modal ======================== -->
+    {% include "includes/bank_account_modal.html" %}
+    <!-- ======================== End Quick Add Bank Account Modal ======================== -->
 
     <!-- ======================== Global Searchable Product Combobox Menu ======================== -->
     <div id="prod_combo_menu" class="prod-combo-menu">
@@ -3176,6 +3230,130 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         initCustCombobox();
+        initBankCombobox();
+    });
+
+    // =============================================
+    // SEARCHABLE BANK ACCOUNT COMBOBOX
+    // =============================================
+    let bankOptionsData = [];
+
+    function initBankCombobox() {
+        const select = document.getElementById('bank_account_sel');
+        if (!select) return;
+        bankOptionsData = [];
+        Array.from(select.options).forEach(opt => {
+            if (opt.value) {
+                bankOptionsData.push({
+                    id: String(opt.value),
+                    name: opt.textContent,
+                });
+            }
+        });
+        renderBankOptions(bankOptionsData);
+        syncBankComboboxValue();
+    }
+
+    function renderBankOptions(list) {
+        const container = document.getElementById('bank_combo_list');
+        const emptyState = document.getElementById('bank_combo_empty');
+        if (!container) return;
+
+        const selectElem = document.getElementById('bank_account_sel');
+        const currentVal = selectElem ? selectElem.value : '';
+
+        if (list.length === 0) {
+            container.innerHTML = '';
+            if (emptyState) emptyState.style.display = 'block';
+            return;
+        }
+        if (emptyState) emptyState.style.display = 'none';
+
+        let html = '';
+        list.forEach(item => {
+            const isSelected = item.id === String(currentVal);
+            const safeName = item.name.replace(/'/g, "\\'");
+
+            html += `
+            <div class="bank-option-item ${isSelected ? 'selected' : ''}" onmousedown="event.preventDefault(); selectBankFromCombobox('${item.id}', '${safeName}');">
+                <div style="width:26px; height:26px; background:${isSelected ? '#2563eb' : '#eff6ff'}; color:${isSelected ? 'white' : '#2563eb'}; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0;">
+                    <i class="fa-solid fa-building-columns"></i>
+                </div>
+                <div style="font-weight:${isSelected ? '600' : '500'}; color:${isSelected ? '#2563eb' : '#1e293b'}; font-size:12.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</div>
+            </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function toggleBankComboboxMenu(e) {
+        if (e) e.stopPropagation();
+        const menu = document.getElementById('bank_combo_menu');
+        if (!menu) return;
+        const isOpen = menu.style.display === 'block';
+        menu.style.display = isOpen ? 'none' : 'block';
+        if (!isOpen) {
+            const searchInput = document.getElementById('bank_combo_search');
+            if (searchInput) {
+                searchInput.value = '';
+                filterBankOptions('');
+                setTimeout(() => searchInput.focus(), 50);
+            }
+        }
+    }
+
+    function filterBankOptions(query) {
+        const q = (query || '').toLowerCase().trim();
+        if (!q) {
+            renderBankOptions(bankOptionsData);
+            return;
+        }
+        const filtered = bankOptionsData.filter(item => item.name.toLowerCase().includes(q));
+        renderBankOptions(filtered);
+    }
+
+    function selectBankFromCombobox(val, name) {
+        const selectElem = document.getElementById('bank_account_sel');
+        if (selectElem) {
+            selectElem.value = val;
+            selectElem.dispatchEvent(new Event('change'));
+        }
+        syncBankComboboxValue();
+        const menu = document.getElementById('bank_combo_menu');
+        if (menu) menu.style.display = 'none';
+    }
+
+    function syncBankComboboxValue() {
+        const selectElem = document.getElementById('bank_account_sel');
+        const labelElem = document.getElementById('bank_combo_label');
+        if (!selectElem || !labelElem) return;
+
+        const selectedOpt = selectElem.options[selectElem.selectedIndex];
+        if (selectedOpt && selectedOpt.value) {
+            labelElem.innerHTML = `<i class="fa-solid fa-building-columns text-primary me-2"></i><strong style="color:#0f172a;">${selectedOpt.textContent}</strong>`;
+        } else {
+            labelElem.innerHTML = `<i class="fa-solid fa-building-columns text-primary me-2"></i>Select Bank Account...`;
+        }
+    }
+
+    window.onBankAccountSaved = function(bankAcc) {
+        const selectElem = document.getElementById('bank_account_sel');
+        if (selectElem) {
+            const displayName = bankAcc.display_name;
+            const newOpt = new Option(displayName, displayName, true, true);
+            selectElem.add(newOpt);
+            initBankCombobox();
+            selectBankFromCombobox(displayName, displayName);
+        }
+    };
+
+    document.addEventListener('click', (e) => {
+        const bankMenu = document.getElementById('bank_combo_menu');
+        const bankTrigger = document.getElementById('bank_combo_trigger');
+        if (bankMenu && !bankMenu.contains(e.target) && bankTrigger && !bankTrigger.contains(e.target)) {
+            bankMenu.style.display = 'none';
+        }
     });
 
     // ── Dynamic Split-Screen Bill Attachment Viewer Engine (Multi-file) ──

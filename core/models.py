@@ -902,3 +902,22 @@ class PageVideoTutorial(models.Model):
             video_id = match.group(1)
             return f"https://www.youtube.com/embed/{video_id}"
         return url
+
+
+class BankAccount(models.Model):
+    bank_name = models.CharField(max_length=150)
+    account_name = models.CharField(max_length=150, blank=True, null=True)
+    account_number = models.CharField(max_length=100)
+    branch_name = models.CharField(max_length=150, blank=True, null=True)
+    swift_code = models.CharField(max_length=50, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['bank_name', 'account_number']
+
+    def __str__(self):
+        if self.account_number:
+            return f"{self.bank_name} - {self.account_number}"
+        return self.bank_name
+

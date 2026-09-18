@@ -15,7 +15,7 @@ from .models import (
     SupplierPayment, SalesReturn, SalesReturnItem, UserProfile,
     ContactPerson, Quotation, QuotationItem, ReceiptDocument,
     SalesOrder, SalesOrderItem, PageHelpGuide, PageNote, PageVideoTutorial,
-    BillAttachment
+    BillAttachment, BankAccount
 )
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -24,6 +24,57 @@ from .forms import ProductForm, ProductCategoryForm, ContactForm, ExpenseForm, E
 
 class HomeView(TemplateView):
     template_name = "pages/home.html"
+
+
+def get_bank_accounts():
+    accounts = BankAccount.objects.filter(is_active=True)
+    if not accounts.exists():
+        default_banks = [
+            {'bank_name': 'NMB Bank', 'account_number': '1234567890'},
+            {'bank_name': 'Everest Bank', 'account_number': '9876543210'},
+            {'bank_name': 'Nabil Bank', 'account_number': '1122334455'},
+            {'bank_name': 'Global IME', 'account_number': '5566778899'},
+        ]
+        for b in default_banks:
+            BankAccount.objects.create(**b)
+        accounts = BankAccount.objects.filter(is_active=True)
+    return accounts
+
+
+class QuickAddBankAccountView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            bank_name = data.get('bank_name', '').strip()
+            account_number = data.get('account_number', '').strip()
+            account_name = data.get('account_name', '').strip()
+            branch_name = data.get('branch_name', '').strip()
+
+            if not bank_name or not account_number:
+                return JsonResponse({'success': False, 'error': 'Bank Name and Account Number are required.'})
+
+            bank_acc, created = BankAccount.objects.get_or_create(
+                bank_name=bank_name,
+                account_number=account_number,
+                defaults={
+                    'account_name': account_name,
+                    'branch_name': branch_name,
+                }
+            )
+
+            display_str = str(bank_acc)
+            return JsonResponse({
+                'success': True,
+                'bank_account': {
+                    'id': bank_acc.id,
+                    'bank_name': bank_acc.bank_name,
+                    'account_number': bank_acc.account_number,
+                    'account_name': bank_acc.account_name or '',
+                    'display_name': display_str
+                }
+            })
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
 
 
 class SalesView(TemplateView):
@@ -483,10 +534,13 @@ class InvoiceAddView(View):
             except SalesOrder.DoesNotExist:
                 pass
 
+        bank_accounts = get_bank_accounts()
+
         context = {
             'customers': customers,
             'products': products,
             'products_json': json.dumps(product_list, cls=DjangoJSONEncoder),
+            'bank_accounts': bank_accounts,
             'today': today,
             'preloaded_doc': preloaded_doc,
             'prefill_invoice_json': json.dumps(prefill_invoice, cls=DjangoJSONEncoder) if prefill_invoice else 'null',

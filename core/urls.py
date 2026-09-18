@@ -58,6 +58,7 @@ from .views import (
     ProjectCreateAPIView,
     ClearPDCView,
     BouncePDCView,
+    QuickAddBankAccountView,
 )
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
@@ -67,6 +68,7 @@ urlpatterns = [
     path("api/customers/<int:pk>/", CustomerDetailAPIView.as_view(), name="api_customer_detail"),
     path("api/customers/add/", CustomerAddAPIView.as_view(), name="api_customer_add"),
     path("api/products/add/", ProductAddAPIView.as_view(), name="api_product_add"),
+    path("api/bank-account/add/", QuickAddBankAccountView.as_view(), name="api_bank_account_add"),
     path("sales/customers/add/", CustomerAddView.as_view(), name="customer_add"),
     # Projects
     path("sales/projects/", ProjectListView.as_view(), name="projects"),
