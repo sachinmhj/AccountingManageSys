@@ -27,11 +27,15 @@
 
     <div class="app-layout">
         <div class="sidebar-header">
-            ERP System
+            <span>ERP System</span>
+            <button type="button" class="sidebar-collapse-btn d-none d-md-flex" onclick="toggleSidebar()" title="Collapse Sidebar">
+                <i class='bx bx-chevron-left'></i>
+            </button>
         </div>
 
         {% include 'includes/navbar.html' %}
         {% include 'includes/sidebar.html' %}
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
         <main class="main-content">
             {% block content %}{% endblock %}

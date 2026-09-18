@@ -12,22 +12,26 @@
 }
 
 .mobile-menu-btn{
-    display:none;
+    display:flex;
     width:36px;
     height:36px;
     align-items:center;
     justify-content:center;
     padding:0;
-    border:none;
-    background:transparent;
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:6px;
+    background:rgba(255,255,255,0.08);
     color:#fff;
-    font-size:24px;
+    font-size:22px;
     cursor:pointer;
     flex-shrink:0;
+    transition:all 0.2s ease;
 }
 
 .mobile-menu-btn:hover{
-    color:#22c55e;
+    background:rgba(255,255,255,0.2);
+    color:#38bdf8;
+    border-color:rgba(255,255,255,0.3);
 }
 
 .search-box{

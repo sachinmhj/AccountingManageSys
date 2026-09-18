@@ -569,8 +569,9 @@
     }
 
     .invoice-viewer-col {
-        width: 44%;
-        max-width: 650px;
+        width: 480px;
+        flex: 0 0 480px;
+        max-width: 480px;
         flex-shrink: 0;
         height: calc(100vh - 120px);
         position: relative;
@@ -3343,11 +3344,20 @@
             if (fbBtn) fbBtn.href = objectUrl;
         }
 
+        function minimizeSidebarForAttachment() {
+            const appLayout = document.querySelector('.app-layout');
+            if (appLayout && window.innerWidth > 767) {
+                appLayout.classList.add('sidebar-closed');
+                localStorage.setItem("sidebarState", "closed");
+            }
+        }
+
         if (viewerCol) {
             viewerCol.style.display = 'flex';
             const ws = document.getElementById('invoiceWorkspace');
             if (ws) ws.classList.add('split-view-active');
             document.querySelectorAll('.panel-responsive-scroll').forEach(el => el.scrollLeft = 0);
+            minimizeSidebarForAttachment();
         }
     }
 
@@ -3382,6 +3392,7 @@
             if (ws) ws.classList.add('split-view-active');
             // Ensure scrollLeft = 0 so left column fields (Customer, etc.) are never hidden
             document.querySelectorAll('.panel-responsive-scroll').forEach(el => el.scrollLeft = 0);
+            minimizeSidebarForAttachment();
             if (selectedBillFiles.length > 0) {
                 previewAttachmentAtIndex(currentViewerIndex);
             }
@@ -3960,6 +3971,9 @@
         if (viewerCol) viewerCol.style.display = 'flex';
         const ws = document.getElementById('invoiceWorkspace');
         if (ws) ws.classList.add('split-view-active');
+        if (typeof minimizeSidebarForAttachment === 'function') {
+            minimizeSidebarForAttachment();
+        }
     });
     {% endif %}
     // ── Pre-fill from Quotation or Sales Order ──────────────────────────────────────
