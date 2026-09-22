@@ -1610,7 +1610,15 @@ class CustomerInvoicesJsonView(View):
             if product_ids:
                 items_qs = items_qs.filter(product_id__in=product_ids)
 
-            items_count = items_qs.count()
+            items_list = []
+            for item in items_qs:
+                items_list.append({
+                    'product_id': item.product_id,
+                    'product_name': item.product.name,
+                    'unit_price': str(item.unit_price),
+                    'quantity': str(item.quantity),
+                    'unit': item.unit,
+                })
 
             data.append({
                 'id': inv.id,
@@ -1621,7 +1629,8 @@ class CustomerInvoicesJsonView(View):
                 'total_amount': str(inv.total_amount),
                 'paid_amount': str(inv.paid_amount),
                 'balance_due': str(inv.balance_due),
-                'items_count': items_count,
+                'items_count': len(items_list),
+                'items': items_list,
             })
 
         return JsonResponse({'invoices': data})

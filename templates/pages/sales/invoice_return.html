@@ -22,6 +22,55 @@
         font-size: 13px;
     }
 
+    /* Custom Searchable Combobox Styling (Tigg Style) */
+    .cust-combo-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .cust-combo-menu {
+        display: none;
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        z-index: 1050;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+        animation: comboMenuFade 0.15s ease-out;
+    }
+
+    @keyframes comboMenuFade {
+        from { opacity: 0; transform: translateY(-4px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .combo-option-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        border-bottom: 1px solid #f8fafc;
+        cursor: pointer;
+        font-size: 12.5px;
+        color: #334155;
+        transition: background 0.12s, color 0.12s;
+    }
+
+    .combo-option-item:hover {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    .combo-option-item.selected {
+        background: #dbeafe;
+        color: #1d4ed8;
+        font-weight: 600;
+    }
+
     .sr-page {
         margin: 20px;
         padding-bottom: 40px;
@@ -263,13 +312,55 @@
             <div class="grid-4">
                 <div>
                     <label>Customer <span>*</span></label>
-                    <select class="form-select" name="customer" id="return_customer" onchange="onCustomerChange()"
-                        required>
-                        <option value="">Select Customer</option>
-                        {% for c in customers %}
-                        <option value="{{ c.id }}">{{ c.name }}</option>
-                        {% endfor %}
-                    </select>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <div class="cust-combo-wrapper" id="cust_combo_container" style="position:relative; flex:1;">
+                            <select name="customer" id="return_customer" style="display:none;" required>
+                                <option value="">Select Customer...</option>
+                                {% for c in customers %}
+                                <option value="{{ c.id }}">{{ c.name }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <div style="position:relative; width:100%;">
+                                <input type="text" id="cust_combo_input" class="form-control"
+                                    placeholder="Select Customer..." autocomplete="off"
+                                    onfocus="openCustMenuFocus()" onclick="openCustMenuFocus()"
+                                    oninput="onCustInput(this.value)"
+                                    style="height:36px; padding-right:32px; font-weight:500; cursor:text; background:#ffffff;">
+                                <i class="fa-solid fa-magnifying-glass" id="cust_combo_icon"
+                                    style="position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:12px; pointer-events:none;"></i>
+                            </div>
+
+                            <div id="cust_combo_menu" class="cust-combo-menu">
+                                <div id="cust_combo_list" style="max-height:220px; overflow-y:auto;">
+                                    {% for c in customers %}
+                                    <div class="combo-option-item" data-id="{{ c.id }}" data-name="{{ c.name }}"
+                                        onclick="selectCustomerOption('{{ c.id }}', '{{ c.name|escapejs }}')">
+                                        <div style="display:flex; align-items:center; gap:9px;">
+                                            <div style="width:26px; height:26px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:11px;">
+                                                <i class="fa-solid fa-user"></i>
+                                            </div>
+                                            <div>
+                                                <div style="font-weight:600; color:#1e293b;">{{ c.name }}</div>
+                                                {% if c.mobile or c.pan_vat_number %}
+                                                <div style="font-size:11px; color:#64748b;">
+                                                    {% if c.mobile %}<i class="fa-solid fa-phone me-1"></i>{{ c.mobile }}{% endif %}
+                                                    {% if c.mobile and c.pan_vat_number %} | {% endif %}
+                                                    {% if c.pan_vat_number %}PAN: {{ c.pan_vat_number }}{% endif %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <div id="cust_combo_empty" style="display:none; padding:14px; text-align:center; color:#94a3b8; font-size:12px;">
+                                    <i class="fa-solid fa-user-slash" style="font-size:18px; margin-bottom:4px; display:block; opacity:0.5;"></i>
+                                    No matching customers found.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label>Return Date <span>*</span></label>
@@ -297,12 +388,31 @@
 
                 <div>
                     <label>Original Invoice (Optional)</label>
-                    <select class="form-select" name="original_invoice">
-                        <option value="">Select Invoice (if applicable)</option>
-                        {% for inv in invoices %}
-                        <option value="{{ inv.id }}">{{ inv.invoice_number }} — {{ inv.customer.name }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="cust-combo-wrapper" id="inv_combo_container" style="position:relative; flex:1;">
+                        <select name="original_invoice" id="return_invoice" style="display:none;">
+                            <option value="">Select Invoice (if applicable)</option>
+                        </select>
+
+                        <div style="position:relative; width:100%;">
+                            <input type="text" id="inv_combo_input" class="form-control"
+                                placeholder="Select customer first..." autocomplete="off" disabled
+                                onfocus="openInvMenuFocus()" onclick="openInvMenuFocus()"
+                                oninput="onInvInput(this.value)"
+                                style="height:36px; padding-right:32px; font-weight:500; cursor:not-allowed; background:#f1f5f9;">
+                            <i class="fa-solid fa-lock" id="inv_combo_icon"
+                                style="position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:12px; pointer-events:none;"></i>
+                        </div>
+
+                        <div id="inv_combo_menu" class="cust-combo-menu">
+                            <div id="inv_combo_list" style="max-height:220px; overflow-y:auto;">
+                                <!-- Dynamically populated when customer is selected -->
+                            </div>
+                            <div id="inv_combo_empty" style="display:none; padding:14px; text-align:center; color:#94a3b8; font-size:12px;">
+                                <i class="fa-solid fa-file-circle-xmark" style="font-size:18px; margin-bottom:4px; display:block; opacity:0.5;"></i>
+                                No matching invoices found.
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label>Refund Method <span>*</span></label>
@@ -431,6 +541,7 @@
                     <tr>
                         <th>Invoice No.</th>
                         <th>Date</th>
+                        <th>Items &amp; Sold Price</th>
                         <th style="text-align:right">Total</th>
                         <th style="text-align:right">Paid</th>
                         <th style="text-align:right">Due</th>
@@ -504,16 +615,30 @@
         const tbody = document.getElementById("returnItemsBody");
         const tr = document.createElement("tr");
 
-        let productOptions = '<option value="">Select Product...</option>';
-        returnProducts.forEach(p => {
-            productOptions += `<option value="${p.id}">${p.code ? p.code + ' - ' : ''}${p.name}</option>`;
-        });
-
         tr.innerHTML = `
             <td>
-                <select class="form-select row-product" name="product_id[]" onchange="returnProductSelected(this); refreshInvoices();" required>
-                    ${productOptions}
+                <select class="row-product-select" name="product_id[]" style="display:none;" required>
+                    <option value="">Select Product...</option>
                 </select>
+
+                <div class="cust-combo-wrapper row-prod-wrapper" style="position:relative; width:100%;">
+                    <div style="position:relative; width:100%;">
+                        <input type="text" class="form-control row-prod-input"
+                            placeholder="Select Product..." autocomplete="off"
+                            onfocus="openRowProdMenuFocus(this)" onclick="openRowProdMenuFocus(this)"
+                            oninput="onRowProdInput(this)"
+                            style="height:32px; padding-right:28px; font-size:12px; font-weight:500; cursor:text; background:#ffffff;">
+                        <i class="fa-solid fa-magnifying-glass"
+                            style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:11px; pointer-events:none;"></i>
+                    </div>
+
+                    <div class="cust-combo-menu row-prod-menu" style="z-index:1060;">
+                        <div class="row-prod-list" style="max-height:180px; overflow-y:auto;"></div>
+                        <div class="row-prod-empty" style="display:none; padding:10px; text-align:center; color:#94a3b8; font-size:11.5px;">
+                            No matching products found.
+                        </div>
+                    </div>
+                </div>
             </td>
             <td><input type="number" step="0.01" class="row-qty" name="returned_qty[]" value="1" oninput="calcReturnRow(this)" min="0.01" required></td>
             <td>
@@ -542,7 +667,116 @@
             </td>
         `;
         tbody.appendChild(tr);
+        renderRowProdMenu(tr);
         calcReturnTotals();
+    }
+
+    function renderRowProdMenu(tr) {
+        const list = tr.querySelector('.row-prod-list');
+        if (!list) return;
+        list.innerHTML = '';
+        returnProducts.forEach(p => {
+            const item = document.createElement('div');
+            item.className = 'combo-option-item';
+            item.dataset.id = p.id;
+            item.dataset.name = p.name;
+            item.dataset.code = p.code || '';
+            item.onclick = function() {
+                selectRowProduct(tr, p);
+            };
+            const codeStr = p.code ? `<span style="font-size:10.5px; color:#64748b; font-weight:600; background:#f1f5f9; padding:1px 5px; border-radius:4px; margin-right:6px;">${p.code}</span>` : '';
+            item.innerHTML = `
+                <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                    <div>
+                        ${codeStr}<span style="font-weight:600; color:#1e293b;">${p.name}</span>
+                    </div>
+                    <span style="font-size:11px; font-weight:600; color:#2563eb; background:#eff6ff; padding:2px 6px; border-radius:4px;">Rs. ${parseFloat(p.selling_price).toFixed(2)}</span>
+                </div>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    function _openRowProdMenuCore(input, selectAll) {
+        const tr = input.closest('tr');
+        const menu = tr.querySelector('.row-prod-menu');
+        if (!menu) return;
+
+        document.querySelectorAll('.row-prod-menu').forEach(m => {
+            if (m !== menu) m.style.display = 'none';
+        });
+
+        menu.style.display = 'block';
+
+        const currentVal = input.value.trim();
+        const sel = tr.querySelector('.row-product-select');
+        const selectedId = sel ? sel.value : '';
+
+        if (selectedId || currentVal) {
+            filterRowProdList(tr, '');
+        } else {
+            filterRowProdList(tr, currentVal);
+        }
+
+        tr.querySelectorAll('.row-prod-list .combo-option-item').forEach(item => {
+            item.classList.toggle('selected', item.dataset.id === selectedId);
+        });
+
+        if (selectAll) input.select();
+    }
+
+    // Called on focus/click — selects all text so user can type immediately
+    function openRowProdMenuFocus(input) { _openRowProdMenuCore(input, true); }
+    // Called programmatically / during typing — does NOT select text
+    function openRowProdMenu(input) { _openRowProdMenuCore(input, false); }
+
+    function onRowProdInput(input) {
+        const tr = input.closest('tr');
+        openRowProdMenu(input);
+        filterRowProdList(tr, input.value);
+
+        if (!input.value.trim()) {
+            const sel = tr.querySelector('.row-product-select');
+            if (sel.value) {
+                sel.value = '';
+                tr.querySelector('.row-rate').value = '0.00';
+                calcReturnRow(input);
+                refreshInvoices();
+            }
+        }
+    }
+
+    function filterRowProdList(tr, query) {
+        const q = (query || '').toLowerCase().trim();
+        let matchCount = 0;
+        tr.querySelectorAll('.row-prod-list .combo-option-item').forEach(item => {
+            const name = (item.dataset.name || '').toLowerCase();
+            const code = (item.dataset.code || '').toLowerCase();
+            if (!q || name.includes(q) || code.includes(q)) {
+                item.style.display = 'flex';
+                matchCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        const emptyEl = tr.querySelector('.row-prod-empty');
+        if (emptyEl) emptyEl.style.display = matchCount === 0 ? 'block' : 'none';
+    }
+
+    function selectRowProduct(tr, product) {
+        const sel = tr.querySelector('.row-product-select');
+        const input = tr.querySelector('.row-prod-input');
+        const menu = tr.querySelector('.row-prod-menu');
+
+        sel.value = product.id;
+        const codePrefix = product.code ? product.code + ' - ' : '';
+        input.value = codePrefix + product.name;
+        if (menu) menu.style.display = 'none';
+
+        tr.querySelector(".row-rate").value = product.selling_price;
+        tr.querySelector(".row-unit").value = product.unit || 'Pcs';
+        calcReturnRow(input);
+        refreshInvoices();
     }
 
     function removeReturnRow(btn) {
@@ -607,28 +841,210 @@
         if (document.getElementById("lbl_total")) document.getElementById("lbl_total").textContent = returnGrandTotal.toFixed(2);
     }
 
+    /* ── Direct Inline Input Combobox Functions (Tigg Style) ────────── */
+    function _openCustMenuCore(selectAll) {
+        const menu = document.getElementById('cust_combo_menu');
+        const input = document.getElementById('cust_combo_input');
+        if (!menu || !input) return;
+
+        menu.style.display = 'block';
+
+        const currentVal = input.value.trim();
+        const sel = document.getElementById('return_customer');
+        const selectedOpt = sel && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null;
+        const selectedName = selectedOpt && selectedOpt.value ? selectedOpt.textContent.trim() : '';
+
+        if (currentVal && (currentVal === selectedName || sel.value)) {
+            filterCustList('');
+        } else {
+            filterCustList(currentVal);
+        }
+
+        const selectedId = sel ? sel.value : '';
+        document.querySelectorAll('#cust_combo_list .combo-option-item').forEach(item => {
+            item.classList.toggle('selected', item.dataset.id === selectedId);
+        });
+
+        if (selectAll) input.select();
+    }
+
+    // Called on focus/click — selects all text so user can type to filter immediately
+    function openCustMenuFocus() { _openCustMenuCore(true); }
+    // Called programmatically during typing — does NOT select text
+    function openCustMenu() { _openCustMenuCore(false); }
+
+    function onCustInput(val) {
+        openCustMenu();
+        filterCustList(val);
+        if (!val.trim()) {
+            const sel = document.getElementById('return_customer');
+            if (sel.value) {
+                sel.value = '';
+                onCustomerChange();
+            }
+        }
+    }
+
+    function filterCustList(query) {
+        const q = (query || '').toLowerCase().trim();
+        let matchCount = 0;
+        document.querySelectorAll('#cust_combo_list .combo-option-item').forEach(item => {
+            const name = (item.dataset.name || '').toLowerCase();
+            if (!q || name.includes(q)) {
+                item.style.display = 'flex';
+                matchCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        document.getElementById('cust_combo_empty').style.display = matchCount === 0 ? 'block' : 'none';
+    }
+
+    function selectCustomerOption(id, name) {
+        document.getElementById('return_customer').value = id;
+        document.getElementById('cust_combo_input').value = name;
+        document.getElementById('cust_combo_menu').style.display = 'none';
+
+        document.querySelectorAll('#cust_combo_list .combo-option-item').forEach(item => {
+            item.classList.toggle('selected', item.dataset.id === id);
+        });
+
+        onCustomerChange();
+    }
+
+    function _openInvMenuCore(selectAll) {
+        const custId = document.getElementById('return_customer').value;
+        if (!custId) {
+            alert('Please select a Customer first to view their invoices.');
+            return;
+        }
+
+        const menu = document.getElementById('inv_combo_menu');
+        const input = document.getElementById('inv_combo_input');
+        if (!menu || !input) return;
+
+        menu.style.display = 'block';
+
+        const currentVal = input.value.trim();
+        const sel = document.getElementById('return_invoice');
+        const selectedId = sel ? sel.value : '';
+
+        if (selectedId || currentVal) {
+            filterInvList('');
+        } else {
+            filterInvList(currentVal);
+        }
+
+        document.querySelectorAll('#inv_combo_list .combo-option-item').forEach(item => {
+            item.classList.toggle('selected', item.dataset.id === selectedId);
+        });
+
+        if (selectAll) input.select();
+    }
+
+    // Called on focus/click — selects all text so user can retype to filter
+    function openInvMenuFocus() { _openInvMenuCore(true); }
+    // Called programmatically (not from user typing) — does NOT select text
+    function openInvMenu() { _openInvMenuCore(false); }
+
+    function onInvInput(val) {
+        const custId = document.getElementById('return_customer').value;
+        if (!custId) return;
+
+        const menu = document.getElementById('inv_combo_menu');
+        if (menu) menu.style.display = 'block';
+
+        filterInvList(val);
+        if (!val.trim()) {
+            document.getElementById('return_invoice').value = '';
+        }
+    }
+
+    function filterInvList(query) {
+        const q = (query || '').toLowerCase().trim();
+        let matchCount = 0;
+        document.querySelectorAll('#inv_combo_list .combo-option-item').forEach(item => {
+            const text = item.textContent.toLowerCase();
+            if (!q || text.includes(q)) {
+                item.style.display = 'flex';
+                matchCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        const emptyEl = document.getElementById('inv_combo_empty');
+        if (emptyEl) emptyEl.style.display = matchCount === 0 ? 'block' : 'none';
+    }
+
+    function selectInvoiceOption(id, invNumber) {
+        document.getElementById('return_invoice').value = id;
+        document.getElementById('inv_combo_input').value = invNumber;
+        document.getElementById('inv_combo_menu').style.display = 'none';
+
+        document.querySelectorAll('#inv_combo_list .combo-option-item').forEach(item => {
+            item.classList.toggle('selected', item.dataset.id === id);
+        });
+    }
+
+    // Global Click Handler to close dropdown menus when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('#cust_combo_container') && !e.target.closest('#cust_combo_menu')) {
+            const menu = document.getElementById('cust_combo_menu');
+            if (menu) menu.style.display = 'none';
+        }
+        if (!e.target.closest('#inv_combo_container') && !e.target.closest('#inv_combo_menu')) {
+            const menu = document.getElementById('inv_combo_menu');
+            if (menu) menu.style.display = 'none';
+        }
+        if (!e.target.closest('.row-prod-wrapper') && !e.target.closest('.row-prod-menu')) {
+            document.querySelectorAll('.row-prod-menu').forEach(m => m.style.display = 'none');
+        }
+    });
+
     /* ── Customer Invoices Panel ─────────────────────────────────── */
     let _lastCustomerId = null;
-    let _allInvoicesCache = []; // all invoices for current customer
+    let _allInvoicesCache = [];
 
     function onCustomerChange() {
         const customerId = document.getElementById('return_customer').value;
         _lastCustomerId = customerId || null;
         _allInvoicesCache = [];
 
+        // Reset Invoice Input & Selection
+        document.getElementById('return_invoice').value = '';
+        const invInput = document.getElementById('inv_combo_input');
+        const invIcon = document.getElementById('inv_combo_icon');
+        const invList = document.getElementById('inv_combo_list');
+
         if (!customerId) {
+            invInput.disabled = true;
+            invInput.value = '';
+            invInput.placeholder = 'Select customer first...';
+            invInput.style.background = '#f1f5f9';
+            invInput.style.cursor = 'not-allowed';
+            if (invIcon) invIcon.className = 'fa-solid fa-lock';
+            invList.innerHTML = '<div style="padding:14px; text-align:center; color:#94a3b8; font-size:12px;">Select a customer above to view their invoices.</div>';
             showInvEmpty();
             return;
         }
+
+        invInput.disabled = false;
+        invInput.value = '';
+        invInput.placeholder = 'Select invoice (optional)...';
+        invInput.style.background = '#ffffff';
+        invInput.style.cursor = 'text';
+        if (invIcon) invIcon.className = 'fa-solid fa-file-invoice text-primary';
+        invList.innerHTML = '<div style="padding:14px; text-align:center; color:#94a3b8; font-size:12px;"><i class="fa-solid fa-spinner fa-spin me-2"></i>Loading invoices...</div>';
+
         loadCustomerInvoices(customerId, []);
     }
 
     function getSelectedProductIds() {
         const ids = [];
-        document.querySelectorAll('#returnItemsBody .row-product').forEach(sel => {
+        document.querySelectorAll('#returnItemsBody .row-product-select').forEach(sel => {
             if (sel.value) ids.push(parseInt(sel.value));
         });
-        return [...new Set(ids)]; // dedupe
+        return [...new Set(ids)];
     }
 
     function refreshInvoices() {
@@ -656,12 +1072,49 @@
             .then(r => r.json())
             .then(data => {
                 document.getElementById('cust_inv_loading').style.display = 'none';
-                renderInvoiceTable(data.invoices || []);
+                const invoices = data.invoices || [];
+                renderInvoiceTable(invoices);
+                populateInvoiceDropdown(invoices);
             })
             .catch(() => {
                 document.getElementById('cust_inv_loading').style.display = 'none';
                 showInvEmpty();
             });
+    }
+
+    function populateInvoiceDropdown(invoices) {
+        const invSelect = document.getElementById('return_invoice');
+        const invList = document.getElementById('inv_combo_list');
+        const invEmpty = document.getElementById('inv_combo_empty');
+
+        invSelect.innerHTML = '<option value="">Select Invoice (if applicable)</option>';
+        invList.innerHTML = '';
+
+        if (invoices.length === 0) {
+            if (invEmpty) invEmpty.style.display = 'block';
+            return;
+        }
+        if (invEmpty) invEmpty.style.display = 'none';
+
+        invoices.forEach(inv => {
+            const opt = document.createElement('option');
+            opt.value = inv.id;
+            opt.textContent = `${inv.invoice_number} — ${inv.date_display} (Rs. ${parseFloat(inv.total_amount).toFixed(2)})`;
+            invSelect.appendChild(opt);
+
+            const item = document.createElement('div');
+            item.className = 'combo-option-item';
+            item.dataset.id = inv.id;
+            item.onclick = function() { selectInvoiceOption(inv.id, `${inv.invoice_number} (${inv.date_display})`); };
+            item.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:1px;">
+                    <span style="font-weight:600; color:#1e293b;"><i class="fa-solid fa-file-invoice text-primary me-1" style="font-size:11px;"></i>${inv.invoice_number}</span>
+                    <span style="font-size:11px; color:#64748b;">${inv.date_display} • Due: Rs. ${parseFloat(inv.balance_due).toLocaleString('en-NP', {minimumFractionDigits:2})}</span>
+                </div>
+                <span class="status-badge" style="background:#eff6ff; color:#2563eb; font-size:11px; font-weight:600; border:1px solid #bfdbfe;">Rs. ${parseFloat(inv.total_amount).toLocaleString('en-NP', {minimumFractionDigits:2})}</span>
+            `;
+            invList.appendChild(item);
+        });
     }
 
     function renderInvoiceTable(invoices) {
@@ -699,10 +1152,23 @@
                 ? `<span style="color:#dc2626; font-weight:600;">Rs. ${parseFloat(inv.balance_due).toLocaleString('en-NP', { minimumFractionDigits: 2 })}</span>`
                 : `<span style="color:#16a34a;">Rs. ${parseFloat(inv.balance_due).toLocaleString('en-NP', { minimumFractionDigits: 2 })}</span>`;
 
+            let itemsHtml = '';
+            if (inv.items && inv.items.length > 0) {
+                itemsHtml = inv.items.map(it => {
+                    return `<div style="font-size:11.5px; font-weight:500; color:#1e293b; margin-bottom:2px; display:flex; align-items:center; gap:6px;">
+                        <span style="font-weight:600; color:#0f172a;">${it.product_name}</span>
+                        <span style="color:#2563eb; font-weight:700; background:#eff6ff; padding:1px 6px; border-radius:4px; border:1px solid #dbeafe;">Rs. ${parseFloat(it.unit_price).toLocaleString('en-NP', {minimumFractionDigits:2})} / ${it.unit}</span>
+                    </div>`;
+                }).join('');
+            } else {
+                itemsHtml = '<span style="color:#94a3b8; font-size:11px;">—</span>';
+            }
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td style="color:#2563eb; font-weight:500;">${inv.invoice_number}</td>
+                <td style="color:#2563eb; font-weight:600;">${inv.invoice_number}</td>
                 <td>${inv.date_display}</td>
+                <td>${itemsHtml}</td>
                 <td style="text-align:right;">Rs. ${parseFloat(inv.total_amount).toLocaleString('en-NP', { minimumFractionDigits: 2 })}</td>
                 <td style="text-align:right; color:#16a34a;">Rs. ${parseFloat(inv.paid_amount).toLocaleString('en-NP', { minimumFractionDigits: 2 })}</td>
                 <td style="text-align:right;">${dueStr}</td>

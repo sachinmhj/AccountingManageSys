@@ -548,10 +548,10 @@
                         <td>{{ item.product.name }}</td>
                         <td>{{ item.unit }}</td>
                         <td class="num">{{ item.quantity|floatformat:2 }}</td>
-                        <td class="num">{{ item.rate|floatformat:2 }}</td>
+                        <td class="num">{{ item.unit_price|floatformat:2 }}</td>
                         <td class="num">{{ item.tax_type }}</td>
-                        <td class="num">{{ item.tax_amount|floatformat:2 }}</td>
-                        <td class="num" style="font-weight:500;">{{ item.amount|floatformat:2 }}</td>
+                        <td class="num">{{ item.vat_amount|floatformat:2 }}</td>
+                        <td class="num" style="font-weight:500;">{{ item.total_price|floatformat:2 }}</td>
                     </tr>
                     {% empty %}
                     <tr>
