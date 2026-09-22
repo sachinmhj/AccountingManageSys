@@ -157,7 +157,7 @@
         background: white;
         border: 1px solid var(--border);
         border-radius: 8px;
-        overflow: hidden;
+        overflow-x: auto;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
 
@@ -168,8 +168,8 @@
 
     .sh-table th {
         background: var(--bg-light);
-        padding: 10px 12px;
-        font-size: 12px;
+        padding: 9px 8px;
+        font-size: 11.5px;
         font-weight: 600;
         color: var(--text-gray);
         border-bottom: 1px solid var(--border);
@@ -177,9 +177,36 @@
         white-space: nowrap;
     }
 
+    .sh-table th.sortable {
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.15s ease;
+    }
+
+    .sh-table th.sortable:hover {
+        background: #e2e8f0;
+        color: var(--text-dark);
+    }
+
+    .sh-table th .sort-icon {
+        font-size: 10px;
+        margin-left: 2px;
+        color: #94a3b8;
+        transition: color 0.15s ease;
+    }
+
+    .sh-table th.sortable:hover .sort-icon {
+        color: var(--primary);
+    }
+
+    .sh-table th.sort-asc .sort-icon,
+    .sh-table th.sort-desc .sort-icon {
+        color: var(--primary);
+    }
+
     .sh-table td {
-        padding: 10px 12px;
-        font-size: 13px;
+        padding: 8px 8px;
+        font-size: 12.5px;
         border-bottom: 1px solid var(--border);
         color: var(--text-dark);
         white-space: nowrap;
@@ -470,17 +497,17 @@
     <div class="sh-table-wrap">
         <table class="sh-table" id="invoiceTable">
             <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Invoice No.</th>
-                    <th>Customer</th>
-                    <th>PAN No.</th>
-                    <th style="text-align:right">Total Amount</th>
-                    <th style="text-align:right">VAT</th>
-                    <th style="text-align:right">Paid</th>
-                    <th style="text-align:right">Due</th>
-                    <th>Status</th>
-                    <th style="text-align:center;">Attachment</th>
+                <tr style="user-select: none;">
+                    <th class="sortable" onclick="sortTable('date')" data-sort="date">Date <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" onclick="sortTable('invoice')" data-sort="invoice">Invoice No. <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" onclick="sortTable('customer')" data-sort="customer">Customer <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" onclick="sortTable('pan')" data-sort="pan">PAN No. <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" style="text-align:right" onclick="sortTable('total')" data-sort="total">Total Amount <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" style="text-align:right" onclick="sortTable('vat')" data-sort="vat">VAT <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" style="text-align:right" onclick="sortTable('paid')" data-sort="paid">Paid <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" style="text-align:right" onclick="sortTable('due')" data-sort="due">Due <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" onclick="sortTable('status')" data-sort="status">Status <i class="fa-solid fa-sort sort-icon"></i></th>
+                    <th class="sortable" style="text-align:center;" onclick="sortTable('attachments')" data-sort="attachments">Attachment <i class="fa-solid fa-sort sort-icon"></i></th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -492,11 +519,11 @@
                     data-date="{{ invoice.date|date:'Y-m-d' }}" data-total="{{ invoice.total_amount|default:0 }}"
                     data-vat="{{ invoice.vat_amount|default:0 }}" data-paid="{{ invoice.paid_amount|default:0 }}"
                     data-due="{{ invoice.balance_due|default:0 }}"
+                    data-attachments="{{ invoice.all_attachments|length }}"
                     onclick="window.location.href='{% url 'invoice_detail' invoice.pk %}'">
                     <td class="col-date">
-                        <div class="ad-date-text">{{ invoice.date }}</div>
-                        <div class="bs-date-badge"
-                            style="display:none; font-size:13px; color:var(--text-dark); font-weight:400;"></div>
+                        <div class="ad-date-text" style="font-weight:500; color:var(--text-dark);">{{ invoice.date }}</div>
+                        <div class="bs-date-badge" style="font-size:11.5px; color:#64748b; font-weight:500; margin-top:2px;"></div>
                     </td>
                     <td class="col-inv" style="color:var(--primary); font-weight:500;">{{ invoice.invoice_number }}</td>
                     <td class="col-customer">{{ invoice.customer.name }}</td>
@@ -647,14 +674,6 @@
             }
         }
 
-        // Toggle date column: show AD or BS date in the table rows
-        document.querySelectorAll('#invoiceTable tbody tr.invoice-row').forEach(row => {
-            const adDiv = row.querySelector('.ad-date-text');
-            const bsDiv = row.querySelector('.bs-date-badge');
-            if (adDiv) adDiv.style.display = (mode === 'BS') ? 'none' : '';
-            if (bsDiv) bsDiv.style.display = (mode === 'BS') ? '' : 'none';
-        });
-
         applyFilters();
     }
 
@@ -671,8 +690,97 @@
 
                     const badge = row.querySelector('.bs-date-badge');
                     if (badge) {
-                        badge.textContent = bsStr;
+                        badge.textContent = `${bsStr} BS`;
                     }
+                }
+            }
+        });
+    }
+
+    let currentSortColumn = 'date';
+    let currentSortOrder = 'desc';
+
+    function sortTable(key) {
+        if (currentSortColumn === key) {
+            currentSortOrder = (currentSortOrder === 'asc') ? 'desc' : 'asc';
+        } else {
+            currentSortColumn = key;
+            if (['total', 'vat', 'paid', 'due', 'attachments'].includes(key)) {
+                currentSortOrder = 'desc';
+            } else if (key === 'date') {
+                currentSortOrder = 'desc';
+            } else {
+                currentSortOrder = 'asc';
+            }
+        }
+
+        const tbody = document.querySelector('#invoiceTable tbody');
+        if (!tbody) return;
+
+        const rows = Array.from(tbody.querySelectorAll('tr.invoice-row'));
+
+        rows.sort((a, b) => {
+            let valA, valB;
+
+            if (key === 'date') {
+                valA = a.dataset.date || '';
+                valB = b.dataset.date || '';
+                return currentSortOrder === 'asc' 
+                    ? valA.localeCompare(valB) 
+                    : valB.localeCompare(valA);
+            } else if (key === 'invoice') {
+                valA = a.dataset.invoice || '';
+                valB = b.dataset.invoice || '';
+                return currentSortOrder === 'asc' 
+                    ? valA.localeCompare(valB, undefined, { numeric: true, sensitivity: 'base' })
+                    : valB.localeCompare(valA, undefined, { numeric: true, sensitivity: 'base' });
+            } else if (key === 'customer') {
+                valA = a.dataset.customer || '';
+                valB = b.dataset.customer || '';
+                return currentSortOrder === 'asc' 
+                    ? valA.localeCompare(valB) 
+                    : valB.localeCompare(valA);
+            } else if (key === 'pan') {
+                valA = a.dataset.pan || '';
+                valB = b.dataset.pan || '';
+                return currentSortOrder === 'asc' 
+                    ? valA.localeCompare(valB) 
+                    : valB.localeCompare(valA);
+            } else if (['total', 'vat', 'paid', 'due', 'attachments'].includes(key)) {
+                valA = parseFloat(a.dataset[key]) || 0;
+                valB = parseFloat(b.dataset[key]) || 0;
+                return currentSortOrder === 'asc' ? valA - valB : valB - valA;
+            } else if (key === 'status') {
+                valA = a.dataset.status || '';
+                valB = b.dataset.status || '';
+                return currentSortOrder === 'asc' 
+                    ? valA.localeCompare(valB) 
+                    : valB.localeCompare(valA);
+            }
+            return 0;
+        });
+
+        const noInvoicesRow = document.getElementById('no_invoices_row');
+        const noFilteredRow = document.getElementById('no_filtered_row');
+
+        rows.forEach(row => tbody.appendChild(row));
+        if (noInvoicesRow) tbody.appendChild(noInvoicesRow);
+        if (noFilteredRow) tbody.appendChild(noFilteredRow);
+
+        updateSortIcons();
+    }
+
+    function updateSortIcons() {
+        document.querySelectorAll('#invoiceTable th.sortable').forEach(th => {
+            const key = th.dataset.sort;
+            const icon = th.querySelector('.sort-icon');
+            th.classList.remove('sort-asc', 'sort-desc');
+            if (icon) {
+                if (key === currentSortColumn) {
+                    th.classList.add(currentSortOrder === 'asc' ? 'sort-asc' : 'sort-desc');
+                    icon.className = `fa-solid fa-sort-${currentSortOrder === 'asc' ? 'up' : 'down'} sort-icon`;
+                } else {
+                    icon.className = 'fa-solid fa-sort sort-icon';
                 }
             }
         });
@@ -1072,6 +1180,7 @@
         attachFilterBSPicker('filter_start_date_bs', applyFilters);
         attachFilterBSPicker('filter_end_date_bs', applyFilters);
         loadCardSettings();
+        updateSortIcons();
         applyFilters();
     });
 </script>

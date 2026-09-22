@@ -758,8 +758,10 @@ class InvoiceAddView(View):
             except ValueError:
                 payment_date = invoice_date
 
+        is_pdc = (request.POST.get('is_pdc') == '1') if payment_method == 'Cheque' else False
+        pdc_status_val = 'Pending Clearance' if is_pdc else 'Cleared'
+
         if paid_amount > 0:
-            is_pdc = (request.POST.get('is_pdc') == '1') if payment_method == 'Cheque' else False
             cheque_bank = request.POST.get('cheque_bank', '') if payment_method == 'Cheque' else ''
             cheque_no = request.POST.get('cheque_no', '') if payment_method == 'Cheque' else ''
             cheque_date_raw = request.POST.get('cheque_date', '') if payment_method == 'Cheque' else ''
