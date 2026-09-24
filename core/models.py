@@ -13,6 +13,10 @@ class Contact(models.Model):
         ('Supplier', 'Supplier'),
         ('Both', 'Both'),
     )
+    CUSTOMER_CATEGORY_CHOICES = (
+        ('Regular', 'Regular'),
+        ('One-Time', 'One-Time'),
+    )
     name = models.CharField(max_length=255)
     contact_person = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
@@ -24,6 +28,14 @@ class Contact(models.Model):
     pan_type = models.CharField("PAN/VAT Type", max_length=10, choices=[('PAN', 'PAN'), ('VAT', 'VAT')], default='PAN')
     vat_registered = models.BooleanField("VAT Registered", default=False)
     contact_type = models.CharField(max_length=10, choices=CONTACT_TYPES, default='Customer')
+    customer_category = models.CharField(
+        "Customer Type",
+        max_length=20,
+        choices=CUSTOMER_CATEGORY_CHOICES,
+        default='Regular',
+        blank=True,
+        null=True,
+    )
 
     # Financial defaults for this customer
     credit_limit = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
@@ -34,6 +46,7 @@ class Contact(models.Model):
 
     def __str__(self):
         return self.name
+
 
     def outstanding_balance(self):
         """Total unpaid amount across all invoices."""

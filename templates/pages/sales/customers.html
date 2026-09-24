@@ -1059,6 +1059,13 @@
     function openModal() {
         cmOpen();
     }
+    function openEditModal() {
+        if (!currentCustomerData) {
+            alert('Please select a customer first.');
+            return;
+        }
+        cmOpenEdit(currentCustomerData);
+    }
     /* ── Floating BS Date Picker for Customer History Filter ───────── */
     function attachHistBSPicker(inputId, onChange) {
         const inp = document.getElementById(inputId);
